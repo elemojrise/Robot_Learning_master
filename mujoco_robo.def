@@ -1,0 +1,33 @@
+Bootstrap: docker
+From: nvidia/cuda:10.2-runtime-ubuntu18.04    
+
+%environment
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/.mujoco/mujoco200_linux/bin
+    export MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco200_linux/
+    export MUJOCO_PY_MJKEY_PATH=/root/.mujoco/mujoco200_linux/bin/mjkey.txt
+    export PYTHONPATH=$PYTHONPATH:./CQL/d4rl/rlkit
+
+%files
+    /home/kg/.mujoco/mujoco200_linux/bin/mjkey.txt /opt/mjkey.txt
+
+%post
+    # Run dpkg (behind other tools like apt-get) without interactive dialogue.
+    export DEBIAN_FRONTEND=noninteractive
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/.mujoco/mujoco200_linux/bin
+    export MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco200_linux/
+    export MUJOCO_PY_MJKEY_PATH=/root/.mujoco/mujoco200_linux/bin/mjkey.txt
+    export PYTHONPATH=$PYTHONPATH:./CQL/d4rl/rlkit
+    
+    apt-get -y update -q
+    apt-get -y install git ffmpeg python3-pip libgl1-mesa-dev libgl1-mesa-glx \
+        libglew-dev libosmesa6-dev software-properties-common net-tools unzip \
+        curl wget xpra xserver-xorg-dev virtualenv patchelf
+
+    python3 -m pip install -U pip
+
+    mkdir -p /root/.mujoco \
+        && wget https://www.roboti.us/download/mujoco200_linux.zip -O mujoco.zip \
+        && unzip mujoco.zip -d /root/.mujoco \
+        && rm mujoco.zip       
+
+    mv /opt/mjkey.txt /root/.mujoco/mujoco200_linux/bin/mjkey.txt
