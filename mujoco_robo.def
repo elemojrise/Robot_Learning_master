@@ -1,22 +1,18 @@
 Bootstrap: docker
-From: nvidia/cuda:10.2-runtime-ubuntu18.04    
+From: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04.1    
 
 %environment
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/.mujoco/mujoco200_linux/bin
-    export MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco200_linux/
-    export MUJOCO_PY_MJKEY_PATH=/root/.mujoco/mujoco200_linux/bin/mjkey.txt
-    export PYTHONPATH=$PYTHONPATH:./CQL/d4rl/rlkit
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/sagar/.mujoco/mujoco210/bin
+    export MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco210/
+    export MUJOCO_PY_MJKEY_PATH=/root/.mujoco/mjkey.txt
 
 %files
-    /home/kg/.mujoco/mujoco200_linux/bin/mjkey.txt /opt/mjkey.txt
+    /home/ojrise/.mujoco/mjkey.txt /opt/mjkey.txt
 
 %post
-    # Run dpkg (behind other tools like apt-get) without interactive dialogue.
-    export DEBIAN_FRONTEND=noninteractive
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/.mujoco/mujoco200_linux/bin
-    export MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco200_linux/
-    export MUJOCO_PY_MJKEY_PATH=/root/.mujoco/mujoco200_linux/bin/mjkey.txt
-    export PYTHONPATH=$PYTHONPATH:./CQL/d4rl/rlkit
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/sagar/.mujoco/mujoco210/bin
+    export MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco210/
+    export MUJOCO_PY_MJKEY_PATH=/root/.mujoco/mjkey.txt
     
     apt-get -y update -q
     apt-get -y install git ffmpeg python3-pip libgl1-mesa-dev libgl1-mesa-glx \
@@ -26,8 +22,8 @@ From: nvidia/cuda:10.2-runtime-ubuntu18.04
     python3 -m pip install -U pip
 
     mkdir -p /root/.mujoco \
-        && wget https://www.roboti.us/download/mujoco200_linux.zip -O mujoco.zip \
-        && unzip mujoco.zip -d /root/.mujoco \
-        && rm mujoco.zip       
+        && wget https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz -O mujoco.tar.gz \
+        && tar -xf mujoco.tar.gz -C /root/.mujoco \
+        && rm mujoco.tar.gz     
 
-    mv /opt/mjkey.txt /root/.mujoco/mujoco200_linux/bin/mjkey.txt
+    mv /opt/mjkey.txt /root/.mujoco/mjkey.txt
