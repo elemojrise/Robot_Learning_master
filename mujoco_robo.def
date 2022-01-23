@@ -7,17 +7,18 @@ From: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04.1
     export MUJOCO_PY_MJKEY_PATH=/root/.mujoco/mjkey.txt
 
 %files
-    /home/ojrise/.mujoco/mjkey.txt /opt/mjkey.txt
+    /cluster/home/ojrise/.mujoco/mjkey.txt /opt/mjkey.txt
 
 %post
+    export DEBIAN_FRONTEND=noninteractive
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/sagar/.mujoco/mujoco210/bin
     export MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco210/
     export MUJOCO_PY_MJKEY_PATH=/root/.mujoco/mjkey.txt
     
     apt-get -y update -q
-    apt-get -y install git ffmpeg python3-pip libgl1-mesa-dev libgl1-mesa-glx \
-        libglew-dev libosmesa6-dev software-properties-common net-tools unzip \
-        curl wget xpra xserver-xorg-dev virtualenv patchelf
+    apt-get -y install curl git libgl1-mesa-dev libgl1-mesa-glx libglew-dev \
+         libosmesa6-dev software-properties-common net-tools unzip vim \
+         virtualenv wget xpra xserver-xorg-dev libglfw3-dev patchelf
 
     python3 -m pip install -U pip
 
@@ -27,4 +28,3 @@ From: nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04.1
         && rm mujoco.tar.gz     
 
     mv /opt/mjkey.txt /root/.mujoco/mjkey.txt
-    
