@@ -4,7 +4,7 @@ import numpy as np
 
 from robosuite.environments.manipulation.single_arm_env import SingleArmEnv
 from robosuite.models.arenas import TableArena
-from robosuite.models.objects import BoxObject
+from robosuite.models.objects import BoxObject, BallObject, CapsuleObject, CylinderObject
 from robosuite.models.tasks import ManipulationTask
 from robosuite.utils.mjcf_utils import CustomMaterial
 from robosuite.utils.observables import Observable, sensor
@@ -12,7 +12,7 @@ from robosuite.utils.placement_samplers import UniformRandomSampler
 from robosuite.utils.transform_utils import convert_quat
 
 
-class Lift_10_objects(SingleArmEnv):
+class Lift_4_objects(SingleArmEnv):
     """
     This class corresponds to the lifting task for a single robot arm.
     Args:
@@ -103,7 +103,7 @@ class Lift_10_objects(SingleArmEnv):
         robots,
         env_configuration="default",
         controller_configs=None,
-        gripper_types="default",
+        gripper_types="Robotiq85Gripper",
         initialization_noise="default",
         table_full_size=(0.8, 0.8, 0.05),
         table_friction=(1.0, 5e-3, 1e-4),
@@ -195,6 +195,7 @@ class Lift_10_objects(SingleArmEnv):
         if self._check_success():
             reward = 2.25
 
+
         # use a shaping reward
         elif self.reward_shaping:
 
@@ -259,16 +260,38 @@ class Lift_10_objects(SingleArmEnv):
             material=redwood,
         )
 
+        self.ball = BallObject(
+            name = "ball",
+            size = [0.03],
+            rgba = [0, 0.5, 0.5, 1]
+        )
+
+        self.capsule = CapsuleObject(
+            name = "capsule",
+            size = [0.02, 0.025],
+            rgba= [0.6, 0.7, 0.2, 1]
+        )
+
+        self.cylinder = CylinderObject(
+            name = "cylinder",
+            size = [0.02, 0.025],
+            rgba= [0.1, 1, 0.35, 1]
+        )
+
+
+        self.object_list = [self.cube, self.ball, self.capsule, self.cylinder]
+
         # Create placement initializer
         if self.placement_initializer is not None:
             self.placement_initializer.reset()
-            self.placement_initializer.add_objects(self.cube)
+            for obj in self.object_list:
+                self.placement_initializer.add_objects(obj)
         else:
             self.placement_initializer = UniformRandomSampler(
                 name="ObjectSampler",
-                mujoco_objects=self.cube,
-                x_range=[-0.03, 0.03],
-                y_range=[-0.03, 0.03],
+                mujoco_objects= self.object_list,
+                x_range=[-0.2, 0.2], #Skjønner ikke helt hvor dette er definert ut ifra
+                y_range=[-0.2, 0.2],
                 rotation=None,
                 ensure_object_boundary_in_range=False,
                 ensure_valid_placement=True,
@@ -280,7 +303,7 @@ class Lift_10_objects(SingleArmEnv):
         self.model = ManipulationTask(
             mujoco_arena=mujoco_arena,
             mujoco_robots=[robot.robot_model for robot in self.robots],
-            mujoco_objects=self.cube,
+            mujoco_objects=self.object_list,
         )
 
     def _setup_references(self):
@@ -291,8 +314,13 @@ class Lift_10_objects(SingleArmEnv):
         """
         super()._setup_references()
 
+        self.obj_body_id = {}
+
         # Additional object references from this env
-        self.cube_body_id = self.sim.model.body_name2id(self.cube.root_body)
+        for obj in self.object_list:
+            self.obj_body_id[obj.name] = self.sim.model.body_name2id(obj.root_body)
+
+        self.cube_body_id = self.sim.model.body_name2id(self.cube.root_body) #Denne må kopieres bort
 
     def _setup_observables(self):
         """
@@ -375,8 +403,17 @@ class Lift_10_objects(SingleArmEnv):
         Returns:
             bool: True if cube has been lifted
         """
-        cube_height = self.sim.data.body_xpos[self.cube_body_id][2]
+        height_over_table = 0.07 #Denner må jeg huske å sette slik at ingen av objektene vil være høyerer enn dette i starten
+
+        object_height = []
+
+        for obj in self.object_list:
+            object_height.append(self.sim.data.body_xpos[self.obj_body_id[obj.name]][2])
+
         table_height = self.model.mujoco_arena.table_offset[2]
 
-        # cube is higher than the table top above a margin
-        return cube_height > table_height + 0.04
+        # Sjekker om noen av objektene er løftet over en hvis margin
+        if any(obj_h > (table_height + height_over_table) for obj_h in object_height):
+            return True
+        else: 
+            return False

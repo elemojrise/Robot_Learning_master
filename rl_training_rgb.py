@@ -32,7 +32,6 @@ env = GymWrapper(
             use_camera_obs=True,
             use_object_obs=False,
             control_freq = 20,
-            render_camera = None,
             horizon = 2000,
             reward_shaping = True,
         )
@@ -41,9 +40,9 @@ env = GymWrapper(
 env = wrap_env(env)
 filename = 'rgb_test'
 
-model = PPO('MlpPolicy', env, verbose=1, tensorboard_log='./ppo_fetchpush_tensorboard/')
+model = PPO('MlpPolicy', env, verbose=2, tensorboard_log='./ppo_fetchpush_tensorboard/')
 print("starting to learn")
-model.learn(total_timesteps=2000, tb_log_name=filename)
+model.learn(total_timesteps= 4000, log_interval = 1000,  tb_log_name=filename)
 
 print("finished learning")
 
