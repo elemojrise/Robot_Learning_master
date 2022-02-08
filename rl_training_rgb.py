@@ -2,6 +2,8 @@ import robosuite as suite
 import gym
 import numpy as np
 
+from environments import Lift_4_objects
+
 from robosuite.environments.base import register_env
 from robosuite import load_controller_config
 from robosuite.wrappers import GymWrapper
@@ -18,31 +20,35 @@ def wrap_env(env):
     wrapped_env = VecNormalize(wrapped_env)             # Needed for improving training when using MuJoCo envs?
     return wrapped_env
 
+register_env(Lift_4_objects)
+
+config = load_controller_config(default_controller="OSC_POSE")
 
 print("Starting to wrap environment")
 
 # Training
 env = GymWrapper(
         suite.make(
-            env_name="Lift",
+            env_name="Lift_4_objects",
             robots = "IIWA",
-            gripper_types="Robotiq85Gripper", 
-            has_renderer = False,
-            has_offscreen_renderer= True,
-            use_camera_obs=True,
-            use_object_obs=False,
-            control_freq = 20,
-            horizon = 200,
-            reward_shaping = True,
-        )
-    )
+            controller_configs = config, 
+            gripper_types="Robotiq85Gripper",      
+            has_renderer=False,                    
+            has_offscreen_renderer=True,           
+            control_freq=20,                       
+            horizon=1000,                          
+            use_object_obs=False,                  
+            use_camera_obs=True,                   
+        ), ["agentview_image"]
+)
 
 env = wrap_env(env)
-filename = 'rgb_test'
 
-model = PPO('MlpPolicy', env, verbose=2, tensorboard_log='./ppo_fetchpush_tensorboard/')
+filename = 'rgb_4_objects'
+
+model = PPO('MlpPolicy', env, verbose=2, tensorboard_log='./ppo_lift_4_objects_tensorboard/')
 print("starting to learn")
-model.learn(total_timesteps= 200, log_interval= 10,  tb_log_name=filename)
+model.learn(total_timesteps= 25000, log_interval= 5000,  tb_log_name=filename)
 
 print("finished learning")
 
