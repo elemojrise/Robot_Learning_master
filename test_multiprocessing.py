@@ -46,9 +46,9 @@ def make_robosuite_env(env_id, options, observations, rank, seed=0):
 if __name__ == '__main__':
 
     # The different number of processes that will be used
-    PROCESSES_TO_TEST = [1, 2, 4, 8, 16] 
+    PROCESSES_TO_TEST = [2, 4, 8] 
     NUM_EXPERIMENTS = 3 # RL algorithms can often be unstable, so we run several experiments (see https://arxiv.org/abs/1709.06560)
-    TRAIN_STEPS = 5000
+    TRAIN_STEPS = 200
     # Number of episodes for evaluation
     EVAL_EPS = 20
     ALGO = PPO
@@ -88,7 +88,7 @@ if __name__ == '__main__':
         for experiment in range(NUM_EXPERIMENTS):
             # it is recommended to run several experiments due to variability in results
             train_env.reset()
-            model = ALGO('MlpPolicy', train_env, verbose=0)
+            model = ALGO('MlpPolicy', train_env, verbose=2)
             start = time.time()
             model.learn(total_timesteps=TRAIN_STEPS)
             times.append(time.time() - start)
