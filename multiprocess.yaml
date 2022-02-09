@@ -1,16 +1,32 @@
 robosuite:
   env_id: "Lift_4_objects"
   robots: "IIWA"
-  controller_configs:  config 
   gripper_types: "Robotiq85Gripper"      
   has_renderer: False                    
   has_offscreen_renderer: True           
   control_freq: 500                       
   horizon: 1000
   camera_heights: 48
-  camera_width: 48                          
+  camera_widths: 48                          
   use_object_obs: False                  
-  use_camera_obs: True 
+  use_camera_obs: True
+  controller_configs: 
+    type: "OSC_POSE"
+    input_max: 1
+    input_min: -1
+    output_max: [0.05, 0.05, 0.05, 0.5, 0.5, 0.5]
+    output_min: [-0.05, -0.05, -0.05, -0.5, -0.5, -0.5]
+    kp: 150
+    damping_ratio: 1
+    impedance_mode: "fixed"
+    kp_limits: [0, 300]
+    damping_ratio_limits: [0, 10]
+    position_limits": null
+    orientation_limits: null
+    uncouple_pos_ori: true
+    control_delta: true
+    interpolation: null
+    ramp_ratio: 0.2
 
 observations:
   rgb: "agentview_image"
