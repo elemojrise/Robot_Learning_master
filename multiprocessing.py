@@ -12,8 +12,7 @@ from robosuite.environments.base import register_env
 from stable_baselines3 import PPO
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, SubprocVecEnv
-from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, SubprocVecEnvn
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.callbacks import EvalCallback, CheckpointCallback
@@ -44,15 +43,16 @@ def make_robosuite_env(env_id, options, rank, seed=0):
     return _init
 
 
-# The different number of processes that will be used
-PROCESSES_TO_TEST = [1, 2, 4, 8, 16] 
-NUM_EXPERIMENTS = 3 # RL algorithms can often be unstable, so we run several experiments (see https://arxiv.org/abs/1709.06560)
-TRAIN_STEPS = 5000
-# Number of episodes for evaluation
-EVAL_EPS = 20
-ALGO = PPO
-
 if __name__ == '__main__':
+
+    # The different number of processes that will be used
+    PROCESSES_TO_TEST = [1, 2, 4, 8, 16] 
+    NUM_EXPERIMENTS = 3 # RL algorithms can often be unstable, so we run several experiments (see https://arxiv.org/abs/1709.06560)
+    TRAIN_STEPS = 5000
+    # Number of episodes for evaluation
+    EVAL_EPS = 20
+    ALGO = PPO
+    
     register_env(Lift_4_objects)
 
     with open("multiprocess.yaml", 'r') as stream:
