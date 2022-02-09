@@ -1,0 +1,16 @@
+robosuite:
+  env_id: "Lift_4_objects"
+  robots: "IIWA"
+  controller_configs:  config 
+  gripper_types: "Robotiq85Gripper"      
+  has_renderer: False                    
+  has_offscreen_renderer: True           
+  control_freq: 500                       
+  horizon: 1000
+  camera_heights: 48
+  camera_width: 48                          
+  use_object_obs: False                  
+  use_camera_obs: True 
+
+observations:
+  rgb: "agentview_image"
