@@ -38,7 +38,9 @@ env = GymWrapper(
             control_freq=20,                       
             horizon=1000,                          
             use_object_obs=False,                  
-            use_camera_obs=True,                   
+            use_camera_obs=True,
+	    camera_heights=48,
+	    camera_widths=48,                   
         ), ["agentview_image"]
 )
 
