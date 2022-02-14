@@ -77,7 +77,7 @@ def make_robosuite_env(env_id, options, observations, rank, seed=0):
 if __name__ == '__main__':
 
     # The different number of processes that will be used
-    PROCESSES_TO_TEST = [2, 4, 8] 
+    PROCESSES_TO_TEST = [1, 2, 4, 8] 
     NUM_EXPERIMENTS = 3 # RL algorithms can often be unstable, so we run several experiments (see https://arxiv.org/abs/1709.06560)
     TRAIN_STEPS = 200
     # Number of episodes for evaluation
@@ -126,7 +126,7 @@ if __name__ == '__main__':
             start = time.time()
             print("startng to train")
             with ProgressBarManager(total_timesteps=TRAIN_STEPS) as callback:
-                model.learn(total_timesteps=TRAIN_STEPS, callback=callback)
+                model.learn(total_timesteps=TRAIN_STEPS, callback=callback, reset_num_timesteps= False)
             times.append(time.time() - start)
 
             print("evaluating starting")
