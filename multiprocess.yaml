@@ -4,8 +4,8 @@ robosuite:
   gripper_types: "Robotiq85Gripper"      
   has_renderer: False                    
   has_offscreen_renderer: True           
-  control_freq: 500                       
-  horizon: 1000
+  control_freq: 20                       
+  horizon: 100
   camera_heights: 48
   camera_widths: 48                          
   use_object_obs: False                  

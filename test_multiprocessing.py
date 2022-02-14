@@ -9,6 +9,8 @@ from robosuite.wrappers import GymWrapper
 from robosuite import load_controller_config
 from robosuite.environments.base import register_env
 
+from stable_baselines3.common.callbacks import BaseCallback
+
 from stable_baselines3 import PPO
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
 from stable_baselines3.common.monitor import Monitor
@@ -23,6 +25,37 @@ from stable_baselines3.common.env_util import make_vec_env
 from typing import Callable
 
 from environments import Lift_4_objects
+
+from tqdm.auto import tqdm
+
+class ProgressBarCallback(BaseCallback):
+    """
+    :param pbar: (tqdm.pbar) Progress bar object
+    """
+    def __init__(self, pbar):
+        super(ProgressBarCallback, self).__init__()
+        self._pbar = pbar
+
+    def _on_step(self):
+        # Update the progress bar:
+        self._pbar.n = self.num_timesteps
+        self._pbar.update(0)
+
+# this callback uses the 'with' block, allowing for correct initialisation and destruction
+class ProgressBarManager(object):
+    def __init__(self, total_timesteps): # init object with total timesteps
+        self.pbar = None
+        self.total_timesteps = total_timesteps
+        
+    def __enter__(self): # create the progress bar and callback, return the callback
+        self.pbar = tqdm(total=self.total_timesteps)
+            
+        return ProgressBarCallback(self.pbar)
+
+    def __exit__(self, exc_type, exc_val, exc_tb): # close the callback
+        self.pbar.n = self.total_timesteps
+        self.pbar.update(0)
+        self.pbar.close()
 
 
 
@@ -46,7 +79,7 @@ def make_robosuite_env(env_id, options, observations, rank, seed=0):
 if __name__ == '__main__':
 
     # The different number of processes that will be used
-    PROCESSES_TO_TEST = [2, 4, 8] 
+    PROCESSES_TO_TEST = [1, 2, 4, 8] 
     NUM_EXPERIMENTS = 3 # RL algorithms can often be unstable, so we run several experiments (see https://arxiv.org/abs/1709.06560)
     TRAIN_STEPS = 200
     # Number of episodes for evaluation
@@ -90,9 +123,13 @@ if __name__ == '__main__':
             train_env.reset()
             model = ALGO('MlpPolicy', train_env, verbose=2)
             start = time.time()
-            model.learn(total_timesteps=TRAIN_STEPS)
+            with ProgressBarManager(total_timesteps=TRAIN_STEPS) as callback:
+                model.learn(total_timesteps=TRAIN_STEPS, callback=callback)
             times.append(time.time() - start)
+
+            print("evaluating starting")
             mean_reward, _  = evaluate_policy(model, eval_env, n_eval_episodes=EVAL_EPS)
+            print("evaluating finished")
             rewards.append(mean_reward)
         # Important: when using subprocess, don't forget to close them
         # otherwise, you may have memory issues when running a lot of experiments
