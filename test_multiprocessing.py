@@ -9,15 +9,13 @@ from robosuite.wrappers import GymWrapper
 from robosuite import load_controller_config
 from robosuite.environments.base import register_env
 
-from stable_baselines3.common.callbacks import BaseCallback
-
 from stable_baselines3 import PPO
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, SubprocVecEnv
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.callbacks import EvalCallback, CheckpointCallback
+from stable_baselines3.common.callbacks import BaseCallback, EvalCallback, CheckpointCallback
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.env_util import make_vec_env
 
@@ -79,7 +77,7 @@ def make_robosuite_env(env_id, options, observations, rank, seed=0):
 if __name__ == '__main__':
 
     # The different number of processes that will be used
-    PROCESSES_TO_TEST = [1, 2, 4, 8] 
+    PROCESSES_TO_TEST = [2, 4, 8] 
     NUM_EXPERIMENTS = 3 # RL algorithms can often be unstable, so we run several experiments (see https://arxiv.org/abs/1709.06560)
     TRAIN_STEPS = 200
     # Number of episodes for evaluation
@@ -113,16 +111,20 @@ if __name__ == '__main__':
         else:
             # Here we use the "fork" method for launching the processes, more information is available in the doc
             # This is equivalent to make_vec_env(env_id, n_envs=n_procs, vec_env_cls=SubprocVecEnv, vec_env_kwargs=dict(start_method='fork'))
-            train_env = SubprocVecEnv([make_robosuite_env(env_id, env_options, obs_image, i+total_procs) for i in range(n_procs)], start_method='fork')
+            print("lager flere envs")
+            train_env = SubprocVecEnv([make_robosuite_env(env_id, env_options, obs_image, i, seed=3) for i in range(n_procs)])
 
         rewards = []
         times = []
 
+        print(NUM_EXPERIMENTS)
         for experiment in range(NUM_EXPERIMENTS):
             # it is recommended to run several experiments due to variability in results
+            print("in for loop")
             train_env.reset()
             model = ALGO('MlpPolicy', train_env, verbose=2)
             start = time.time()
+            print("startng to train")
             with ProgressBarManager(total_timesteps=TRAIN_STEPS) as callback:
                 model.learn(total_timesteps=TRAIN_STEPS, callback=callback)
             times.append(time.time() - start)
