@@ -2,76 +2,38 @@ import robosuite as suite
 import os
 import yaml
 
-from robosuite.wrappers import GymWrapper
-from robosuite import load_controller_config
+from wrapper import GymWrapper_rgb, GymWrapper_multiinput
 from robosuite.environments.base import register_env
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
-from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, SubprocVecEnv
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.callbacks import EvalCallback, CheckpointCallback
 
-from typing import Callable
 
 from environments import Lift_4_objects
+from callback import ProgressBarManager
 
-import gym
 
-
-def make_robosuite_env(env_id, options, rank, seed=0):
+def make_robosuite_env(env_id, options, observations, rank, seed=0):
     """
     Utility function for multiprocessed env.
     :param env_id: (str) the environment ID
     :param options: (dict) additional arguments to pass to the specific environment class initializer
+    :param observations: (str) observations to use from environment
     :param seed: (int) the inital seed for RNG
     :param rank: (int) index of the subprocess
     """
     def _init():
-        env = GymWrapper(suite.make(env_id, **options))
-        env = Monitor(env)
+        env = GymWrapper_multiinput(suite.make(env_id, **options), observations)
         env.seed(seed + rank)
         return env
     set_random_seed(seed)
     return _init
 
-
-def make_gym_env(env_id, rank, seed=0):
-    """
-    Utility function for multiprocessed env.
-    :param env_id: (str) the environment ID
-    :param seed: (int) the inital seed for RNG
-    :param rank: (int) index of the subprocess
-    """
-    def _init():
-        env = gym.make(env_id, reward_type="dense")
-        env = gym.wrappers.FlattenObservation(env)
-        env = Monitor(env)
-        env.seed(seed + rank)
-        return env
-    set_random_seed(seed)
-    return _init
-
-
-def linear_schedule(initial_value: float) -> Callable[[float], float]:
-    """
-    Linear learning rate schedule.
-    :param initial_value: Initial learning rate.
-    :return: schedule that computes
-      current learning rate depending on remaining progress
-    """
-    def func(progress_remaining: float) -> float:
-        """
-        Progress will decrease from 1 (beginning) to 0.
-        :param progress_remaining:
-        :return: current learning rate
-        """
-        return progress_remaining * initial_value
-
-    return func
 
 
 if __name__ == '__main__':
@@ -84,11 +46,15 @@ if __name__ == '__main__':
     env_options = config["robosuite"]
     env_id = env_options.pop("env_id")
 
+    # Observations
+    obs_config = config["observations"]
+    obs_list = [obs_config["rgb"]] #lager en liste av det
+
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
     training_timesteps = sb_config["total_timesteps"]
     check_pt_interval = sb_config["check_pt_interval"]
-    num_cpu = sb_config["num_cpu"]
+    num_procs = sb_config["num_procs"]
 
     # Settings for stable-baselines policy
     policy_kwargs = config["sb_policy"]
@@ -120,7 +86,10 @@ if __name__ == '__main__':
 
     # RL pipeline
     if training:
-        env = SubprocVecEnv([make_robosuite_env(env_id, env_options, i, seed) for i in range(num_cpu)])
+        if num_procs == 1:
+            env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list)
+        else:
+            env = SubprocVecEnv([make_robosuite_env(env_id, env_options, obs_list, i, seed) for i in range(num_procs)])
 
         # Create callback
         checkpoint_callback = CheckpointCallback(save_freq=check_pt_interval, save_path='./checkpoints/', 
@@ -130,10 +99,11 @@ if __name__ == '__main__':
         if continue_training_model_filename is None:
 
             # Normalize environment
-            env = VecNormalize(env)
+            #env = VecNormalize(env)
 
+            "TODO Her må jeg legge inn policy_kwargs slik at det er mulig å lage eget nettverk"
             # Create model
-            model = PPO(policy_type, env, policy_kwargs=policy_kwargs, tensorboard_log=tb_log_folder, verbose=1)
+            model = PPO(policy_type, env, tensorboard_log=tb_log_folder, verbose=1)
 
             print("Created a new model")
 
@@ -162,7 +132,6 @@ if __name__ == '__main__':
     else:
         # Create evaluation environment
         env_options['has_renderer'] = True
-        register_gripper(UltrasoundProbeGripper)
         env_gym = GymWrapper(suite.make(env_id, **env_options))
         env = DummyVecEnv([lambda : env_gym])
 

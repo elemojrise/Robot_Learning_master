@@ -33,9 +33,9 @@ env.reset()
 action = np.random.randn(env.robots[0].dof) # sample random action
 obs, reward, done, info = env.step(action)  # take action in the environment
 
-#print(obs)
-image = obs['agentview_image'] #uint8
-print(image.shape)
+print(obs)
+#image = obs['agentview_image'] #uint8
+#print(image.shape)
 
 # print(obs)
 # print(reward)
