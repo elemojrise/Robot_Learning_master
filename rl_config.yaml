@@ -4,12 +4,12 @@ training: True   # Whether to train a model or not
 # Settings for stable-baselines RL algorithm
 sb_config:
   total_timesteps: 40.0e+6
-  check_pt_interval: 200 #1.0e+6
+  check_pt_interval: 1000 #1.0e+6
   num_procs: 1
 
 # Policy settings
 sb_policy:
-  type: "CnnPolicy"
+  type: "MultiInputPolicy"
   # net_arch: 
   #   - pi: [256, 128]    # Custom actor network
   #     vf: [256, 128]    # Value function network

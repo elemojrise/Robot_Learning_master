@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     # Observations
     obs_config = config["observations"]
-    obs_list = [obs_config["rgb"]] #lager en liste av det
+    obs_list = obs_config["rgb"] #lager en liste av det
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
@@ -87,6 +87,7 @@ if __name__ == '__main__':
     # RL pipeline
     if training:
         if num_procs == 1:
+            print(obs_list)
             env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list)
         else:
             env = SubprocVecEnv([make_robosuite_env(env_id, env_options, obs_list, i, seed) for i in range(num_procs)])
