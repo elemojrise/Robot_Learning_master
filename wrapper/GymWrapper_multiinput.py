@@ -26,7 +26,7 @@ class GymWrapper_multiinput(Wrapper, Env):
         AssertionError: [Object observations must be enabled if no keys]
     """
 
-    def __init__(self, env, keys=None):
+    def __init__(self, env, keys=None, smaller_action_space = False):
         # Run super method
         super().__init__(env=env)
         # Create name for gym
@@ -35,6 +35,8 @@ class GymWrapper_multiinput(Wrapper, Env):
 
         # Get reward range
         self.reward_range = (0, self.env.reward_scale)
+
+        self.smaller_action_space = smaller_action_space
 
         if keys is None:
             keys = []
@@ -82,6 +84,8 @@ class GymWrapper_multiinput(Wrapper, Env):
         #print(self.observation_space)
 
         low, high = self.env.action_spec
+        if self.smaller_action_space:
+            low, high = low[:-2], high[:-2] #trekker fra a og b som mulige inputs
         self.action_space = spaces.Box(low=np.float32(low), high=np.float32(high))
 
         for key in image_list:
@@ -132,6 +136,9 @@ class GymWrapper_multiinput(Wrapper, Env):
                 - (bool) whether the current episode is completed or not
                 - (dict) misc information
         """
+        if self.smaller_action_space:
+            action = np.insert(action, 3, 0)
+            action = np.insert(action, 4, 0)
         ob_dict, reward, done, info = self.env.step(action)
         return self._multiinput_obs(ob_dict), reward, done, info
 
