@@ -20,7 +20,7 @@ register_env(Lift_4_objects)
 
 config = {
     "policy_type": 'CnnPolicy',
-    "total_timesteps": 100000,
+    "total_timesteps": 100001,
 }
 
 run = wandb.init(
