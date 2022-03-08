@@ -43,6 +43,7 @@ env = GymWrapper_rgb(
             has_offscreen_renderer=True,           
             control_freq=20,                       
             horizon= 100,
+            ignore_done = True, 
             camera_heights = 512,
             camera_widths = 512,                          
             use_object_obs=False,                  
@@ -63,9 +64,9 @@ obs = env.reset()
 model = PPO(
         config["policy_type"],
         env = env,
-        n_steps = 500,
+        n_steps = 2048,
         batch_size = 64, 
-        n_epochs = 5,
+        n_epochs = 10,
         verbose=1, 
         tensorboard_log=f"runs/{run.id}"
     )
