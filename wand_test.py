@@ -42,7 +42,7 @@ env = GymWrapper_rgb(
             has_renderer=False,                    
             has_offscreen_renderer=True,           
             control_freq=20,                       
-            horizon=1000,
+            horizon= 100,
             camera_heights = 512,
             camera_widths = 512,                          
             use_object_obs=False,                  
@@ -60,7 +60,17 @@ obs = env.reset()
 # img.save('lift.png')
 
 #env = VecVideoRecorder(env, f"videos/{run.id}", record_video_trigger=lambda x: x % 2000 == 0, video_length=200)
-model = PPO(config["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
+model = PPO(
+        config["policy_type"],
+        env = env,
+        n_steps = 500,
+        batch_size = 64, 
+        n_epochs = 5,
+        verbose=1, 
+        tensorboard_log=f"runs/{run.id}"
+    )
+
+    
 model.learn(
     total_timesteps=config["total_timesteps"],
     callback=WandbCallback(
