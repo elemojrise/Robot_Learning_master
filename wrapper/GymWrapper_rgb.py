@@ -91,6 +91,7 @@ class GymWrapper_rgb(Wrapper, Env):
             np.array: Flattened environment observation space after reset occurs
         """
         ob_dict = self.env.reset()
+        print("resetting_env")
         return self._rgb_obs(ob_dict)
 
     def step(self, action):
