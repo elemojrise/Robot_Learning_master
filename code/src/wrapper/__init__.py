@@ -1,0 +1,2 @@
+from .GymWrapper_rgb import GymWrapper_rgb
+from .GymWrapper_multiinput import GymWrapper_multiinput

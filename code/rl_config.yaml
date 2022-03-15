@@ -1,0 +1,70 @@
+seed: 3
+training: True   # Whether to train a model or not
+
+# Settings for stable-baselines RL algorithm
+sb_config:
+  total_timesteps: 40.0e+6
+  check_pt_interval: 1000 #1.0e+6
+  num_procs: 1
+
+# Policy settings
+sb_policy:
+  type: "MultiInputPolicy"
+  # net_arch: 
+  #   - pi: [256, 128]    # Custom actor network
+  #     vf: [256, 128]    # Value function network
+
+# Specify environment
+robosuite:
+  env_id: "Lift_4_objects"
+  robots: "IIWA"
+  gripper_types: "Robotiq85Gripper"      
+  has_renderer: False                    
+  has_offscreen_renderer: True           
+  control_freq: 20                       
+  horizon: 100
+  camera_heights: 48
+  camera_widths: 48                          
+  use_object_obs: False                  
+  use_camera_obs: True
+  controller_configs: 
+    type: "OSC_POSE"
+    input_max: 1
+    input_min: -1
+    output_max: [0.05, 0.05, 0.05, 0.5, 0.5, 0.5]
+    output_min: [-0.05, -0.05, -0.05, -0.5, -0.5, -0.5]
+    kp: 150
+    damping_ratio: 1
+    impedance_mode: "fixed"
+    kp_limits: [0, 300]
+    damping_ratio_limits: [0, 10]
+    position_limits": null
+    orientation_limits: null
+    uncouple_pos_ori: true
+    control_delta: true
+    interpolation: null
+    ramp_ratio: 0.2
+  # early_termination: True
+  # save_data: False
+  # deterministic_trajectory: False
+  # torso_solref_randomization: True
+  # initial_probe_pos_randomization: True
+  # use_box_torso: True
+
+
+observations:
+  rgb: ["agentview_image", "robot0_joint_pos_cos"]
+
+# Settings used for file handling and logging (save/load destination etc)
+file_handling:
+  # Logging with Tensorboard and saving trained models
+  tb_log_folder: "ppo_lift_4_objects_tensorboard"
+  tb_log_name: "rgb_4_objects_plot"
+  save_model_folder: "trained_models"
+  save_model_filename: "rgb_4_objects"
+  # Loading of trained models
+  load_model_folder: "trained_models"
+  load_model_filename: "rgb_4_objects"
+  # Path to model which should be continued to train
+  continue_training_model_folder: "trained_models"
+  continue_training_model_filename: null       # is null when training a new model
