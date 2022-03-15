@@ -72,18 +72,19 @@ from robosuite import load_controller_config
 from robosuite.utils.input_utils import input2action
 from robosuite.wrappers import VisualizationWrapper
 
-from environments import Lift_4_objects
+from environments import Lift_4_objects, Lift_edit
 
 from robosuite.environments.base import register_env
 
 #Registrerer custom environment
 register_env(Lift_4_objects)
+register_env(Lift_edit)
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--environment", type=str, default="Lift")
-    parser.add_argument("--robots", nargs="+", type=str, default="Panda", help="Which robot(s) to use in the env")
+    parser.add_argument("--environment", type=str, default="Lift_edit")
+    parser.add_argument("--robots", nargs="+", type=str, default="IIWA", help="Which robot(s) to use in the env")
     parser.add_argument(
         "--config", type=str, default="single-arm-opposed", help="Specified environment configuration if necessary"
     )
@@ -124,9 +125,10 @@ if __name__ == "__main__":
     # Create environment
     env = suite.make(
         **config,
+        gripper_types="Robotiq85Gripper",
         has_renderer=True,
         has_offscreen_renderer=False,
-        render_camera="agentview",
+        render_camera="frontview",
         ignore_done=True,
         use_camera_obs=False,
         reward_shaping=True,

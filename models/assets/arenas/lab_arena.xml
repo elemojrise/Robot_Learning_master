@@ -9,7 +9,7 @@
     <material name="wall_ceramic" reflectance="0.0" shininess="0.0" specular="0.2" texrepeat="1 1" texture="tex-ceramic" />
     
     <!-- ceramic table texture and material-->
-    <texture file="../textures/gray-felt.png" type="cube" name="tex-felt"/>
+    <texture file="../textures/manulab.png" type="cube" name="tex-felt"/>
     <material name="table_felt" reflectance="0.0" shininess="0.0" specular="0.2" texrepeat="1 1" texture="tex-felt" />
 
     <!-- steel legs -->

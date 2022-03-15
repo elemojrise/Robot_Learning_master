@@ -13,6 +13,8 @@ from robosuite.models.tasks import ManipulationTask
 from robosuite.utils.placement_samplers import UniformRandomSampler
 from robosuite.utils.observables import Observable, sensor
 
+from helper_functions.camera_functions import get_pos_and_quat_from_trans_matrix
+
 
 class Lift_edit(SingleArmEnv):
     """
@@ -166,11 +168,22 @@ class Lift_edit(SingleArmEnv):
         camera_segmentations=None,      # {None, instance, class, element}
         renderer="mujoco",
         renderer_config=None,
+        custom_camera_name = None,
+        custom_camera_trans_matrix = [],
+        custom_camera_conversion = True,
+        custom_camera_attrib = None,
     ):
         # settings for table top
         self.table_full_size = table_full_size
         self.table_friction = table_friction
         self.table_offset = np.array((0.7, 0, 0.8)) #Hallaballa
+        self.rbot_base_frame = np.array((0, 0, 0.8))
+
+        # settings for custom camera
+        self.custom_camera_name = custom_camera_name
+        self.custom_camera_trans_matrix = custom_camera_trans_matrix
+        self.custom_camera_conversion = custom_camera_conversion 
+        self.custom_camera_attrib = custom_camera_attrib 
 
         # reward configuration
         self.reward_scale = reward_scale
@@ -283,6 +296,10 @@ class Lift_edit(SingleArmEnv):
         # Arena always gets set to zero origin
         mujoco_arena.set_origin([0, 0, 0])
 
+        if self.custom_camera_name != None:
+            custom_camera_pos, custom_camera_quat = get_pos_and_quat_from_trans_matrix(self.custom_camera_trans_matrix, self.rbot_base_frame, self.custom_camera_conversion)
+            mujoco_arena.set_camera(self.custom_camera_name, custom_camera_pos, custom_camera_quat, self.custom_camera_attrib)
+
         # initialize objects of interest
         tex_attrib = {
             "type": "cube",
@@ -301,10 +318,12 @@ class Lift_edit(SingleArmEnv):
         )
         self.cube = BoxObject(
             name="cube",
-            size_min=[0.020, 0.020, 0.020],  # [0.015, 0.015, 0.015],
-            size_max=[0.022, 0.022, 0.022],  # [0.018, 0.018, 0.018])
+            size_min= [0.040, 0.040, 0.040],  #[0.020] # [0.015, 0.015, 0.015],
+            size_max=[0.042, 0.042, 0.042],  #[0.022] # [0.018, 0.018, 0.018])
             rgba=[1, 0, 0, 1],
-            material=redwood,
+            density= 375, #Measured density
+            friction = (0.01, 0.005, 0.0001), #Empirically tested friction
+            #material=redwood,
         )
 
         # Create placement initializer
