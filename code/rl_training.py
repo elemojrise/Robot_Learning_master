@@ -11,14 +11,15 @@ from src.wrapper.GymWrapper_multiinput import GymWrapper_multiinput
 from stable_baselines3 import PPO
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
+from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, VecTransposeImage
 from stable_baselines3.common.callbacks import EvalCallback
 
-
+print("doing")
 def wrap_env(env):
-    wrapped_env = Monitor(env)                          # Needed for extracting eprewmean and eplenmean
+    wrapped_env = Monitor(env, info_keywords = ("is_success",))                          # Needed for extracting eprewmean and eplenmean
     wrapped_env = DummyVecEnv([lambda : wrapped_env])   # Needed for all environments (e.g. used for mulit-processing)
-    wrapped_env = VecNormalize(wrapped_env)             # Needed for improving training when using MuJoCo envs?
+    #wrapped_env = VecNormalize(wrapped_env)             # Needed for improving training when using MuJoCo envs?
+    wrapped_env = VecTransposeImage(wrapped_env)
     return wrapped_env
 
 controller_config = load_controller_config(default_controller="OSC_POSE")
@@ -33,8 +34,8 @@ env = GymWrapper_multiinput(
             has_renderer=False,                    
             has_offscreen_renderer=True,           
             control_freq=20,                       
-            horizon= 300,
-            ignore_done = True, 
+            horizon= 100,
+            ignore_done = False, 
             camera_heights = 48,
             camera_widths = 48,                          
             use_object_obs=False,                  
@@ -42,13 +43,13 @@ env = GymWrapper_multiinput(
             reward_shaping= True,
             #camera_names = ["all-robotview"]                   
         ),  
-        keys = ["agentview_image","robot0_joint_pos"],
+        keys = ["agentview_image"]#,"robot0_joint_pos"],
         #smaller_action_space= True
 )
-#env = wrap_env(env)
+env = wrap_env(env)
 
 eval_callback = EvalCallback(env, callback_on_new_best=None, #callback_after_eval=None, 
-                            n_eval_episodes=3, eval_freq=600, log_path='./logs/', 
+                            n_eval_episodes=3, eval_freq=200, log_path='./logs/', 
                             best_model_save_path='best_model/logs/', deterministic=False, render=False, 
                             verbose=1, warn=True)
 filename = 'test'
@@ -57,7 +58,7 @@ obs = env.reset()
 
 print(obs)
 
-model = PPO('MultiInputPolicy', env)
+model = PPO('MultiInputPolicy', env, n_steps = 400, verbose=1)
 print("starting to learn")
 
 model.learn(total_timesteps=12000, callback = eval_callback)
