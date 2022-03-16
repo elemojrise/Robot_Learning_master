@@ -33,13 +33,13 @@ env = GymWrapper_multiinput(
             gripper_types="Robotiq85Gripper",      
             has_renderer=False,                    
             has_offscreen_renderer=True,           
-            control_freq=500,                       
-            horizon=1000,
+            control_freq=20,                       
+            horizon=4,
             camera_heights = 48,
             camera_widths = 48,                          
             use_object_obs=False,                  
-            use_camera_obs=True,                   
-        ), ["agentview_image", "robot0_joint_pos_cos"]
+            use_camera_obs=False,                   
+        ), ["robot0_joint_pos"]
 )
 
 #env = wrap_env(env)
@@ -50,13 +50,23 @@ check_env(env)
 #print("Getting observations")
 
 obs = env.reset()
-action = env.action_space.sample()
-obs, reward, done, info = env.step(action)
+
+for i in range(12):
+    action = env.action_space.sample()
+    obs, reward, done, info = env.step(action)
+
+    print("reward = ", reward)
+    print("done = ",done)
+    print("info = ",info)
+
+    if done:
+        env.reset()
+
 
 #image = np.reshape(obs, (256,256,3))
-print("Observation = {} \n\n Action = {} \n\n".format(obs,action))
+#print("Observation = {} \n\n Action = {} \n\n".format(obs,action))
 
-model = PPO('MultiInputPolicy', env, verbose=2, tensorboard_log='./ppo_lift_4_objects_tensorboard/')
+# model = PPO('MultiInputPolicy', env, verbose=2, tensorboard_log='./ppo_lift_4_objects_tensorboard/')
 
-model.learn(total_timesteps= 25000)
+# model.learn(total_timesteps= 25000)
 

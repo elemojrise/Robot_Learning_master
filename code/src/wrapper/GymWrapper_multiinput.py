@@ -91,6 +91,9 @@ class GymWrapper_multiinput(Wrapper, Env):
         for key in image_list:
             self.keys.insert(0,key)
 
+        #variable for checking grasp sucess
+        self.grasp_success = 0
+
     def _multiinput_obs(self, obs_dict, verbose=False):
         """
         Filters keys of interest out and concatenate the information.
@@ -118,6 +121,8 @@ class GymWrapper_multiinput(Wrapper, Env):
         Returns:
             np.array: Flattened environment observation space after reset occurs
         """
+        self.grasp_success = 0
+
         ob_dict = self.env.reset()
         return self._multiinput_obs(ob_dict)
 
@@ -139,7 +144,16 @@ class GymWrapper_multiinput(Wrapper, Env):
         if self.smaller_action_space:
             action = np.insert(action, 3, 0)
             action = np.insert(action, 4, 0)
+
         ob_dict, reward, done, info = self.env.step(action)
+
+        # It will now keep being 1 until reset
+        if self.env._check_success():
+            print("succesful_grasp")
+            self.grasp_success = 1
+        
+        info["is_success"] = self.grasp_success
+
         return self._multiinput_obs(ob_dict), reward, done, info
 
     def seed(self, seed=None):
