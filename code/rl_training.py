@@ -11,7 +11,7 @@ from src.wrapper.GymWrapper_multiinput import GymWrapper_multiinput
 from stable_baselines3 import PPO
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, VecTransposeImage
+from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, VecTransposeImage, VecVideoRecorder
 from stable_baselines3.common.callbacks import EvalCallback
 
 print("doing")
@@ -47,6 +47,8 @@ env = GymWrapper_multiinput(
         #smaller_action_space= True
 )
 env = wrap_env(env)
+
+env = VecVideoRecorder(env, "videos", record_video_trigger=lambda x: x % 300 == 0, video_length=200)
 
 eval_callback = EvalCallback(env, callback_on_new_best=None, #callback_after_eval=None, 
                             n_eval_episodes=3, eval_freq=200, log_path='./logs/', 
