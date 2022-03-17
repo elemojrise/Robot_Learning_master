@@ -48,6 +48,15 @@ env = GymWrapper_multiinput(
 )
 env = wrap_env(env)
 
+# print(env.metadata)
+# print(env.get_attr("metadata")[0])
+
+# temp_env = env.venv
+# print(temp_env)
+
+# print(temp_env.metadata)
+# print(temp_env.get_attr("metadata")[0])
+
 env = VecVideoRecorder(env, "videos", record_video_trigger=lambda x: x % 300 == 0, video_length=200)
 
 eval_callback = EvalCallback(env, callback_on_new_best=None, #callback_after_eval=None, 
