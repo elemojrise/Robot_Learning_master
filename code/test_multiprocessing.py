@@ -24,6 +24,7 @@ from typing import Callable
 
 from src.environments import Lift_4_objects
 
+from src.wrapper import GymWrapper_multiinput
 from tqdm.auto import tqdm
 
 class ProgressBarCallback(BaseCallback):
@@ -66,7 +67,7 @@ def make_robosuite_env(env_id, options, observations, rank, seed=0):
     :param rank: (int) index of the subprocess
     """
     def _init():
-        env = GymWrapper(suite.make(env_id, **options), observations)
+        env = GymWrapper_multiinput(suite.make(env_id, **options), observations)
         env = Monitor(env)
         env.seed(seed + rank)
         return env
@@ -77,7 +78,7 @@ def make_robosuite_env(env_id, options, observations, rank, seed=0):
 if __name__ == '__main__':
 
     # The different number of processes that will be used
-    PROCESSES_TO_TEST = [1, 2, 4, 8] 
+    PROCESSES_TO_TEST = [64] 
     NUM_EXPERIMENTS = 3 # RL algorithms can often be unstable, so we run several experiments (see https://arxiv.org/abs/1709.06560)
     TRAIN_STEPS = 200
     # Number of episodes for evaluation
@@ -122,7 +123,7 @@ if __name__ == '__main__':
             # it is recommended to run several experiments due to variability in results
             print("in for loop")
             train_env.reset()
-            model = ALGO('MlpPolicy', train_env, verbose=2)
+            model = ALGO('MultiInputPolicy', train_env, verbose=2)
             start = time.time()
             print("startng to train")
             with ProgressBarManager(total_timesteps=TRAIN_STEPS) as callback:
