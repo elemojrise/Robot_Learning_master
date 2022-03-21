@@ -15,6 +15,8 @@ from robosuite.utils.observables import Observable, sensor
 
 from src.helper_functions.camera_functions import get_pos_and_quat_from_trans_matrix
 
+from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+
 
 class Lift_edit(SingleArmEnv):
     """
@@ -284,7 +286,7 @@ class Lift_edit(SingleArmEnv):
         xpos = (0, 0, 0.8)
         self.robots[0].robot_model.set_base_xpos(xpos)
 
-        loc = os.getcwd()
+        loc = os.getcwd() + "/src"
         # load model for table top workspace
         mujoco_arena = TableArena(
             table_full_size=self.table_full_size,
@@ -342,11 +344,14 @@ class Lift_edit(SingleArmEnv):
                 reference_pos=self.table_offset,
                 z_offset=0.01,
             )
+        print("first", self.robots)
+        print("robot_model", [robot.robot_model for robot in self.robots] )
 
+        self.robot_model = IIWA_14()
         # task includes arena, robot, and objects of interest
         self.model = ManipulationTask(
             mujoco_arena=mujoco_arena,
-            mujoco_robots=[robot.robot_model for robot in self.robots], 
+            mujoco_robots= self.robot_model,  #[robot.robot_model for robot in self.robots], 
             mujoco_objects=self.cube,
         )
 
