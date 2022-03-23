@@ -1,3 +1,4 @@
+import numpy as np
 import robosuite as suite
 import os
 import yaml
@@ -19,6 +20,7 @@ from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 from src.helper_functions.wrap_env import make_multiprocess_env, make_singel_env
+from src.helper_functions.camera_functions import adjust_width_of_image
 
 
 
@@ -34,20 +36,23 @@ if __name__ == '__main__':
 
     # Environment specifications
     env_options = config["robosuite"]
+    env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
+    env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
 
     # Observations
-    obs_config = config["observations"]
-    obs_list = obs_config["rgb"] #lager en liste av det
-
-    #Action space
-    smaller_action_space = config["smaller_action_space"]
+    obs_config = config["gymwrapper"]
+    obs_list = obs_config["observations"] 
+    smaller_action_space = obs_config["smaller_action_space"]
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
     training_timesteps = sb_config["total_timesteps"]
     check_pt_interval = sb_config["check_pt_interval"]
     num_procs = sb_config["num_procs"]
+
+    messages_to_wand_callback = config["wandb_callback"]
+    messages_to_eval_callback = config["eval_callback"]
 
     # Settings for stable-baselines policy
     policy_kwargs = config["sb_policy"]
@@ -79,6 +84,9 @@ if __name__ == '__main__':
 
     #Settings for wandb
     wandb_settings = config["wandb"]
+
+
+
     # RL pipeline
     if training:
         if num_procs == 1:
@@ -93,24 +101,15 @@ if __name__ == '__main__':
         )
 
         # Create callback
-        wandb_callback = WandbCallback(gradient_save_freq=100, model_save_path=f"models/{run.id}", verbose=2)
-
-        eval_callback = EvalCallback(VecTransposeImage(env), callback_on_new_best=None, #callback_after_eval=None, 
-                            n_eval_episodes=3, eval_freq=200, log_path='./logs/', 
-                            best_model_save_path='best_model/logs/', deterministic=False, render=False, 
-                            verbose=1, warn=True)
-
+        wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
+        eval_callback = EvalCallback(VecTransposeImage(env), **messages_to_eval_callback)
         callback = CallbackList([wandb_callback, eval_callback])
         
         # Train new model
         if continue_training_model_filename is None:
 
-            # Normalize environment
-            #env = VecNormalize(env)
-
-            "TODO Her må jeg legge inn policy_kwargs slik at det er mulig å lage eget nettverk"
             # Create model
-            model = PPO(policy_type, env, tensorboard_log=tb_log_folder, verbose=1)
+            model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
 
             print("Created a new model")
 
@@ -127,10 +126,10 @@ if __name__ == '__main__':
             env = VecNormalize.load(continue_training_vecnormalize_path, env)
 
             # Load model
-            model = PPO.load(continue_training_model_path, env=env)    
-
+            model = PPO.load(continue_training_model_path, env=env)
+        
         # Training
-        model.learn(total_timesteps=training_timesteps, tb_log_name=tb_log_name, callback=callback, reset_num_timesteps=True)
+        model.learn(total_timesteps=training_timesteps, callback=callback)
 
         run.finish()
 

@@ -5,11 +5,32 @@ training: True   # Whether to train a model or not
 sb_config:
   total_timesteps: 40.0e+6
   check_pt_interval: 1000 #1.0e+6
-  num_procs: 2
+  num_procs: 24
 
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
+  learning_rate: 0.0003 
+  n_steps: 2048 
+  batch_size: 64 
+  n_epochs: 10 
+  gamma: 0.99 
+  gae_lambda=: 0.95 
+  clip_range: 0.2 
+  clip_range_vf: None 
+  normalize_advantage: True 
+  ent_coef: 0.0 
+  vf_coef: 0.5 
+  max_grad_norm: 0.5
+  use_sde: False 
+  sde_sample_freq: - 1 
+  target_kl: None 
+  create_eval_env: False 
+  policy_kwargs: None
+  verbose: 1 
+  seed: None,
+  device: 'auto' 
+  _init_setup_model: True
   # net_arch: 
   #   - pi: [256, 128]    # Custom actor network
   #     vf: [256, 128]    # Value function network
@@ -22,11 +43,19 @@ robosuite:
   has_renderer: False                    
   has_offscreen_renderer: True           
   control_freq: 20                       
-  horizon: 100
-  camera_heights: 48
-  camera_widths: 48                          
+  horizon: 400
+  camera_heights: 300                          
   use_object_obs: False                  
   use_camera_obs: True
+  reward_shaping: True
+  camera_names: "custom"
+  custom_camera_name: "custom" 
+  custom_camera_trans_matrix: [ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
+                                [ 0.961834,  0.241668,  0.128340, -129.767868], 
+                                [ 0.273397, -0.868215, -0.414073,  503.424103], 
+                                [ 0.000000,  0.000000,  0.000000,  1.000000] ]
+  custom_camera_conversion: True
+  custom_camera_attrib:  {"fovy": 36}
   controller_configs: 
     type: "OSC_POSE"
     input_max: 1
@@ -45,17 +74,30 @@ robosuite:
     interpolation: null
     ramp_ratio: 0.2
   
+wandb_callback:
+  gradient_save_freq: 10000
+  verbose: 2
 
+eval_callback:
+  callback_on_new_best: None
+  n_eval_episodes: 100
+  eval_freq: 4096 
+  log_path: './logs_real/' 
+  best_model_save_path: './logs_real/'
+  deterministic: False
+  render: False 
+  verbose: 1 
+  warn: True
 
-observations:
-  rgb: ["agentview_image"]
-
-smaller_action_space: False
+gymwrapper:
+  observations: ["custom_image"]
+  smaller_action_space: False
 
 wandb:
   project: "sb3_lift"
   sync_tensorboard: True 
   save_code: True
+
 
 # Settings used for file handling and logging (save/load destination etc)
 file_handling:
