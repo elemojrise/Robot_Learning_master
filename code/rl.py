@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
             "TODO Her må jeg legge inn policy_kwargs slik at det er mulig å lage eget nettverk"
             # Create model
-            model = PPO(policy_type, env, tensorboard_log=tb_log_folder, verbose=1, device= "cpu")
+            model = PPO(policy_type, env, tensorboard_log=tb_log_folder, verbose=1)
 
             print("Created a new model")
 
