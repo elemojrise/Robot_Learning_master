@@ -137,6 +137,8 @@ if __name__ == '__main__':
         model.save(save_model_path)
         env.save(save_vecnormalize_path)
 
+        env.close()
+
     else:
         # Create evaluation environment
         env_options['has_renderer'] = True
