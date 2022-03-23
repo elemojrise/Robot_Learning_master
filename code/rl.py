@@ -2,41 +2,31 @@ import robosuite as suite
 import os
 import yaml
 
-from src.wrapper import GymWrapper_rgb, GymWrapper_multiinput
+import wandb
+from wandb.integration.sb3 import WandbCallback
+
+from robosuite.models.robots.robot_model import register_robot
 from robosuite.environments.base import register_env
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, SubprocVecEnv
-from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.utils import set_random_seed
-from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.callbacks import EvalCallback, CheckpointCallback
+from stable_baselines3.common.callbacks import EvalCallback, CallbackList
 
 
-from src.environments import Lift_4_objects
-from src.callback import ProgressBarManager
-
-
-def make_robosuite_env(env_id, options, observations, rank, seed=0):
-    """
-    Utility function for multiprocessed env.
-    :param env_id: (str) the environment ID
-    :param options: (dict) additional arguments to pass to the specific environment class initializer
-    :param observations: (str) observations to use from environment
-    :param seed: (int) the inital seed for RNG
-    :param rank: (int) index of the subprocess
-    """
-    def _init():
-        env = GymWrapper_multiinput(suite.make(env_id, **options), observations)
-        env.seed(seed + rank)
-        return env
-    set_random_seed(seed)
-    return _init
+from src.environments import Lift_4_objects, Lift_edit
+from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
+from src.helper_functions.wrap_env import make_multiprocess_env, make_singel_env
 
 
 
 if __name__ == '__main__':
+    register_robot(IIWA_14)
+    register_gripper(Robotiq85Gripper_iiwa_14)
+    register_robot_class_mapping("IIWA_14")
+    register_env(Lift_edit)
     register_env(Lift_4_objects)
 
     with open("rl_config.yaml", 'r') as stream:
@@ -49,6 +39,9 @@ if __name__ == '__main__':
     # Observations
     obs_config = config["observations"]
     obs_list = obs_config["rgb"] #lager en liste av det
+
+    #Action space
+    smaller_action_space = config["smaller_action_space"]
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
@@ -84,17 +77,30 @@ if __name__ == '__main__':
     training = config["training"]
     seed = config["seed"]
 
+    #Settings for wandb
+    wandb_settings = config["wandb"]
     # RL pipeline
     if training:
         if num_procs == 1:
-            print(obs_list)
-            env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list)
+            env = make_singel_env(env_id, env_options, obs_list, smaller_action_space)
         else:
-            env = SubprocVecEnv([make_robosuite_env(env_id, env_options, obs_list, i, seed) for i in range(num_procs)])
+            print("making")
+            env = SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)])
+
+        run = wandb.init(
+            **wandb_settings,
+            config=config,
+        )
 
         # Create callback
-        checkpoint_callback = CheckpointCallback(save_freq=check_pt_interval, save_path='./checkpoints/', 
-                                name_prefix=save_model_filename, verbose=2)
+        wandb_callback = WandbCallback(gradient_save_freq=100, model_save_path=f"models/{run.id}", verbose=2)
+
+        eval_callback = EvalCallback(env, callback_on_new_best=None, #callback_after_eval=None, 
+                            n_eval_episodes=3, eval_freq=200, log_path='./logs/', 
+                            best_model_save_path='best_model/logs/', deterministic=False, render=False, 
+                            verbose=1, warn=True)
+
+        callback = CallbackList([wandb_callback, eval_callback])
         
         # Train new model
         if continue_training_model_filename is None:
@@ -104,7 +110,7 @@ if __name__ == '__main__':
 
             "TODO Her må jeg legge inn policy_kwargs slik at det er mulig å lage eget nettverk"
             # Create model
-            model = PPO(policy_type, env, tensorboard_log=tb_log_folder, verbose=1)
+            model = PPO(policy_type, env, tensorboard_log=tb_log_folder, verbose=1, device= "cpu")
 
             print("Created a new model")
 
@@ -121,10 +127,12 @@ if __name__ == '__main__':
             env = VecNormalize.load(continue_training_vecnormalize_path, env)
 
             # Load model
-            model = PPO.load(continue_training_model_path, env=env)
+            model = PPO.load(continue_training_model_path, env=env)    
 
         # Training
-        model.learn(total_timesteps=training_timesteps, tb_log_name=tb_log_name, callback=checkpoint_callback, reset_num_timesteps=True)
+        model.learn(total_timesteps=training_timesteps, tb_log_name=tb_log_name, callback=callback, reset_num_timesteps=True)
+
+        run.finish()
 
         # Save trained model
         model.save(save_model_path)
