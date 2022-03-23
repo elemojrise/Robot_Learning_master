@@ -32,7 +32,7 @@ def make_multiprocess_env(env_id, options, observations, smaller_action_space, r
 
         env = GymWrapper_multiinput(suite.make(env_id, **options), observations, smaller_action_space)
         env = Monitor(env, info_keywords = ("is_success",)) 
-        env = VecTransposeImage(env)
+        #env = VecTransposeImage(env)
         env.seed(seed + rank)
         return env
     set_random_seed(seed)
@@ -48,5 +48,5 @@ def make_singel_env(env_id, options, observations, smaller_action_space):
     env = GymWrapper_multiinput(suite.make(env_id, **options), observations, smaller_action_space)
     env = Monitor(env, info_keywords = ("is_success",)) 
     env = DummyVecEnv([lambda : env])
-    env = VecTransposeImage(env)
+    #env = VecTransposeImage(env)
     return env
