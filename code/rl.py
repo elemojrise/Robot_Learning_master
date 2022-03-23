@@ -10,7 +10,7 @@ from robosuite.environments.base import register_env
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, SubprocVecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecTransposeImage
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList
 
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
         # Create callback
         wandb_callback = WandbCallback(gradient_save_freq=100, model_save_path=f"models/{run.id}", verbose=2)
 
-        eval_callback = EvalCallback(env, callback_on_new_best=None, #callback_after_eval=None, 
+        eval_callback = EvalCallback(VecTransposeImage(env), callback_on_new_best=None, #callback_after_eval=None, 
                             n_eval_episodes=3, eval_freq=200, log_path='./logs/', 
                             best_model_save_path='best_model/logs/', deterministic=False, render=False, 
                             verbose=1, warn=True)
