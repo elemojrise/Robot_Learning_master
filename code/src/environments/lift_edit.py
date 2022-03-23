@@ -13,9 +13,18 @@ from robosuite.models.tasks import ManipulationTask
 from robosuite.utils.placement_samplers import UniformRandomSampler
 from robosuite.utils.observables import Observable, sensor
 
-from src.helper_functions.camera_functions import get_pos_and_quat_from_trans_matrix
+from src.helper_functions.camera_functions import get_pos_and_quat_from_trans_matrix, adjust_width_of_image
 
-from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+# from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+# from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+
+# from robosuite.models.robots.robot_model import register_robot
+# from src.helper_functions.register_gripper import register_gripper
+
+# register_robot(IIWA_14)
+# register_gripper(Robotiq85Gripper_iiwa_14)
+
+
 
 
 class Lift_edit(SingleArmEnv):
@@ -320,8 +329,8 @@ class Lift_edit(SingleArmEnv):
         )
         self.cube = BoxObject(
             name="cube",
-            size_min= [0.040, 0.040, 0.040],  #[0.020] # [0.015, 0.015, 0.015],
-            size_max=[0.042, 0.042, 0.042],  #[0.022] # [0.018, 0.018, 0.018])
+            size_min= [0.019, 0.019, 0.019],  #[0.020] # [0.015, 0.015, 0.015],
+            size_max=[0.021, 0.021, 0.021],  #[0.022] # [0.018, 0.018, 0.018])
             rgba=[1, 0, 0, 1],
             density= 375, #Measured density
             friction = (0.01, 0.005, 0.0001), #Empirically tested friction
@@ -344,14 +353,11 @@ class Lift_edit(SingleArmEnv):
                 reference_pos=self.table_offset,
                 z_offset=0.01,
             )
-        print("first", self.robots)
-        print("robot_model", [robot.robot_model for robot in self.robots] )
 
-        self.robot_model = IIWA_14()
         # task includes arena, robot, and objects of interest
         self.model = ManipulationTask(
             mujoco_arena=mujoco_arena,
-            mujoco_robots= self.robot_model,  #[robot.robot_model for robot in self.robots], 
+            mujoco_robots= [robot.robot_model for robot in self.robots], 
             mujoco_objects=self.cube,
         )
 

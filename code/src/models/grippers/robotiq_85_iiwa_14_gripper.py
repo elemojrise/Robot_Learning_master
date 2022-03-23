@@ -4,6 +4,7 @@
 import numpy as np
 from robosuite.utils.mjcf_utils import xml_path_completion
 from robosuite.models.grippers.gripper_model import GripperModel
+import os
 
 
 class Robotiq85GripperBase(GripperModel):
@@ -15,7 +16,8 @@ class Robotiq85GripperBase(GripperModel):
     """
 
     def __init__(self, idn=0):
-        super().__init__(xml_path_completion("grippers/robotiq_gripper_85_lab.xml"), idn=idn)
+        loc = os.getcwd() + "/src/models/assets/"
+        super().__init__(xml_path_completion(loc + "grippers/robotiq_gripper_85_lab.xml"), idn=idn)
 
     def format_action(self, action):
         return action

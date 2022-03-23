@@ -73,6 +73,15 @@ from robosuite.utils.input_utils import input2action
 from robosuite.wrappers import VisualizationWrapper
 
 from src.environments import Lift_4_objects, Lift_edit
+from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+
+from robosuite.models.robots.robot_model import register_robot
+from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
+
+register_robot(IIWA_14)
+register_gripper(Robotiq85Gripper_iiwa_14)
+register_robot_class_mapping("IIWA_14")
 
 from robosuite.environments.base import register_env
 

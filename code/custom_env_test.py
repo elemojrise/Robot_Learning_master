@@ -10,6 +10,8 @@ from robosuite.utils.camera_utils import CameraMover
 
 from robosuite.environments.base import register_env
 
+from src.helper_functions.camera_functions import adjust_width_of_image
+
 #Registrerer custom environment
 register_env(Lift_4_objects)
 register_env(lift_edit)
@@ -67,7 +69,6 @@ print(cam_rot)
 
 legit = np.array([0.653, 0.271, 0.271, 0.653])
 
-
 # create environment instance
 env = suite.make(
     env_name="Lift_edit",
@@ -82,13 +83,12 @@ env = suite.make(
     camera_names="custom",
     render_camera = None,               # use "agentview" camera for observations
     camera_heights=1200,                      # image height
-    camera_widths=1200,                       # image width
+    camera_widths=adjust_width_of_image(1200),                       # image width
     # reward_shaping=False,
     custom_camera_name = "custom",
     custom_camera_trans_matrix = Trans_matrix,
-    custom_camera_conversion= True,
-    custom_camera_attrib = None,
-
+    custom_camera_conversion= False,
+    custom_camera_attrib = {"fovy": 32},
 )
 
 # cam_pose = np.add(cam_pose, env.table_offset)
@@ -107,7 +107,7 @@ obs, reward, done, info = env.step(action)  # take action in the environment
 
 image = obs['custom_image'] #uint8
 img = Image.fromarray(image, 'RGB')
-#img = img.rotate(180)
+img = img.rotate(180)
 img.save('new_class_test.png')
 
 

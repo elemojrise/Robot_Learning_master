@@ -48,6 +48,12 @@ def get_pos_and_quat_from_trans_matrix(Trans_matrix, rbot_base_frame, conversion
 
     return cam_pose, cam_quat
 
+def adjust_width_of_image(height: int):
+    ratio = 1944/1200
+    dif = 0.00001
+    assert height*ratio % 1 <= dif, "Make height pixel divisible by 1944 and 1200"
+    return int(height*ratio)
+
 
 
 

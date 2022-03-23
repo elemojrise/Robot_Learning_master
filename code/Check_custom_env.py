@@ -1,7 +1,7 @@
 import robosuite as suite
 import numpy as np
 
-from src.environments import Lift_4_objects
+from src.environments import Lift_4_objects, Lift_edit
 
 from robosuite.environments.base import register_env
 from robosuite import load_controller_config
@@ -12,6 +12,16 @@ from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, SubprocVecEnv
 
+from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+
+from robosuite.models.robots.robot_model import register_robot
+from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
+
+register_robot(IIWA_14)
+register_gripper(Robotiq85Gripper_iiwa_14)
+register_robot_class_mapping("IIWA_14")
+register_env(Lift_edit)
 
 def wrap_env(env):
     wrapped_env = Monitor(env)                          # Needed for extracting eprewmean and eplenmean
@@ -19,27 +29,25 @@ def wrap_env(env):
     wrapped_env = VecNormalize(wrapped_env)             # Needed for improving training when using MuJoCo envs?
     return wrapped_env
 
-#Registrerer custom environment
-register_env(Lift_4_objects)
+
 
 config = load_controller_config(default_controller="OSC_POSE")
 
-
 env = GymWrapper_multiinput(
         suite.make(
-            env_name="Lift_4_objects",
-            robots = "IIWA",
+            env_name="Lift_edit",
+            robots = "IIWA_14",
             controller_configs = config, 
-            gripper_types="Robotiq85Gripper",      
-            has_renderer=False,                    
-            has_offscreen_renderer=True,           
+            gripper_types="Robotiq85Gripper_iiwa_14",      
+            has_renderer=True,                    
+            has_offscreen_renderer=False,           
             control_freq=20,                       
-            horizon=4,
+            horizon=10000,
             camera_heights = 48,
             camera_widths = 48,                          
             use_object_obs=False,                  
             use_camera_obs=False,                   
-        ), ["robot0_joint_pos"]
+        ), ["robot0_joint_pos_cos"]
 )
 
 #env = wrap_env(env)
@@ -51,13 +59,10 @@ check_env(env)
 
 obs = env.reset()
 
-for i in range(12):
+for i in range(10000):
+    env.render()
     action = env.action_space.sample()
     obs, reward, done, info = env.step(action)
-
-    print("reward = ", reward)
-    print("done = ",done)
-    print("info = ",info)
 
     if done:
         env.reset()
