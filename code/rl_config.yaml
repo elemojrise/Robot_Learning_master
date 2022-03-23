@@ -94,7 +94,7 @@ gymwrapper:
   smaller_action_space: False
 
 wandb:
-  project: "sb3_lift"
+  project: "sb3_lift_real"
   sync_tensorboard: True 
   save_code: True
 
