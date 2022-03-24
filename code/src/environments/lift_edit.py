@@ -295,13 +295,16 @@ class Lift_edit(SingleArmEnv):
         xpos = (0, 0, 0.8)
         self.robots[0].robot_model.set_base_xpos(xpos)
 
-        loc = os.getcwd() + "/src"
+        loc = os.getcwd() 
+
+        if loc == '/home/kukauser/dev_ws': #if we are using the MANULAB computer and running policy node from dev_ws
+            loc = '/home/kukauser/Robot_Learning_master/code'
         # load model for table top workspace
         mujoco_arena = TableArena(
             table_full_size=self.table_full_size,
             table_friction=self.table_friction,
             table_offset=self.table_offset,
-            xml= loc + "/models/assets/arenas/lab_arena.xml", #hallaballa
+            xml= loc + "/src/models/assets/arenas/lab_arena.xml", #hallaballa
         )
 
         # Arena always gets set to zero origin

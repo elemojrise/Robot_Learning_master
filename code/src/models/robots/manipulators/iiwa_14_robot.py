@@ -13,7 +13,10 @@ class IIWA_14(ManipulatorModel):
     """
 
     def __init__(self, idn=0):
-        loc = os.getcwd() + "/src/models/assets/"
+        loc = os.getcwd()
+        if loc == '/home/kukauser/dev_ws': #if we are using the MANULAB computer and running policy node from dev_ws
+            loc = '/home/kukauser/Robot_Learning_master/code'
+        loc = loc + "/src/models/assets/"
         super().__init__(xml_path_completion(loc + "robots/iiwa_14/robot.xml"), idn=idn)
 
     @property
