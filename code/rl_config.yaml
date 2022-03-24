@@ -23,7 +23,7 @@ sb_policy:
   vf_coef: 0.5 
   max_grad_norm: 0.5
   use_sde: False 
-  sde_sample_freq: - 1 
+  sde_sample_freq: -1 
   target_kl: None 
   create_eval_env: False 
   policy_kwargs: None

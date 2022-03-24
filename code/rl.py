@@ -93,16 +93,18 @@ if __name__ == '__main__':
             env = make_singel_env(env_id, env_options, obs_list, smaller_action_space)
         else:
             print("making")
-            env = SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)])
+            env = [make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]
 
         run = wandb.init(
             **wandb_settings,
             config=config,
         )
+        print(env)
 
         # Create callback
         wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
-        eval_callback = EvalCallback(VecTransposeImage(env), **messages_to_eval_callback)
+        eval_env = [VecTransposeImage(e) for e in env] 
+        eval_callback = EvalCallback(eval_env, **messages_to_eval_callback)
         callback = CallbackList([wandb_callback, eval_callback])
         
         # Train new model
