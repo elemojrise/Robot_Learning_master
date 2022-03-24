@@ -1,3 +1,4 @@
+from locale import normalize
 import numpy as np
 import robosuite as suite
 import os
@@ -93,7 +94,7 @@ if __name__ == '__main__':
             env = make_singel_env(env_id, env_options, obs_list, smaller_action_space)
         else:
             print("making")
-            env = [make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]
+            env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
 
         run = wandb.init(
             **wandb_settings,
@@ -103,8 +104,7 @@ if __name__ == '__main__':
 
         # Create callback
         wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
-        eval_env = [VecTransposeImage(e) for e in env] 
-        eval_callback = EvalCallback(eval_env, **messages_to_eval_callback)
+        eval_callback = EvalCallback(env, **messages_to_eval_callback)
         callback = CallbackList([wandb_callback, eval_callback])
         
         # Train new model
@@ -131,6 +131,7 @@ if __name__ == '__main__':
             model = PPO.load(continue_training_model_path, env=env)
         
         # Training
+        print("starting to train")
         model.learn(total_timesteps=training_timesteps, callback=callback)
 
         run.finish()

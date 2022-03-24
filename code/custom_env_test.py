@@ -12,13 +12,36 @@ from robosuite.environments.base import register_env
 
 from src.helper_functions.camera_functions import adjust_width_of_image
 
+from robosuite.models.robots.robot_model import register_robot
+
+from src.wrapper import GymWrapper_multiinput
+from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
+
+from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.vec_env import VecTransposeImage, DummyVecEnv
+
 #Registrerer custom environment
+register_robot(IIWA_14)
+register_gripper(Robotiq85Gripper_iiwa_14)
+register_robot_class_mapping("IIWA_14")
 register_env(Lift_4_objects)
 register_env(lift_edit)
 
 Trans_matrix = np.array([ [ 0.171221,  0.730116, -0.661524,  1124.551880], 
   [ 0.985078, -0.138769,  0.101808, -46.181087], 
   [-0.017467, -0.669085, -0.742981,  815.163208], 
+  [ 0.000000,  0.000000,  0.000000,  1.000000] ])
+
+Trans_matrix_20_points = np.array([ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
+  [ 0.961834,  0.241668,  0.128340, -129.767868], 
+  [ 0.273397, -0.868215, -0.414073,  503.424103], 
+  [ 0.000000,  0.000000,  0.000000,  1.000000] ])  
+
+Trans_matrix_over_the_shoulder = np.array([ [ 0.477045, -0.841291,  0.254279,  251.447571], 
+  [-0.877611, -0.471518,  0.086427, -159.115860], 
+  [ 0.047187, -0.264388, -0.963261,  1172.085205], 
   [ 0.000000,  0.000000,  0.000000,  1.000000] ])
 
 Ned_to_Enu_conversion_1 = np.array([  [1,0,0],
@@ -32,48 +55,11 @@ Ned_to_Enu_conversion_2 = np.array([  [0,1,0],
                         ])
 
 
-
-def Rot_z(angle):
-    return np.array([   [np.cos(angle),-np.sin(angle),0],
-                        [np.sin(angle),np.cos(angle),0],
-                        [0,0,1]])
-def Rot_y(angle):
-    return np.array([   [np.cos(angle),0, np.sin(angle)],
-                        [0,1,0],
-                        [-np.sin(angle),0, np.cos(angle)]])
-
-
-def Rot_x(angle):
-    return np.array([   [1,0,0],
-                        [0, np.cos(angle),-np.sin(angle)],
-                        [0, np.sin(angle),np.cos(angle)]])
-
-
-stand_rot = Rot_z(np.pi/2)@Rot_x(np.pi/4)
-
-# print(stand_rot)
-
-
-cam_pose = Trans_matrix[:3,3]/1000 #converting to meter
-
-correct_rotation = Trans_matrix[:3,:3]@Ned_to_Enu_conversion_1
-print(correct_rotation)
-
-cam_rot = R.from_matrix(correct_rotation).as_quat()[[3, 0, 1, 2]]
-
-cam_rot = R.from_matrix(stand_rot).as_quat()[[3, 0, 1, 2]]
-
-
-
-print(cam_rot)
-
-legit = np.array([0.653, 0.271, 0.271, 0.653])
-
 # create environment instance
 env = suite.make(
     env_name="Lift_edit",
-    robots = "IIWA",
-    gripper_types="Robotiq85Gripper",                # use default grippers per robot arm
+    robots = "IIWA_14",
+    gripper_types="Robotiq85Gripper_iiwa_14",                # use default grippers per robot arm
     has_renderer=False,                     # no on-screen rendering
     has_offscreen_renderer=True,            # off-screen rendering needed for image obs
     control_freq=20,                        # 20 hz control for applied actions
@@ -82,22 +68,31 @@ env = suite.make(
     use_camera_obs=True,                   # provide image observations to agent
     camera_names="custom",
     render_camera = None,               # use "agentview" camera for observations
-    camera_heights=1200,                      # image height
-    camera_widths=adjust_width_of_image(1200),                       # image width
+    camera_heights=300,                      # image height
+    camera_widths=adjust_width_of_image(300),                       # image width
     # reward_shaping=False,
     custom_camera_name = "custom",
-    custom_camera_trans_matrix = Trans_matrix,
-    custom_camera_conversion= False,
-    custom_camera_attrib = {"fovy": 32},
+    custom_camera_trans_matrix = Trans_matrix_20_points,
+    custom_camera_conversion= True,
+    custom_camera_attrib = {"fovy": 36},
 )
+
+env = GymWrapper_multiinput(env=env, keys= ["custom_image"])
+env = Monitor(env, info_keywords = ("is_success",)) 
+env = DummyVecEnv([lambda : env])
+# env = VecTransposeImage(env)
 
 # cam_pose = np.add(cam_pose, env.table_offset)
 
 # reset the environment
 env.reset()
 
-action = np.random.randn(env.robots[0].dof) # sample random action
+#action = np.random.randn(env.robots[0].dof) # sample random action
+action = [env.action_space.sample()]
+print(action)
 obs, reward, done, info = env.step(action)  # take action in the environment
+
+print(obs)
 
 # cam_move = CameraMover(env= env, camera = "custom", init_camera_pos= cam_pose , init_camera_quat= np.array([[0.653], [0.271], [0.271], [0.653]]).flatten() )
 
@@ -106,9 +101,15 @@ obs, reward, done, info = env.step(action)  # take action in the environment
 #print(pose, quat)
 
 image = obs['custom_image'] #uint8
+image = np.squeeze(image)
+print(image.shape)
 img = Image.fromarray(image, 'RGB')
 img = img.rotate(180)
-img.save('new_class_test.png')
+
+rot_img = np.asarray(img)
+print(rot_img.shape)
+print(rot_img)
+img.save('20_points.png')
 
 
 # print(obs)

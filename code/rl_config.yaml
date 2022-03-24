@@ -15,20 +15,19 @@ sb_policy:
   batch_size: 64 
   n_epochs: 10 
   gamma: 0.99 
-  gae_lambda=: 0.95 
+  gae_lambda: 0.95 
   clip_range: 0.2 
-  clip_range_vf: None 
-  normalize_advantage: True 
+  clip_range_vf: null 
   ent_coef: 0.0 
   vf_coef: 0.5 
   max_grad_norm: 0.5
   use_sde: False 
   sde_sample_freq: -1 
-  target_kl: None 
+  target_kl: null 
   create_eval_env: False 
-  policy_kwargs: None
+  policy_kwargs: null
   verbose: 1 
-  seed: None,
+  seed: null
   device: 'auto' 
   _init_setup_model: True
   # net_arch: 
@@ -79,7 +78,7 @@ wandb_callback:
   verbose: 2
 
 eval_callback:
-  callback_on_new_best: None
+  callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 4096 
   log_path: './logs_real/' 
