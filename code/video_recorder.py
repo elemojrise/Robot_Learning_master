@@ -1,77 +1,82 @@
 import robosuite as suite
-import gym
 import numpy as np
+import imageio
 
-from src.environments import Lift_4_objects
+import robosuite.utils.macros as macros
+from robosuite.models.robots.robot_model import register_robot
+
+from src.environments import Lift_4_objects, Lift_edit
+from src.wrapper import GymWrapper_multiinput
+from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 
 from robosuite.environments.base import register_env
 from robosuite import load_controller_config
-from robosuite.wrappers import GymWrapper
 
 from stable_baselines3 import PPO
-from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
-from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.vec_env import VecVideoRecorder, DummyVecEnv, VecNormalize
 
-from stable_baselines3.common.evaluation import evaluate_policy
-
+register_robot(IIWA_14)
+register_gripper(Robotiq85Gripper_iiwa_14)
+register_robot_class_mapping("IIWA_14")
 register_env(Lift_4_objects)
-
-filename = 'rgb_4_objects'
+register_env(Lift_edit)
 
 config = load_controller_config(default_controller="OSC_POSE")
 
 
-env_robo = GymWrapper(
-        suite.make(
-            env_name="Lift_4_objects",
-            robots = "IIWA",
-            controller_configs = config, 
-            gripper_types="Robotiq85Gripper",      
-            has_renderer=False,                    
-            has_offscreen_renderer=True,           
-            control_freq=20,                       
-            horizon=1000,                          
-            use_object_obs=False,                  
-            use_camera_obs=True,
-	        camera_heights=48,
-	        camera_widths=48,                   
-        ), ["agentview_image"]
+env_robo = GymWrapper_multiinput(
+                suite.make(
+                  env_name="Lift_edit",
+                  robots = "IIWA_14",
+                  controller_configs = config, 
+                  gripper_types="Robotiq85Gripper_iiwa_14",      
+                  has_renderer=False,                    
+                  has_offscreen_renderer=True,           
+                  control_freq=20,                       
+                  horizon=400,                          
+                  use_object_obs=False,                  
+                  use_camera_obs=True,
+                  camera_heights=300,
+                  camera_widths=486,
+                  camera_names = "custom",
+                  custom_camera_name = "custom", 
+                  custom_camera_trans_matrix = np.array([ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
+                                                [ 0.961834,  0.241668,  0.128340, -129.767868], 
+                                                [ 0.273397, -0.868215, -0.414073,  503.424103], 
+                                                [ 0.000000,  0.000000,  0.000000,  1.000000] ]),
+                  custom_camera_conversion= True,
+                  custom_camera_attrib=  {"fovy": 36}                   
+            ), ["custom_image"]
 )
 
-# Load model
-model = PPO.load('trained_models/' + filename)
-# Load the saved statistics
-env = Monitor(env_robo)
-env = DummyVecEnv([lambda : env])
-env = VecNormalize.load('trained_models/vec_normalize_' + filename + '.pkl', env)
-#  do not update them at test time
-env.training = False
-# reward normalization
-env.norm_reward = False
 
-def record_video(env_id, model, video_length=500, prefix='', video_folder='videos/'):
-  """
-  :param env_id: (str)
-  :param model: (RL model)
-  :param video_length: (int)
-  :param prefix: (str)
-  :param video_folder: (str)
-  """
-  eval_env = DummyVecEnv([lambda: gym.make(env_id)])
-  # Start the video at step=0 and record 500 steps
-  eval_env = VecVideoRecorder(eval_env, video_folder=video_folder,
-                              record_video_trigger=lambda step: step == 0, video_length=video_length,
-                              name_prefix=prefix)
+def record_video(env, model, video_length, video_folder):
+  macros.IMAGE_CONVENTION = "opencv"
 
-  obs = eval_env.reset()
-  for _ in range(video_length):
-    action, _ = model.predict(obs)
-    obs, _, _, _ = eval_env.step(action)
+  obs = env.reset()
 
-  # Close the video recorder
-  eval_env.close()
+  # create a video writer with imageio
+  writer = imageio.get_writer(video_folder, fps=20)
+
+  frames = []
+  for i in range(video_length):
+
+      action = model.predict(obs)
+      obs, reward, done, info = env.step(action)
+
+      frame = obs["custom" + "_image"]
+      writer.append_data(frame)
+      print("Saving frame #{}".format(i))
+
+      if done:
+        break
+
+  writer.close()
+
+model = PPO.load("/home/ojrise/best_model")
+model.device = "cpu"
 
 
-
+record_video(env=env_robo, model=model, video_length=400, video_folder="trying_to_make_video.mp4")
 
