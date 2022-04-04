@@ -5,7 +5,9 @@ training: True   # Whether to train a model or not
 sb_config:
   total_timesteps: 200000
   check_pt_interval: 1000 #1.0e+6
-  num_procs: 2
+  num_procs: 12
+
+vec_normalize: False
 
 # Policy settings
 sb_policy:
