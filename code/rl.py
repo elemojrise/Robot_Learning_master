@@ -59,7 +59,7 @@ if __name__ == '__main__':
     training_timesteps = sb_config["total_timesteps"]
     check_pt_interval = sb_config["check_pt_interval"]
     num_procs = sb_config["num_procs"]
-    device = sb_config['deiv']
+
 
     messages_to_wand_callback = config["wandb_callback"]
     messages_to_eval_callback = config["eval_callback"]

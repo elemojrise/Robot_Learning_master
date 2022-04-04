@@ -1,3 +1,7 @@
+#trained models
+trained_models/
+models/
+wandb/
 # Editors
 .vscode/
 .idea/
