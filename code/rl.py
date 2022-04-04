@@ -87,6 +87,8 @@ if __name__ == '__main__':
     save_vecnormalize_path = os.path.join(save_model_folder, 'vec_normalize_' + save_model_filename + '.pkl')
     load_model_path = os.path.join(load_model_folder, load_model_filename)
     load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
+    continue_training_model_path = os.path.join(continue_training_model_folder, continue_training_model_filename)
+    continue_training_vecnormalize_path = os.path.join(continue_training_model_folder, 'vec_normalize_' + continue_training_model_filename + '.pkl')
 
     # Settings for pipeline
     training = config["training"]
@@ -118,7 +120,7 @@ if __name__ == '__main__':
         callback = CallbackList([wandb_callback, eval_callback])
         
         # Train new model
-        if continue_training_model_filename is None:
+        if not os.path.exists(continue_training_model_path):
 
             if normalize_obs or normalize_rew:
                 env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
@@ -129,11 +131,6 @@ if __name__ == '__main__':
 
         # Continual training
         else:
-
-            # Join file paths
-            continue_training_model_path = os.path.join(continue_training_model_folder, continue_training_model_filename)
-            continue_training_vecnormalize_path = os.path.join(continue_training_model_folder, 'vec_normalize_' + continue_training_model_filename + '.pkl')
-
             print(f"Continual training on model located at {continue_training_model_path}")
 
             # Load normalized env
