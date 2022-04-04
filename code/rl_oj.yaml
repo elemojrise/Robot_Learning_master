@@ -5,15 +5,20 @@ training: True   # Whether to train a model or not
 sb_config:
   total_timesteps: 200000
   check_pt_interval: 1000 #1.0e+6
-  num_procs: 12
+  num_procs: 2
+  policy: PPO
 
-vec_normalize: False
+
+# Settings for normalization
+normalize_obs: False
+normalize_rew: False
+norm_obs_keys: []    #List of obs keys to normalize
 
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
   learning_rate: 0.0003 
-  n_steps: 1024 
+  n_steps: 1 #1024
   batch_size: 64 
   n_epochs: 10 
   gamma: 0.99 
@@ -106,10 +111,10 @@ file_handling:
   tb_log_folder: "ppo_lift_4_objects_tensorboard"
   tb_log_name: "rgb_4_objects_plot"
   save_model_folder: "trained_models"
-  save_model_filename: "rgb_4_objects"
+  save_model_filename: "baseline_test"
   # Loading of trained models
   load_model_folder: "trained_models"
-  load_model_filename: "rgb_4_objects"
+  load_model_filename: "baseline_test"
   # Path to model which should be continued to train
   continue_training_model_folder: "trained_models"
   continue_training_model_filename: null       # is null when training a new model

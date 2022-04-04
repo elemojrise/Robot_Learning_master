@@ -1,0 +1,365 @@
+wandb_version: 1
+
+_current_progress_remaining:
+  desc: null
+  value: 1
+_custom_logger:
+  desc: null
+  value: 'False'
+_episode_num:
+  desc: null
+  value: 0
+_last_episode_starts:
+  desc: null
+  value: '[ True  True]'
+_last_obs:
+  desc: null
+  value: "OrderedDict([('custom_image', array([[[[ 75,  72,  73, ..., 147, 148, 150],\n\
+    \         [ 75,  76,  70, ..., 154, 156, 153],\n         [ 74,  75,  74, ...,\
+    \ 158, 160, 160],\n         ...,\n         [119, 112, 109, ..., 255, 255, 255],\n\
+    \         [122, 118, 115, ..., 255, 255, 255],\n         [119, 113, 118, ...,\
+    \ 255, 255, 255]],\n\n        [[ 70,  69,  70, ..., 181, 181, 183],\n        \
+    \ [ 71,  72,  66, ..., 184, 187, 185],\n         [ 71,  72,  71, ..., 188, 186,\
+    \ 189],\n         ...,\n         [140, 136, 133, ..., 255, 255, 255],\n      \
+    \   [140, 138, 137, ..., 255, 255, 255],\n         [140, 137, 143, ..., 255, 255,\
+    \ 255]],\n\n        [[ 67,  65,  66, ..., 193, 193, 195],\n         [ 68,  68,\
+    \  62, ..., 195, 197, 195],\n         [ 68,  68,  67, ..., 197, 197, 199],\n \
+    \        ...,\n         [144, 142, 140, ..., 255, 255, 255],\n         [146, 144,\
+    \ 143, ..., 255, 255, 255],\n         [146, 144, 150, ..., 255, 255, 255]]],\n\
+    \n\n       [[[ 75,  72,  73, ..., 147, 148, 150],\n         [ 75,  76,  70, ...,\
+    \ 154, 156, 153],\n         [ 74,  75,  74, ..., 158, 160, 160],\n         ...,\n\
+    \         [119, 112, 109, ..., 255, 255, 255],\n         [122, 118, 115, ...,\
+    \ 255, 255, 255],\n         [119, 113, 118, ..., 255, 255, 255]],\n\n        [[\
+    \ 70,  69,  70, ..., 181, 181, 183],\n         [ 71,  72,  66, ..., 184, 187,\
+    \ 185],\n         [ 71,  72,  71, ..., 188, 186, 189],\n         ...,\n      \
+    \   [140, 136, 133, ..., 255, 255, 255],\n         [140, 138, 137, ..., 255, 255,\
+    \ 255],\n         [140, 137, 143, ..., 255, 255, 255]],\n\n        [[ 67,  65,\
+    \  66, ..., 193, 193, 195],\n         [ 68,  68,  62, ..., 195, 197, 195],\n \
+    \        [ 68,  68,  67, ..., 197, 197, 199],\n         ...,\n         [144, 142,\
+    \ 140, ..., 255, 255, 255],\n         [146, 144, 143, ..., 255, 255, 255],\n \
+    \        [146, 144, 150, ..., 255, 255, 255]]]], dtype=uint8))])"
+_last_original_obs:
+  desc: null
+  value: None
+_logger:
+  desc: null
+  value: <stable_baselines3.common.logger.Logger object at 0x7f196d3f30a0>
+_n_updates:
+  desc: null
+  value: 0
+_num_timesteps_at_start:
+  desc: null
+  value: 0
+_total_timesteps:
+  desc: null
+  value: 2000
+_vec_normalize_env:
+  desc: null
+  value: None
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.12.11
+    code_path: code/code/rl.py
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.8.12
+    start_time: 1649076467
+    t:
+      1:
+      - 1
+      - 3
+      2:
+      - 1
+      - 3
+      3:
+      - 1
+      - 16
+      - 22
+      - 35
+      4: 3.8.12
+      5: 0.12.11
+      8:
+      - 5
+action_noise:
+  desc: null
+  value: None
+action_space:
+  desc: null
+  value: Box([-1. -1. -1. -1. -1.], [1. 1. 1. 1. 1.], (5,), float32)
+algo:
+  desc: null
+  value: PPO
+batch_size:
+  desc: null
+  value: 64
+clip_range:
+  desc: null
+  value: <function constant_fn.<locals>.func at 0x7f196d410ee0>
+clip_range_vf:
+  desc: null
+  value: None
+device:
+  desc: null
+  value: cuda
+ent_coef:
+  desc: null
+  value: 0.0
+env:
+  desc: null
+  value: <stable_baselines3.common.vec_env.vec_transpose.VecTransposeImage object
+    at 0x7f1a201e4ca0>
+ep_info_buffer:
+  desc: null
+  value: deque([], maxlen=100)
+ep_success_buffer:
+  desc: null
+  value: deque([], maxlen=100)
+eval_callback:
+  desc: null
+  value:
+    best_model_save_path: ./logs_real/
+    callback_on_new_best: null
+    deterministic: false
+    eval_freq: 4096
+    log_path: ./logs_real/
+    n_eval_episodes: 20
+    render: false
+    verbose: 1
+    warn: true
+eval_env:
+  desc: null
+  value: None
+file_handling:
+  desc: null
+  value:
+    continue_training_model_filename: null
+    continue_training_model_folder: trained_models
+    load_model_filename: rgb_4_objects
+    load_model_folder: trained_models
+    save_model_filename: rgb_4_objects
+    save_model_folder: trained_models
+    tb_log_folder: ppo_lift_4_objects_tensorboard
+    tb_log_name: rgb_4_objects_plot
+gae_lambda:
+  desc: null
+  value: 0.95
+gamma:
+  desc: null
+  value: 0.99
+gymwrapper:
+  desc: null
+  value:
+    observations:
+    - custom_image
+    smaller_action_space: true
+learning_rate:
+  desc: null
+  value: 0.0003
+lr_schedule:
+  desc: null
+  value: <function constant_fn.<locals>.func at 0x7f196d410c10>
+max_grad_norm:
+  desc: null
+  value: 0.5
+n_envs:
+  desc: null
+  value: 2
+n_epochs:
+  desc: null
+  value: 10
+n_steps:
+  desc: null
+  value: 24
+norm_obs_keys:
+  desc: null
+  value: []
+normalize_obs:
+  desc: null
+  value: false
+normalize_rew:
+  desc: null
+  value: false
+num_timesteps:
+  desc: null
+  value: 0
+observation_space:
+  desc: null
+  value: "Dict(custom_image:Box([[[0 0 0 ... 0 0 0]\n  [0 0 0 ... 0 0 0]\n  [0 0 0\
+    \ ... 0 0 0]\n  ...\n  [0 0 0 ... 0 0 0]\n  [0 0 0 ... 0 0 0]\n  [0 0 0 ... 0\
+    \ 0 0]]\n\n [[0 0 0 ... 0 0 0]\n  [0 0 0 ... 0 0 0]\n  [0 0 0 ... 0 0 0]\n  ...\n\
+    \  [0 0 0 ... 0 0 0]\n  [0 0 0 ... 0 0 0]\n  [0 0 0 ... 0 0 0]]\n\n [[0 0 0 ...\
+    \ 0 0 0]\n  [0 0 0 ... 0 0 0]\n  [0 0 0 ... 0 0 0]\n  ...\n  [0 0 0 ... 0 0 0]\n\
+    \  [0 0 0 ... 0 0 0]\n  [0 0 0 ... 0 0 0]]], [[[255 255 255 ... 255 255 255]\n\
+    \  [255 255 255 ... 255 255 255]\n  [255 255 255 ... 255 255 255]\n  ...\n  [255\
+    \ 255 255 ... 255 255 255]\n  [255 255 255 ... 255 255 255]\n  [255 255 255 ...\
+    \ 255 255 255]]\n\n [[255 255 255 ... 255 255 255]\n  [255 255 255 ... 255 255\
+    \ 255]\n  [255 255 255 ... 255 255 255]\n  ...\n  [255 255 255 ... 255 255 255]\n\
+    \  [255 255 255 ... 255 255 255]\n  [255 255 255 ... 255 255 255]]\n\n [[255 255\
+    \ 255 ... 255 255 255]\n  [255 255 255 ... 255 255 255]\n  [255 255 255 ... 255\
+    \ 255 255]\n  ...\n  [255 255 255 ... 255 255 255]\n  [255 255 255 ... 255 255\
+    \ 255]\n  [255 255 255 ... 255 255 255]]], (3, 300, 486), uint8))"
+policy:
+  desc: null
+  value: "MultiInputActorCriticPolicy(\n  (features_extractor): CombinedExtractor(\n\
+    \    (extractors): ModuleDict(\n      (custom_image): NatureCNN(\n        (cnn):\
+    \ Sequential(\n          (0): Conv2d(3, 32, kernel_size=(8, 8), stride=(4, 4))\n\
+    \          (1): ReLU()\n          (2): Conv2d(32, 64, kernel_size=(4, 4), stride=(2,\
+    \ 2))\n          (3): ReLU()\n          (4): Conv2d(64, 64, kernel_size=(3, 3),\
+    \ stride=(1, 1))\n          (5): ReLU()\n          (6): Flatten(start_dim=1, end_dim=-1)\n\
+    \        )\n        (linear): Sequential(\n          (0): Linear(in_features=124032,\
+    \ out_features=256, bias=True)\n          (1): ReLU()\n        )\n      )\n  \
+    \  )\n  )\n  (mlp_extractor): MlpExtractor(\n    (shared_net): Sequential()\n\
+    \    (policy_net): Sequential(\n      (0): Linear(in_features=256, out_features=64,\
+    \ bias=True)\n      (1): Tanh()\n      (2): Linear(in_features=64, out_features=64,\
+    \ bias=True)\n      (3): Tanh()\n    )\n    (value_net): Sequential(\n      (0):\
+    \ Linear(in_features=256, out_features=64, bias=True)\n      (1): Tanh()\n   \
+    \   (2): Linear(in_features=64, out_features=64, bias=True)\n      (3): Tanh()\n\
+    \    )\n  )\n  (action_net): Linear(in_features=64, out_features=5, bias=True)\n\
+    \  (value_net): Linear(in_features=64, out_features=1, bias=True)\n)"
+policy_class:
+  desc: null
+  value: <class 'stable_baselines3.common.policies.MultiInputActorCriticPolicy'>
+policy_kwargs:
+  desc: null
+  value: '{}'
+robosuite:
+  desc: null
+  value:
+    camera_heights: 300
+    camera_names: custom
+    camera_widths: 486
+    control_freq: 20
+    controller_configs:
+      control_delta: true
+      damping_ratio: 1
+      damping_ratio_limits:
+      - 0
+      - 10
+      impedance_mode: fixed
+      input_max: 1
+      input_min: -1
+      interpolation: null
+      kp: 150
+      kp_limits:
+      - 0
+      - 300
+      orientation_limits: null
+      output_max:
+      - 0.05
+      - 0.05
+      - 0.05
+      - 0.5
+      - 0.5
+      - 0.5
+      output_min:
+      - -0.05
+      - -0.05
+      - -0.05
+      - -0.5
+      - -0.5
+      - -0.5
+      position_limits": null
+      ramp_ratio: 0.2
+      type: OSC_POSE
+      uncouple_pos_ori: true
+    custom_camera_attrib:
+      fovy: 36
+    custom_camera_conversion: true
+    custom_camera_name: custom
+    custom_camera_trans_matrix:
+    - - 0.011358
+      - 0.433358
+      - -0.90115
+      - 1220.739746
+    - - 0.961834
+      - 0.241668
+      - 0.12834
+      - -129.767868
+    - - 0.273397
+      - -0.868215
+      - -0.414073
+      - 503.424103
+    - - 0.0
+      - 0.0
+      - 0.0
+      - 1.0
+    gripper_types: Robotiq85Gripper_iiwa_14
+    has_offscreen_renderer: true
+    has_renderer: false
+    horizon: 400
+    reward_shaping: true
+    robots: IIWA_14
+    use_camera_obs: true
+    use_object_obs: false
+rollout_buffer:
+  desc: null
+  value: <stable_baselines3.common.buffers.DictRolloutBuffer object at 0x7f196d40a2b0>
+sb_config:
+  desc: null
+  value:
+    check_pt_interval: 1000
+    num_procs: 2
+    total_timesteps: 2000
+sb_policy:
+  desc: null
+  value:
+    _init_setup_model: true
+    batch_size: 64
+    clip_range: 0.2
+    clip_range_vf: null
+    create_eval_env: false
+    device: auto
+    ent_coef: 0.0
+    gae_lambda: 0.95
+    gamma: 0.99
+    learning_rate: 0.0003
+    max_grad_norm: 0.5
+    n_epochs: 10
+    n_steps: 24
+    policy_kwargs: null
+    sde_sample_freq: -1
+    seed: null
+    target_kl: null
+    use_sde: false
+    verbose: 1
+    vf_coef: 0.5
+sde_sample_freq:
+  desc: null
+  value: -1
+seed:
+  desc: null
+  value: 0
+start_time:
+  desc: null
+  value: 1649076475.4518116
+target_kl:
+  desc: null
+  value: None
+tensorboard_log:
+  desc: null
+  value: runs/255gv0vo
+training:
+  desc: null
+  value: true
+use_sde:
+  desc: null
+  value: 'False'
+verbose:
+  desc: null
+  value: 1
+vf_coef:
+  desc: null
+  value: 0.5
+wandb:
+  desc: null
+  value:
+    project: sb3_lift_real
+    save_code: true
+    sync_tensorboard: true
+wandb_callback:
+  desc: null
+  value:
+    gradient_save_freq: 10000
+    verbose: 2

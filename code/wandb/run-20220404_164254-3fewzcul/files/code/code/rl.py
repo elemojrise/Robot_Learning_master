@@ -123,7 +123,7 @@ if __name__ == '__main__':
             if normalize_obs or normalize_rew:
                 env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
             # Create model
-            model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
+            model = model_type(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
 
             print("Created a new model")
 
@@ -141,7 +141,7 @@ if __name__ == '__main__':
                 env = VecNormalize.load(continue_training_vecnormalize_path, env)
 
             # Load model
-            model = PPO.load(continue_training_model_path, env=env)
+            model = model_type.load(continue_training_model_path, env=env)
             
         
         # Training

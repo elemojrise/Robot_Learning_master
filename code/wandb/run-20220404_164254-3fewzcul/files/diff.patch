@@ -1,0 +1,1190 @@
+diff --git a/code/Check_custom_env.py b/code/Check_custom_env.py
+deleted file mode 100644
+index 3bd96cd..0000000
+--- a/code/Check_custom_env.py
++++ /dev/null
+@@ -1,77 +0,0 @@
+-import robosuite as suite
+-import numpy as np
+-
+-from src.environments import Lift_4_objects, Lift_edit
+-
+-from robosuite.environments.base import register_env
+-from robosuite import load_controller_config
+-from src.wrapper import GymWrapper_rgb, GymWrapper_multiinput
+-
+-from stable_baselines3 import PPO
+-from stable_baselines3.common.env_checker import check_env
+-from stable_baselines3.common.monitor import Monitor
+-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, SubprocVecEnv
+-
+-from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+-from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+-
+-from robosuite.models.robots.robot_model import register_robot
+-from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
+-
+-register_robot(IIWA_14)
+-register_gripper(Robotiq85Gripper_iiwa_14)
+-register_robot_class_mapping("IIWA_14")
+-register_env(Lift_edit)
+-
+-def wrap_env(env):
+-    wrapped_env = Monitor(env)                          # Needed for extracting eprewmean and eplenmean
+-    wrapped_env = DummyVecEnv([lambda : wrapped_env])   # Needed for all environments (e.g. used for mulit-processing)
+-    wrapped_env = VecNormalize(wrapped_env)             # Needed for improving training when using MuJoCo envs?
+-    return wrapped_env
+-
+-
+-
+-config = load_controller_config(default_controller="OSC_POSE")
+-
+-env = GymWrapper_multiinput(
+-        suite.make(
+-            env_name="Lift_edit",
+-            robots = "IIWA_14",
+-            controller_configs = config, 
+-            gripper_types="Robotiq85Gripper_iiwa_14",      
+-            has_renderer=True,                    
+-            has_offscreen_renderer=False,           
+-            control_freq=20,                       
+-            horizon=10000,
+-            camera_heights = 48,
+-            camera_widths = 48,                          
+-            use_object_obs=False,                  
+-            use_camera_obs=False,                   
+-        ), ["robot0_joint_pos_cos"]
+-)
+-
+-#env = wrap_env(env)
+-
+-#Denne koden sjekker om environmentet er godkjent for å trene med stable_baseline
+-check_env(env)
+-
+-#print("Getting observations")
+-
+-obs = env.reset()
+-
+-for i in range(10000):
+-    env.render()
+-    action = env.action_space.sample()
+-    obs, reward, done, info = env.step(action)
+-
+-    if done:
+-        env.reset()
+-
+-
+-#image = np.reshape(obs, (256,256,3))
+-#print("Observation = {} \n\n Action = {} \n\n".format(obs,action))
+-
+-# model = PPO('MultiInputPolicy', env, verbose=2, tensorboard_log='./ppo_lift_4_objects_tensorboard/')
+-
+-# model.learn(total_timesteps= 25000)
+-
+diff --git a/code/custom_env_test.py b/code/custom_env_test.py
+deleted file mode 100644
+index 979afad..0000000
+--- a/code/custom_env_test.py
++++ /dev/null
+@@ -1,124 +0,0 @@
+-import numpy as np
+-import robosuite as suite
+-from PIL import Image
+-
+-from scipy.spatial.transform import Rotation as R
+-
+-from src.environments import Lift_4_objects, lift_edit
+-
+-from robosuite.utils.camera_utils import CameraMover
+-
+-from robosuite.environments.base import register_env
+-
+-from src.helper_functions.camera_functions import adjust_width_of_image
+-
+-from robosuite.models.robots.robot_model import register_robot
+-
+-from src.wrapper import GymWrapper_multiinput
+-from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+-from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+-from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
+-
+-from stable_baselines3.common.monitor import Monitor
+-from stable_baselines3.common.vec_env import VecTransposeImage, DummyVecEnv
+-
+-#Registrerer custom environment
+-register_robot(IIWA_14)
+-register_gripper(Robotiq85Gripper_iiwa_14)
+-register_robot_class_mapping("IIWA_14")
+-register_env(Lift_4_objects)
+-register_env(lift_edit)
+-
+-Trans_matrix = np.array([ [ 0.171221,  0.730116, -0.661524,  1124.551880], 
+-  [ 0.985078, -0.138769,  0.101808, -46.181087], 
+-  [-0.017467, -0.669085, -0.742981,  815.163208], 
+-  [ 0.000000,  0.000000,  0.000000,  1.000000] ])
+-
+-Trans_matrix_20_points = np.array([ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
+-  [ 0.961834,  0.241668,  0.128340, -129.767868], 
+-  [ 0.273397, -0.868215, -0.414073,  503.424103], 
+-  [ 0.000000,  0.000000,  0.000000,  1.000000] ])  
+-
+-Trans_matrix_over_the_shoulder = np.array([ [ 0.477045, -0.841291,  0.254279,  251.447571], 
+-  [-0.877611, -0.471518,  0.086427, -159.115860], 
+-  [ 0.047187, -0.264388, -0.963261,  1172.085205], 
+-  [ 0.000000,  0.000000,  0.000000,  1.000000] ])
+-
+-Ned_to_Enu_conversion_1 = np.array([  [1,0,0],
+-                                        [0,-1,0],
+-                                        [0,0,-1]
+-                        ])
+-
+-Ned_to_Enu_conversion_2 = np.array([  [0,1,0],
+-                                        [1,0,0],
+-                                        [0,0,-1]
+-                        ])
+-
+-
+-# create environment instance
+-env = suite.make(
+-    env_name="Lift_edit",
+-    robots = "IIWA_14",
+-    gripper_types="Robotiq85Gripper_iiwa_14",                # use default grippers per robot arm
+-    has_renderer=False,                     # no on-screen rendering
+-    has_offscreen_renderer=True,            # off-screen rendering needed for image obs
+-    control_freq=20,                        # 20 hz control for applied actions
+-    horizon=1000,                            # each episode terminates after 200 steps
+-    use_object_obs=False,                   # don't provide object observations to agent
+-    use_camera_obs=True,                   # provide image observations to agent
+-    camera_names="custom",
+-    render_camera = None,               # use "agentview" camera for observations
+-    camera_heights=300,                      # image height
+-    camera_widths=adjust_width_of_image(300),                       # image width
+-    # reward_shaping=False,
+-    custom_camera_name = "custom",
+-    custom_camera_trans_matrix = Trans_matrix_20_points,
+-    custom_camera_conversion= True,
+-    custom_camera_attrib = {"fovy": 36},
+-)
+-
+-env = GymWrapper_multiinput(env=env, keys= ["custom_image"])
+-env = Monitor(env, info_keywords = ("is_success",)) 
+-env = DummyVecEnv([lambda : env])
+-# env = VecTransposeImage(env)
+-
+-# cam_pose = np.add(cam_pose, env.table_offset)
+-
+-# reset the environment
+-env.reset()
+-
+-#action = np.random.randn(env.robots[0].dof) # sample random action
+-action = [env.action_space.sample()]
+-print(action)
+-obs, reward, done, info = env.step(action)  # take action in the environment
+-
+-print(obs)
+-
+-# cam_move = CameraMover(env= env, camera = "custom", init_camera_pos= cam_pose , init_camera_quat= np.array([[0.653], [0.271], [0.271], [0.653]]).flatten() )
+-
+-# pose, quat = cam_move.get_camera_pose()
+-
+-#print(pose, quat)
+-
+-image = obs['custom_image'] #uint8
+-image = np.squeeze(image)
+-print(image.shape)
+-img = Image.fromarray(image, 'RGB')
+-img = img.rotate(180)
+-
+-rot_img = np.asarray(img)
+-print(rot_img.shape)
+-print(rot_img)
+-img.save('20_points.png')
+-
+-
+-# print(obs)
+-# print(reward)
+-# print(done)
+-# print(info)
+-
+-# for i in range(1000):
+-#     action = np.random.randn(env.robots[0].dof) # sample random action
+-#     obs, reward, done, info = env.step(action)  # take action in the environment
+-#     env.render()
+-
+diff --git a/code/multiprocess.yaml b/code/multiprocess.yaml
+deleted file mode 100644
+index 5d2e16a..0000000
+--- a/code/multiprocess.yaml
++++ /dev/null
+@@ -1,32 +0,0 @@
+-robosuite:
+-  env_id: "Lift_4_objects"
+-  robots: "IIWA"
+-  gripper_types: "Robotiq85Gripper"      
+-  has_renderer: False                    
+-  has_offscreen_renderer: True           
+-  control_freq: 20                       
+-  horizon: 100
+-  camera_heights: 48
+-  camera_widths: 48                          
+-  use_object_obs: False                  
+-  use_camera_obs: True
+-  controller_configs: 
+-    type: "OSC_POSE"
+-    input_max: 1
+-    input_min: -1
+-    output_max: [0.05, 0.05, 0.05, 0.5, 0.5, 0.5]
+-    output_min: [-0.05, -0.05, -0.05, -0.5, -0.5, -0.5]
+-    kp: 150
+-    damping_ratio: 1
+-    impedance_mode: "fixed"
+-    kp_limits: [0, 300]
+-    damping_ratio_limits: [0, 10]
+-    position_limits": null
+-    orientation_limits: null
+-    uncouple_pos_ori: true
+-    control_delta: true
+-    interpolation: null
+-    ramp_ratio: 0.2
+-
+-observations:
+-  rgb: "agentview_image"
+\ No newline at end of file
+diff --git a/code/reading_npz.py b/code/reading_npz.py
+deleted file mode 100644
+index ef1313e..0000000
+--- a/code/reading_npz.py
++++ /dev/null
+@@ -1,8 +0,0 @@
+-import numpy as np
+-
+-data = np.load('logs/evaluations.npz', allow_pickle=True)
+-lst = data.files
+-
+-for item in lst:
+-    print(item)
+-    print(data[item])
+\ No newline at end of file
+diff --git a/code/rl.py b/code/rl.py
+index 0e78060..ee30b88 100644
+--- a/code/rl.py
++++ b/code/rl.py
+@@ -13,6 +13,7 @@ from robosuite.environments.base import register_env
+ from stable_baselines3 import PPO
+ from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
+ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecTransposeImage
++from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
+ from stable_baselines3.common.callbacks import EvalCallback, CallbackList
+ 
+ 
+@@ -41,6 +42,13 @@ if __name__ == '__main__':
+     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
+     env_id = env_options.pop("env_id")
+ 
++    #normalize obs and rew
++    
++    normalize_obs = config['normalize_obs']
++    normalize_rew = config['normalize_rew']
++    norm_obs_keys = config['norm_obs_keys']
++
++
+     # Observations
+     obs_config = config["gymwrapper"]
+     obs_list = obs_config["observations"] 
+@@ -51,6 +59,7 @@ if __name__ == '__main__':
+     training_timesteps = sb_config["total_timesteps"]
+     check_pt_interval = sb_config["check_pt_interval"]
+     num_procs = sb_config["num_procs"]
++    model_type = sb_config['policy']
+ 
+     messages_to_wand_callback = config["wandb_callback"]
+     messages_to_eval_callback = config["eval_callback"]
+@@ -96,6 +105,7 @@ if __name__ == '__main__':
+             print("making")
+             env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
+ 
++    
+         run = wandb.init(
+             **wandb_settings,
+             config=config,
+@@ -110,8 +120,10 @@ if __name__ == '__main__':
+         # Train new model
+         if continue_training_model_filename is None:
+ 
++            if normalize_obs or normalize_rew:
++                env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
+             # Create model
+-            model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
++            model = model_type(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
+ 
+             print("Created a new model")
+ 
+@@ -124,11 +136,13 @@ if __name__ == '__main__':
+ 
+             print(f"Continual training on model located at {continue_training_model_path}")
+ 
+-            # Load normalized env 
+-            env = VecNormalize.load(continue_training_vecnormalize_path, env)
++            # Load normalized env
++            if normalize_obs or normalize_rew:
++                env = VecNormalize.load(continue_training_vecnormalize_path, env)
+ 
+             # Load model
+-            model = PPO.load(continue_training_model_path, env=env)
++            model = model_type.load(continue_training_model_path, env=env)
++            
+         
+         # Training
+         print("starting to train")
+@@ -138,7 +152,8 @@ if __name__ == '__main__':
+ 
+         # Save trained model
+         model.save(save_model_path)
+-        env.save(save_vecnormalize_path)
++        if normalize_obs or normalize_rew:
++            env.save(save_vecnormalize_path)
+ 
+         env.close()
+ 
+diff --git a/code/rl_env_testing.py b/code/rl_env_testing.py
+deleted file mode 100644
+index 8951273..0000000
+--- a/code/rl_env_testing.py
++++ /dev/null
+@@ -1,161 +0,0 @@
+-from locale import normalize
+-import numpy as np
+-import robosuite as suite
+-import os
+-import yaml
+-
+-import wandb
+-from wandb.integration.sb3 import WandbCallback
+-
+-from robosuite.models.robots.robot_model import register_robot
+-from robosuite.environments.base import register_env
+-
+-from stable_baselines3 import PPO
+-from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
+-from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecTransposeImage
+-from stable_baselines3.common.callbacks import EvalCallback, CallbackList
+-
+-
+-from src.environments import Lift_4_objects, Lift_edit
+-from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+-from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+-from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
+-from src.helper_functions.wrap_env import make_multiprocess_env, make_singel_env
+-from src.helper_functions.camera_functions import adjust_width_of_image
+-
+-
+-import matplotlib
+-import matplotlib.animation as animation
+-import matplotlib.pyplot as plt
+-from IPython.display import HTML
+-import PIL.Image
+-def display_video(frames, framerate=2):
+-    print(frames.shape)
+-    print(frames[0].shape)
+-    height, width, __ = frames[0].shape
+-    dpi = 70
+-    orig_backend = matplotlib.get_backend()
+-    matplotlib.use('Agg')  # Switch to headless 'Agg' to inhibit figure rendering.
+-    fig, ax = plt.subplots(1, 1, figsize=(width / dpi, height / dpi), dpi=dpi)
+-    matplotlib.use(orig_backend)  # Switch back to the original backend.
+-    ax.set_axis_off()
+-    ax.set_aspect('equal')
+-    ax.set_position([0, 0, 1, 1])
+-    im = ax.imshow(frames[0])
+-
+-    def update(frame):
+-      im.set_data(frame)
+-      return [im]
+-    interval = 1000/framerate
+-    anim = animation.FuncAnimation(fig=fig, func=update, frames=frames,
+-                                   interval=interval, blit=True, repeat=False)
+-    writer = animation.writers['ffmpeg'](fps=30)
+-    anim.save(video_name,writer=writer,dpi=dpi)
+-
+-from scipy import ndimage
+-
+-
+-
+-if __name__ == '__main__':
+-    register_robot(IIWA_14)
+-    register_gripper(Robotiq85Gripper_iiwa_14)
+-    register_robot_class_mapping("IIWA_14")
+-    register_env(Lift_edit)
+-    register_env(Lift_4_objects)
+-
+-    with open("rl_config.yaml", 'r') as stream:
+-        config = yaml.safe_load(stream)
+-
+-    # Environment specifications
+-    env_options = config["robosuite"]
+-    env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
+-    env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
+-    env_id = env_options.pop("env_id")
+-
+-    # Observations
+-    obs_config = config["gymwrapper"]
+-    obs_list = obs_config["observations"] 
+-    smaller_action_space = obs_config["smaller_action_space"]
+-
+-    # Settings for stable-baselines RL algorithm
+-    sb_config = config["sb_config"]
+-    training_timesteps = sb_config["total_timesteps"]
+-    check_pt_interval = sb_config["check_pt_interval"]
+-    num_procs = sb_config["num_procs"]
+-
+-    messages_to_wand_callback = config["wandb_callback"]
+-    messages_to_eval_callback = config["eval_callback"]
+-
+-    # Settings for stable-baselines policy
+-    policy_kwargs = config["sb_policy"]
+-    policy_type = policy_kwargs.pop("type")
+-
+-    # Settings used for file handling and logging (save/load destination etc)
+-    file_handling = config["file_handling"]
+-
+-    tb_log_folder = file_handling["tb_log_folder"]
+-    tb_log_name = file_handling["tb_log_name"]
+-
+-    save_model_folder = file_handling["save_model_folder"]
+-    save_model_filename = file_handling["save_model_filename"]
+-    load_model_folder = file_handling["load_model_folder"]
+-    load_model_filename = file_handling["load_model_filename"]
+-
+-    continue_training_model_folder = file_handling["continue_training_model_folder"]
+-    continue_training_model_filename = file_handling["continue_training_model_filename"]
+-
+-    # Join paths
+-    save_model_path = os.path.join(save_model_folder, save_model_filename)
+-    save_vecnormalize_path = os.path.join(save_model_folder, 'vec_normalize_' + save_model_filename + '.pkl')
+-    load_model_path = os.path.join(load_model_folder, load_model_filename)
+-    load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
+-
+-    # Settings for pipeline
+-    training = config["training"]
+-    seed = config["seed"]
+-
+-
+-    print("making")
+-    env = make_singel_env(env_id, env_options, obs_list, smaller_action_space)
+-
+-
+-    env = VecTransposeImage(env)
+-
+-    # Create model
+-    model = PPO(policy_type, env= env, **policy_kwargs)
+-    obs = env.reset()
+-    action, _states = model.predict(obs)
+-    print(f"action: {action}")
+-    obs, reward, done, info = env.step(action)
+-    print("Created a new model")
+-
+-    #print(env.observation_space)
+-    #print(obs['custom_image'].shape)
+-
+-    print(obs['custom_image'])
+-    
+-
+-
+-
+-    ### Video
+-    num_episodes = 1
+-    video_name = 'test.mp4'
+-    frames = []
+-    video = False
+-    if video == True:
+-        for i in range(num_episodes):
+-            obs = env.reset()
+-            img = obs['custom_image']
+-            rotated_img = ndimage.rotate(img, 180)
+-            
+-            frames.append(rotated_img)
+-            for i in range(5):
+-                chosen_action = model.predict(obs)
+-                obs,reward,done,info = env.step(chosen_action[0])
+-                img = obs['custom_image']
+-                rotated_img = ndimage.rotate(img, 180)
+-                frames.append(rotated_img)
+-        display_video(frames)
+-
+-    env.close()
+-
+diff --git a/code/rl_oj.yaml b/code/rl_oj.yaml
+index 9bab24b..6ae05f7 100644
+--- a/code/rl_oj.yaml
++++ b/code/rl_oj.yaml
+@@ -5,15 +5,20 @@ training: True   # Whether to train a model or not
+ sb_config:
+   total_timesteps: 200000
+   check_pt_interval: 1000 #1.0e+6
+-  num_procs: 12
++  num_procs: 2
++  policy: PPO
+ 
+-vec_normalize: False
++
++# Settings for normalization
++normalize_obs: False
++normalize_rew: False
++norm_obs_keys: []    #List of obs keys to normalize
+ 
+ # Policy settings
+ sb_policy:
+   type: "MultiInputPolicy"
+   learning_rate: 0.0003 
+-  n_steps: 1024 
++  n_steps: 1 #1024
+   batch_size: 64 
+   n_epochs: 10 
+   gamma: 0.99 
+diff --git a/code/rl_training.py b/code/rl_training.py
+deleted file mode 100644
+index 049d84d..0000000
+--- a/code/rl_training.py
++++ /dev/null
+@@ -1,82 +0,0 @@
+-from curses import flash
+-import robosuite as suite
+-import gym
+-import numpy as np
+-
+-from robosuite.environments.base import register_env
+-from robosuite import load_controller_config
+-from robosuite.wrappers import GymWrapper
+-from src.wrapper.GymWrapper_multiinput import GymWrapper_multiinput
+-
+-from stable_baselines3 import PPO
+-from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
+-from stable_baselines3.common.monitor import Monitor
+-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, VecTransposeImage, VecVideoRecorder
+-from stable_baselines3.common.callbacks import EvalCallback
+-
+-print("doing")
+-def wrap_env(env):
+-    wrapped_env = Monitor(env, info_keywords = ("is_success",))                          # Needed for extracting eprewmean and eplenmean
+-    wrapped_env = DummyVecEnv([lambda : wrapped_env])   # Needed for all environments (e.g. used for mulit-processing)
+-    #wrapped_env = VecNormalize(wrapped_env)             # Needed for improving training when using MuJoCo envs?
+-    wrapped_env = VecTransposeImage(wrapped_env)
+-    return wrapped_env
+-
+-controller_config = load_controller_config(default_controller="OSC_POSE")
+-
+-# Training
+-env = GymWrapper_multiinput(
+-        suite.make(
+-            env_name="Lift",
+-            robots = "IIWA",
+-            controller_configs = controller_config, 
+-            gripper_types="Robotiq85Gripper",      
+-            has_renderer=False,                    
+-            has_offscreen_renderer=True,           
+-            control_freq=20,                       
+-            horizon= 100,
+-            ignore_done = False, 
+-            camera_heights = 48,
+-            camera_widths = 48,                          
+-            use_object_obs=False,                  
+-            use_camera_obs=True,
+-            reward_shaping= True,
+-            #camera_names = ["all-robotview"]                   
+-        ),  
+-        keys = ["agentview_image"]#,"robot0_joint_pos"],
+-        #smaller_action_space= True
+-)
+-env = wrap_env(env)
+-
+-# print(env.metadata)
+-# print(env.get_attr("metadata")[0])
+-
+-# temp_env = env.venv
+-# print(temp_env)
+-
+-# print(temp_env.metadata)
+-# print(temp_env.get_attr("metadata")[0])
+-
+-env = VecVideoRecorder(env, "videos", record_video_trigger=lambda x: x % 300 == 0, video_length=200)
+-
+-eval_callback = EvalCallback(env, callback_on_new_best=None, #callback_after_eval=None, 
+-                            n_eval_episodes=3, eval_freq=200, log_path='./logs/', 
+-                            best_model_save_path='best_model/logs/', deterministic=False, render=False, 
+-                            verbose=1, warn=True)
+-filename = 'test'
+-
+-obs = env.reset()
+-
+-print(obs)
+-
+-model = PPO('MultiInputPolicy', env, n_steps = 400, verbose=1)
+-print("starting to learn")
+-
+-model.learn(total_timesteps=12000, callback = eval_callback)
+-
+-print("finished learning")
+-
+-# model.save('trained_models/' + filename)
+-# env.save('trained_models/vec_normalize_' + filename + '.pkl')     # Save VecNormalize statistics
+-
+-
+diff --git a/code/rl_training_rgb.py b/code/rl_training_rgb.py
+deleted file mode 100644
+index feafda3..0000000
+--- a/code/rl_training_rgb.py
++++ /dev/null
+@@ -1,60 +0,0 @@
+-import robosuite as suite
+-import gym
+-import numpy as np
+-
+-from src.environments import Lift_4_objects
+-
+-from robosuite.environments.base import register_env
+-from robosuite import load_controller_config
+-from robosuite.wrappers import GymWrapper
+-
+-from stable_baselines3 import PPO
+-from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
+-from stable_baselines3.common.monitor import Monitor
+-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
+-
+-
+-def wrap_env(env):
+-    wrapped_env = Monitor(env)                          # Needed for extracting eprewmean and eplenmean
+-    wrapped_env = DummyVecEnv([lambda : wrapped_env])   # Needed for all environments (e.g. used for mulit-processing)
+-    wrapped_env = VecNormalize(wrapped_env)             # Needed for improving training when using MuJoCo envs?
+-    return wrapped_env
+-
+-register_env(Lift_4_objects)
+-
+-config = load_controller_config(default_controller="OSC_POSE")
+-
+-print("Starting to wrap environment")
+-
+-# Training
+-env = GymWrapper(
+-        suite.make(
+-            env_name="Lift_4_objects",
+-            robots = "IIWA",
+-            controller_configs = config, 
+-            gripper_types="Robotiq85Gripper",      
+-            has_renderer=False,                    
+-            has_offscreen_renderer=True,           
+-            control_freq=20,                       
+-            horizon=1000,                          
+-            use_object_obs=False,                  
+-            use_camera_obs=True,
+-	    camera_heights=48,
+-	    camera_widths=48,                   
+-        ), ["agentview_image"]
+-)
+-
+-env = wrap_env(env)
+-
+-filename = 'rgb_4_objects'
+-
+-model = PPO('MlpPolicy', env, verbose=2, tensorboard_log='./ppo_lift_4_objects_tensorboard/')
+-print("starting to learn")
+-model.learn(total_timesteps= 25000, log_interval= 5000,  tb_log_name=filename)
+-
+-print("finished learning")
+-
+-model.save('trained_models/' + filename)
+-env.save('trained_models/vec_normalize_' + filename + '.pkl')     # Save VecNormalize statistics
+-
+-
+diff --git a/code/robosuite_test.py b/code/robosuite_test.py
+deleted file mode 100644
+index 2253fb8..0000000
+--- a/code/robosuite_test.py
++++ /dev/null
+@@ -1,28 +0,0 @@
+-import numpy as np
+-import robosuite as suite
+-
+-# create environment instance
+-env = suite.make(
+-    env_name="Lift",
+-    robots = "IIWA",
+-    gripper_types="Robotiq85Gripper",                # use default grippers per robot arm
+-    has_renderer=True,                     # no on-screen rendering
+-    has_offscreen_renderer=False,            # off-screen rendering needed for image obs
+-    control_freq=20,                        # 20 hz control for applied actions
+-    horizon=200,                            # each episode terminates after 200 steps
+-    use_object_obs=False,                   # don't provide object observations to agent
+-    use_camera_obs=False,                   # provide image observations to agent
+-    camera_names="agentview",               # use "agentview" camera for observations
+-    camera_heights=84,                      # image height
+-    camera_widths=84,                       # image width
+-    reward_shaping=True,
+-
+-)
+-
+-# reset the environment
+-env.reset()
+-
+-for i in range(1000):
+-    action = np.random.randn(env.robots[0].dof) # sample random action
+-    obs, reward, done, info = env.step(action)  # take action in the environment
+-    env.render() 
+\ No newline at end of file
+diff --git a/code/src/environments/lift_edit.py b/code/src/environments/lift_edit.py
+index 14be96e..cb9ce1f 100644
+--- a/code/src/environments/lift_edit.py
++++ b/code/src/environments/lift_edit.py
+@@ -271,12 +271,13 @@ class Lift_edit(SingleArmEnv):
+             cube_pos = self.sim.data.body_xpos[self.cube_body_id]
+             gripper_site_pos = self.sim.data.site_xpos[self.robots[0].eef_site_id]
+             dist = np.linalg.norm(gripper_site_pos - cube_pos)
+-            reaching_reward = 1 - np.tanh(10.0 * dist)
++            reaching_reward = 1 - np.tanh(10.0 * dist)*0.05
+             reward += reaching_reward
+ 
+             # grasping reward
+             if self._check_grasp(gripper=self.robots[0].gripper, object_geoms=self.cube):
+-                reward += 0.25
++                print("Detected grasp")
++                reward += 0.75
+ 
+         # Scale reward if requested
+         if self.reward_scale is not None:
+@@ -460,4 +461,4 @@ class Lift_edit(SingleArmEnv):
+         table_height = self.model.mujoco_arena.table_offset[2]
+ 
+         # cube is higher than the table top above a margin
+-        return cube_height > table_height + 0.04
+\ No newline at end of file
++        return cube_height > table_height + 0.08       #changed from 0.04
+\ No newline at end of file
+diff --git a/code/test_multiprocessing.py b/code/test_multiprocessing.py
+deleted file mode 100644
+index e7842e8..0000000
+--- a/code/test_multiprocessing.py
++++ /dev/null
+@@ -1,159 +0,0 @@
+-import robosuite as suite
+-import yaml
+-
+-import time
+-import numpy as np
+-import matplotlib.pyplot as plt
+-
+-from robosuite.wrappers import GymWrapper
+-from robosuite import load_controller_config
+-from robosuite.environments.base import register_env
+-
+-from stable_baselines3 import PPO
+-from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
+-from stable_baselines3.common.monitor import Monitor
+-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, SubprocVecEnv
+-from stable_baselines3.common.utils import set_random_seed
+-from stable_baselines3.common.monitor import Monitor
+-from stable_baselines3.common.callbacks import BaseCallback, EvalCallback, CheckpointCallback
+-from stable_baselines3.common.evaluation import evaluate_policy
+-from stable_baselines3.common.env_util import make_vec_env
+-
+-
+-from typing import Callable
+-
+-from src.environments import Lift_4_objects
+-
+-from src.wrapper import GymWrapper_multiinput
+-from tqdm.auto import tqdm
+-
+-class ProgressBarCallback(BaseCallback):
+-    """
+-    :param pbar: (tqdm.pbar) Progress bar object
+-    """
+-    def __init__(self, pbar):
+-        super(ProgressBarCallback, self).__init__()
+-        self._pbar = pbar
+-
+-    def _on_step(self):
+-        # Update the progress bar:
+-        self._pbar.n = self.num_timesteps
+-        self._pbar.update(0)
+-
+-# this callback uses the 'with' block, allowing for correct initialisation and destruction
+-class ProgressBarManager(object):
+-    def __init__(self, total_timesteps): # init object with total timesteps
+-        self.pbar = None
+-        self.total_timesteps = total_timesteps
+-        
+-    def __enter__(self): # create the progress bar and callback, return the callback
+-        self.pbar = tqdm(total=self.total_timesteps)
+-            
+-        return ProgressBarCallback(self.pbar)
+-
+-    def __exit__(self, exc_type, exc_val, exc_tb): # close the callback
+-        self.pbar.n = self.total_timesteps
+-        self.pbar.update(0)
+-        self.pbar.close()
+-
+-
+-
+-def make_robosuite_env(env_id, options, observations, rank, seed=0):
+-    """
+-    Utility function for multiprocessed env.
+-    :param env_id: (str) the environment ID
+-    :param options: (dict) additional arguments to pass to the specific environment class initializer
+-    :param seed: (int) the inital seed for RNG
+-    :param rank: (int) index of the subprocess
+-    """
+-    def _init():
+-        env = GymWrapper_multiinput(suite.make(env_id, **options), observations)
+-        env = Monitor(env)
+-        env.seed(seed + rank)
+-        return env
+-    set_random_seed(seed)
+-    return _init
+-
+-
+-if __name__ == '__main__':
+-
+-    # The different number of processes that will be used
+-    PROCESSES_TO_TEST = [64] 
+-    NUM_EXPERIMENTS = 3 # RL algorithms can often be unstable, so we run several experiments (see https://arxiv.org/abs/1709.06560)
+-    TRAIN_STEPS = 200
+-    # Number of episodes for evaluation
+-    EVAL_EPS = 20
+-    ALGO = PPO
+-    
+-    register_env(Lift_4_objects)
+-
+-    with open("multiprocess.yaml", 'r') as stream:
+-        config = yaml.safe_load(stream)
+-
+-    env_options = config["robosuite"]
+-    env_id = env_options.pop("env_id")
+-
+-    obs_config = config["observations"]
+-    obs_image = [obs_config["rgb"]] #lager en liste av det
+-
+-    # We will create one environment to evaluate the agent on
+-    eval_env = Monitor(GymWrapper(suite.make(env_id, **env_options),obs_image)) # Denne lager da standard environment
+-
+-    reward_averages = []
+-    reward_std = []
+-    training_times = []
+-    total_procs = 0
+-    for n_procs in PROCESSES_TO_TEST:
+-        total_procs += n_procs
+-        print('Running for n_procs = {}'.format(n_procs))
+-        if n_procs == 1:
+-            # if there is only one process, there is no need to use multiprocessing
+-            train_env = DummyVecEnv([lambda: Monitor(GymWrapper(suite.make(env_id, **env_options),obs_image))])
+-        else:
+-            # Here we use the "fork" method for launching the processes, more information is available in the doc
+-            # This is equivalent to make_vec_env(env_id, n_envs=n_procs, vec_env_cls=SubprocVecEnv, vec_env_kwargs=dict(start_method='fork'))
+-            print("lager flere envs")
+-            train_env = SubprocVecEnv([make_robosuite_env(env_id, env_options, obs_image, i, seed=3) for i in range(n_procs)])
+-
+-        rewards = []
+-        times = []
+-
+-        print(NUM_EXPERIMENTS)
+-        for experiment in range(NUM_EXPERIMENTS):
+-            # it is recommended to run several experiments due to variability in results
+-            print("in for loop")
+-            train_env.reset()
+-            model = ALGO('MultiInputPolicy', train_env, verbose=2)
+-            start = time.time()
+-            print("startng to train")
+-            with ProgressBarManager(total_timesteps=TRAIN_STEPS) as callback:
+-                model.learn(total_timesteps=TRAIN_STEPS, callback=callback, reset_num_timesteps= False)
+-            times.append(time.time() - start)
+-
+-            print("evaluating starting")
+-            mean_reward, _  = evaluate_policy(model, eval_env, n_eval_episodes=EVAL_EPS)
+-            print("evaluating finished")
+-            rewards.append(mean_reward)
+-        # Important: when using subprocess, don't forget to close them
+-        # otherwise, you may have memory issues when running a lot of experiments
+-        train_env.close()
+-        reward_averages.append(np.mean(rewards))
+-        reward_std.append(np.std(rewards))
+-        training_times.append(np.mean(times))
+-    
+-
+-    training_steps_per_second = [TRAIN_STEPS / t for t in training_times]
+-
+-    fig = plt.figure(figsize=(9, 4))
+-    plt.subplots_adjust(wspace=0.5)
+-    plt.subplot(1, 2, 1)
+-    plt.errorbar(PROCESSES_TO_TEST, reward_averages, yerr=reward_std, capsize=2)
+-    plt.xlabel('Processes')
+-    plt.ylabel('Average return')
+-    plt.subplot(1, 2, 2)
+-    plt.bar(range(len(PROCESSES_TO_TEST)), training_steps_per_second)
+-    plt.xticks(range(len(PROCESSES_TO_TEST)), PROCESSES_TO_TEST)
+-    plt.xlabel('Processes')
+-    plt.ylabel('Training steps per second')
+-
+-    plt.savefig('multiprocess.png')
+diff --git a/code/testing_trained_models.py b/code/testing_trained_models.py
+deleted file mode 100644
+index b75855a..0000000
+--- a/code/testing_trained_models.py
++++ /dev/null
+@@ -1,71 +0,0 @@
+-import robosuite as suite
+-import gym
+-import numpy as np
+-
+-from src.environments import Lift_4_objects
+-
+-from robosuite.environments.base import register_env
+-from robosuite import load_controller_config
+-from robosuite.wrappers import GymWrapper
+-
+-from stable_baselines3 import PPO
+-from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
+-from stable_baselines3.common.monitor import Monitor
+-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
+-
+-from stable_baselines3.common.evaluation import evaluate_policy
+-
+-register_env(Lift_4_objects)
+-
+-filename = 'rgb_4_objects'
+-
+-config = load_controller_config(default_controller="OSC_POSE")
+-
+-
+-env_robo = GymWrapper(
+-        suite.make(
+-            env_name="Lift_4_objects",
+-            robots = "IIWA",
+-            controller_configs = config, 
+-            gripper_types="Robotiq85Gripper",      
+-            has_renderer=False,                    
+-            has_offscreen_renderer=True,           
+-            control_freq=20,                       
+-            horizon=1000,                          
+-            use_object_obs=False,                  
+-            use_camera_obs=True,
+-	        camera_heights=48,
+-	        camera_widths=48,                   
+-        ), ["agentview_image"]
+-)
+-
+-# Load model
+-model = PPO.load('trained_models/' + filename)
+-# Load the saved statistics
+-env = Monitor(env_robo)
+-env = DummyVecEnv([lambda : env])
+-env = VecNormalize.load('trained_models/vec_normalize_' + filename + '.pkl', env)
+-#  do not update them at test time
+-env.training = False
+-# reward normalization
+-env.norm_reward = False
+-
+-
+-mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=100)
+-
+-print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
+-
+-
+-# obs = env.reset()
+-# eprew = 0
+-# while True:
+-#     action, _states = model.predict(obs)
+-#     print(f"action: {action}")
+-#     obs, reward, done, info = env.step(action)
+-#     print(f"obs: {obs}")
+-#     print(f'reward: {reward}')
+-
+-#     if done:
+-#         print(f'eprew: {eprew}')
+-#         obs = env.reset()
+-#         eprew = 0
+\ No newline at end of file
+diff --git a/code/video_recorder.py b/code/video_recorder.py
+deleted file mode 100644
+index 0561fa3..0000000
+--- a/code/video_recorder.py
++++ /dev/null
+@@ -1,82 +0,0 @@
+-import robosuite as suite
+-import numpy as np
+-import imageio
+-
+-import robosuite.utils.macros as macros
+-from robosuite.models.robots.robot_model import register_robot
+-
+-from src.environments import Lift_4_objects, Lift_edit
+-from src.wrapper import GymWrapper_multiinput
+-from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+-from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+-from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
+-
+-from robosuite.environments.base import register_env
+-from robosuite import load_controller_config
+-
+-from stable_baselines3 import PPO
+-
+-register_robot(IIWA_14)
+-register_gripper(Robotiq85Gripper_iiwa_14)
+-register_robot_class_mapping("IIWA_14")
+-register_env(Lift_4_objects)
+-register_env(Lift_edit)
+-
+-config = load_controller_config(default_controller="OSC_POSE")
+-
+-
+-env_robo = GymWrapper_multiinput(
+-                suite.make(
+-                  env_name="Lift_edit",
+-                  robots = "IIWA_14",
+-                  controller_configs = config, 
+-                  gripper_types="Robotiq85Gripper_iiwa_14",      
+-                  has_renderer=False,                    
+-                  has_offscreen_renderer=True,           
+-                  control_freq=20,                       
+-                  horizon=400,                          
+-                  use_object_obs=False,                  
+-                  use_camera_obs=True,
+-                  camera_heights=300,
+-                  camera_widths=486,
+-                  camera_names = "custom",
+-                  custom_camera_name = "custom", 
+-                  custom_camera_trans_matrix = np.array([ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
+-                                                [ 0.961834,  0.241668,  0.128340, -129.767868], 
+-                                                [ 0.273397, -0.868215, -0.414073,  503.424103], 
+-                                                [ 0.000000,  0.000000,  0.000000,  1.000000] ]),
+-                  custom_camera_conversion= True,
+-                  custom_camera_attrib=  {"fovy": 36}                   
+-            ), ["custom_image"]
+-)
+-
+-
+-def record_video(env, model, video_length, video_folder):
+-  macros.IMAGE_CONVENTION = "opencv"
+-
+-  obs = env.reset()
+-
+-  # create a video writer with imageio
+-  writer = imageio.get_writer(video_folder, fps=20)
+-
+-  frames = []
+-  for i in range(video_length):
+-
+-      action = model.predict(obs)
+-      obs, reward, done, info = env.step(action)
+-
+-      frame = obs["custom" + "_image"]
+-      writer.append_data(frame)
+-      print("Saving frame #{}".format(i))
+-
+-      if done:
+-        break
+-
+-  writer.close()
+-
+-model = PPO.load("/home/ojrise/best_model")
+-model.device = "cpu"
+-
+-
+-record_video(env=env_robo, model=model, video_length=400, video_folder="trying_to_make_video.mp4")
+-
+diff --git a/code/wand_test.py b/code/wand_test.py
+deleted file mode 100644
+index d44ac40..0000000
+--- a/code/wand_test.py
++++ /dev/null
+@@ -1,84 +0,0 @@
+-import gym
+-
+-from PIL import Image
+-
+-from stable_baselines3 import PPO
+-from stable_baselines3.common.monitor import Monitor
+-from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
+-import wandb
+-from wandb.integration.sb3 import WandbCallback
+-
+-import robosuite as suite
+-from robosuite.environments.base import register_env
+-from robosuite import load_controller_config
+-
+-from src.environments import Lift_4_objects
+-from src.wrapper import GymWrapper_multiinput, GymWrapper_rgb
+-
+-
+-register_env(Lift_4_objects)
+-
+-config = {
+-    "policy_type": 'CnnPolicy',
+-    "total_timesteps": 100001,
+-}
+-
+-run = wandb.init(
+-    project="sb3_lift",
+-    config=config,
+-    sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
+-    monitor_gym=False,  # auto-upload the videos of agents playing the game
+-    save_code=True,  # optional
+-)
+-
+-controller_config = load_controller_config(default_controller="OSC_POSE")
+-
+-env = GymWrapper_rgb(
+-        suite.make(
+-            env_name="Lift",
+-            robots = "IIWA",
+-            controller_configs = controller_config, 
+-            gripper_types="Robotiq85Gripper",      
+-            has_renderer=False,                    
+-            has_offscreen_renderer=True,           
+-            control_freq=20,                       
+-            horizon= 100,
+-            ignore_done = True, 
+-            camera_heights = 512,
+-            camera_widths = 512,                          
+-            use_object_obs=False,                  
+-            use_camera_obs=True,
+-            reward_shaping= True,
+-            #camera_names = ["all-robotview"]                   
+-        ),  
+-        keys = ["agentview_image"], #, "robot0_joint_pos_cos"],
+-        #smaller_action_space= True
+-)
+-
+-obs = env.reset()
+-
+-# img = Image.fromarray(obs, 'RGB')
+-# img.save('lift.png')
+-
+-#env = VecVideoRecorder(env, f"videos/{run.id}", record_video_trigger=lambda x: x % 2000 == 0, video_length=200)
+-model = PPO(
+-        config["policy_type"],
+-        env = env,
+-        n_steps = 2048,
+-        batch_size = 64, 
+-        n_epochs = 10,
+-        verbose=1, 
+-        tensorboard_log=f"runs/{run.id}"
+-    )
+-
+-    
+-model.learn(
+-    total_timesteps=config["total_timesteps"],
+-    callback=WandbCallback(
+-        gradient_save_freq=100,
+-        model_save_path=f"models/{run.id}",
+-        verbose=2,
+-    ),
+-)
+-run.finish()
+-
+diff --git a/code/wandb/latest-run b/code/wandb/latest-run
+index ac155ff..629598e 120000
+--- a/code/wandb/latest-run
++++ b/code/wandb/latest-run
+@@ -1 +1 @@
+-run-20220404_135039-30tmx6cf
+\ No newline at end of file
++run-20220404_164254-3fewzcul
+\ No newline at end of file

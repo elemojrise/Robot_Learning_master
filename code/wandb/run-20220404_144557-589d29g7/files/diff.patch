@@ -1,0 +1,75 @@
+diff --git a/code/rl.py b/code/rl.py
+index 0e78060..5b0fea1 100644
+--- a/code/rl.py
++++ b/code/rl.py
+@@ -13,6 +13,7 @@ from robosuite.environments.base import register_env
+ from stable_baselines3 import PPO
+ from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
+ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecTransposeImage
++from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
+ from stable_baselines3.common.callbacks import EvalCallback, CallbackList
+ 
+ 
+@@ -41,6 +42,13 @@ if __name__ == '__main__':
+     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
+     env_id = env_options.pop("env_id")
+ 
++    #normalize obs and rew
++    
++    normalize_obs = config['normalize_obs']
++    normalize_rew = config['normalize_rew']
++    norm_obs_keys = config['norm_obs_keys']
++
++
+     # Observations
+     obs_config = config["gymwrapper"]
+     obs_list = obs_config["observations"] 
+@@ -96,6 +104,7 @@ if __name__ == '__main__':
+             print("making")
+             env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
+ 
++    
+         run = wandb.init(
+             **wandb_settings,
+             config=config,
+@@ -110,6 +119,8 @@ if __name__ == '__main__':
+         # Train new model
+         if continue_training_model_filename is None:
+ 
++            if normalize_obs or normalize_rew:
++                env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
+             # Create model
+             model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
+ 
+diff --git a/code/rl_oj.yaml b/code/rl_oj.yaml
+index 9bab24b..d8f3de1 100644
+--- a/code/rl_oj.yaml
++++ b/code/rl_oj.yaml
+@@ -3,11 +3,15 @@ training: True   # Whether to train a model or not
+ 
+ # Settings for stable-baselines RL algorithm
+ sb_config:
+-  total_timesteps: 200000
++  total_timesteps: 2000
+   check_pt_interval: 1000 #1.0e+6
+-  num_procs: 12
++  num_procs: 2
+ 
+-vec_normalize: False
++
++# Settings for normalization
++normalize_obs: False
++normalize_rew: False
++norm_obs_keys: []    #List of obs keys to normalize
+ 
+ # Policy settings
+ sb_policy:
+diff --git a/code/wandb/latest-run b/code/wandb/latest-run
+index ac155ff..acb8370 120000
+--- a/code/wandb/latest-run
++++ b/code/wandb/latest-run
+@@ -1 +1 @@
+-run-20220404_135039-30tmx6cf
+\ No newline at end of file
++run-20220404_144557-589d29g7
+\ No newline at end of file
