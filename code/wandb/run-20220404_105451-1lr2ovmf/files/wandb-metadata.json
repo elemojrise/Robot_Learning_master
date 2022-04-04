@@ -1,0 +1,24 @@
+{
+    "os": "Linux-5.15.15-76051515-generic-x86_64-with-glibc2.10",
+    "python": "3.8.12",
+    "heartbeatAt": "2022-04-04T08:54:53.911682",
+    "startedAt": "2022-04-04T08:54:51.502276",
+    "docker": null,
+    "gpu": "NVIDIA GeForce GTX 1050 Ti with Max-Q Design",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "rl.py",
+    "codePath": "code/rl.py",
+    "git": {
+        "remote": "https://github.com/ojrise/Robot_Learning_master.git",
+        "commit": "175d6e2f1e77da063f9eca803e6421ae420a47bf"
+    },
+    "email": "ludkasbo@gmail.com",
+    "root": "/home/ludvik/Desktop/Robot_Learning_master",
+    "host": "pop-os",
+    "username": "ludvik",
+    "executable": "/home/ludvik/anaconda3/envs/RS_SB3_test/bin/python3"
+}

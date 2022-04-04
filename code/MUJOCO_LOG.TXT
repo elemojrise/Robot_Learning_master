@@ -1,0 +1,12 @@
+Mon Apr  4 10:53:39 2022
+ERROR: Offscreen framebuffer is not complete, error 0x8cdd
+
+Mon Apr  4 10:53:44 2022
+ERROR: Offscreen framebuffer is not complete, error 0x8cdd
+
+Mon Apr  4 10:53:44 2022
+ERROR: Offscreen framebuffer is not complete, error 0x8cdd
+
+Mon Apr  4 10:53:47 2022
+ERROR: Offscreen framebuffer is not complete, error 0x8cdd
+

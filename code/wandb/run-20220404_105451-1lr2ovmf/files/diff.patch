@@ -1,0 +1,13 @@
+diff --git a/code/rl_config.yaml b/code/rl_config.yaml
+index 393c895..73df18a 100644
+--- a/code/rl_config.yaml
++++ b/code/rl_config.yaml
+@@ -5,7 +5,7 @@ training: True   # Whether to train a model or not
+ sb_config:
+   total_timesteps: 40.0e+6
+   check_pt_interval: 1000 #1.0e+6
+-  num_procs: 24
++  num_procs: 2
+ 
+ # Policy settings
+ sb_policy:

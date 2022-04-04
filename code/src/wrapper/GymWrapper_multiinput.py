@@ -144,7 +144,7 @@ class GymWrapper_multiinput(Wrapper, Env):
         if self.smaller_action_space:
             action = np.insert(action, 3, 0)
             action = np.insert(action, 4, 0)
-
+        
         ob_dict, reward, done, info = self.env.step(action)
 
         # It will now keep being 1 until reset
