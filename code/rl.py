@@ -59,7 +59,7 @@ if __name__ == '__main__':
     training_timesteps = sb_config["total_timesteps"]
     check_pt_interval = sb_config["check_pt_interval"]
     num_procs = sb_config["num_procs"]
-    model_type = sb_config['policy']
+    device = sb_config['deiv']
 
     messages_to_wand_callback = config["wandb_callback"]
     messages_to_eval_callback = config["eval_callback"]
@@ -79,16 +79,9 @@ if __name__ == '__main__':
     load_model_folder = file_handling["load_model_folder"]
     load_model_filename = file_handling["load_model_filename"]
 
-    continue_training_model_folder = file_handling["continue_training_model_folder"]
-    continue_training_model_filename = file_handling["continue_training_model_filename"]
-
     # Join paths
     save_model_path = os.path.join(save_model_folder, save_model_filename)
     save_vecnormalize_path = os.path.join(save_model_folder, 'vec_normalize_' + save_model_filename + '.pkl')
-    load_model_path = os.path.join(load_model_folder, load_model_filename)
-    load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
-    continue_training_model_path = os.path.join(continue_training_model_folder, continue_training_model_filename)
-    continue_training_vecnormalize_path = os.path.join(continue_training_model_folder, 'vec_normalize_' + continue_training_model_filename + '.pkl')
 
     # Settings for pipeline
     training = config["training"]
@@ -100,90 +93,57 @@ if __name__ == '__main__':
 
 
     # RL pipeline
-    if training:
-        if num_procs == 1:
-            env = make_singel_env(env_id, env_options, obs_list, smaller_action_space)
-        else:
-            print("making")
-            env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
+    print("making")
+    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
 
+    run = wandb.init(
+        **wandb_settings,
+        config=config,
+    )
+    print(env)
     
-        run = wandb.init(
-            **wandb_settings,
-            config=config,
-        )
-        print(env)
-
-        # Create callback
-        wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
-        eval_callback = EvalCallback(env, **messages_to_eval_callback)
-        callback = CallbackList([wandb_callback, eval_callback])
-        
-        # Train new model
-        if not os.path.exists(continue_training_model_path):
-
-            if normalize_obs or normalize_rew:
-                env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
-            # Create model
-            model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
-
-            print("Created a new model")
-
-        # Continual training
-        else:
-            print(f"Continual training on model located at {continue_training_model_path}")
-
-            # Load normalized env
-            if normalize_obs or normalize_rew:
-                env = VecNormalize.load(continue_training_vecnormalize_path, env)
-
-            # Load model
-            model = PPO.load(continue_training_model_path, env=env)
-            
-        
-        # Training
-        print("starting to train")
-        model.learn(total_timesteps=training_timesteps, callback=callback)
-
-        run.finish()
-
-        # Save trained model
-        model.save(save_model_path)
+    # Train new model
+    if load_model_filename is None:
         if normalize_obs or normalize_rew:
-            env.save(save_vecnormalize_path)
+            env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
+        # Create model
+        model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
 
-        env.close()
+        print("Created a new model")
 
+    # Continual training
     else:
-        # Create evaluation environment
-        env_options['has_renderer'] = True
-        env_gym = GymWrapper(suite.make(env_id, **env_options))
-        env = DummyVecEnv([lambda : env_gym])
+        load_model_path = os.path.join(load_model_folder, load_model_filename)
+        load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
+        print(f"Continual training on model located at {load_model_path}")
 
         # Load normalized env
-        env = VecNormalize.load(load_vecnormalize_path, env)
-
-        # Turn of updates and reward normalization
-        env.training = False
-        env.norm_reward = False
+        if normalize_obs or normalize_rew:
+            env = VecNormalize.load(load_vecnormalize_path, env)
 
         # Load model
-        model = PPO.load(load_model_path, env)
+        model = PPO.load(load_model_path, env=env)
+    
+    # Training
+    print("starting to train")
 
-        # Simulate environment
-        obs = env.reset()
-        eprew = 0
-        while True:
-            action, _states = model.predict(obs)
-            print(f"action: {action}")
-            obs, reward, done, info = env.step(action)
-            #print(action)
-            print(f'reward: {reward}')
-            eprew += reward
-            env_gym.render()
-            if done:
-                print(f'eprew: {eprew}')
-                obs = env.reset()
-                eprew = 0
+    # Create callback
+    print(env.training)
+    env.training = False
+    print(env.training)
 
-        env.close()
+    wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
+    eval_callback = EvalCallback(env, **messages_to_eval_callback)
+    callback = CallbackList([wandb_callback, eval_callback])
+
+    
+    model.learn(total_timesteps=training_timesteps, callback=callback)
+
+    run.finish()
+
+    # Save trained model
+    model.save(save_model_path)
+    if normalize_obs or normalize_rew:
+        env.save(save_vecnormalize_path)
+
+    env.close()
