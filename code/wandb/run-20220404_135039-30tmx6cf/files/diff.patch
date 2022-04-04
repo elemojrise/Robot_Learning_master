@@ -1,0 +1,141 @@
+diff --git a/code/rl.py b/code/rl.py
+index 77872fd..0e78060 100644
+--- a/code/rl.py
++++ b/code/rl.py
+@@ -32,7 +32,7 @@ if __name__ == '__main__':
+     register_env(Lift_edit)
+     register_env(Lift_4_objects)
+ 
+-    with open("rl_config.yaml", 'r') as stream:
++    with open("rl_oj.yaml", 'r') as stream:
+         config = yaml.safe_load(stream)
+ 
+     # Environment specifications
+diff --git a/code/wandb/latest-run b/code/wandb/latest-run
+index 48a034b..ac155ff 120000
+--- a/code/wandb/latest-run
++++ b/code/wandb/latest-run
+@@ -1 +1 @@
+-run-20220404_105451-1lr2ovmf
+\ No newline at end of file
++run-20220404_135039-30tmx6cf
+\ No newline at end of file
+diff --git a/rl_oj.yaml b/rl_oj.yaml
+deleted file mode 100644
+index b3ebe19..0000000
+--- a/rl_oj.yaml
++++ /dev/null
+@@ -1,113 +0,0 @@
+-seed: 0
+-training: True   # Whether to train a model or not
+-
+-# Settings for stable-baselines RL algorithm
+-sb_config:
+-  total_timesteps: 200000
+-  check_pt_interval: 1000 #1.0e+6
+-  num_procs: 12
+-
+-# Policy settings
+-sb_policy:
+-  type: "MultiInputPolicy"
+-  learning_rate: 0.0003 
+-  n_steps: 1024 
+-  batch_size: 64 
+-  n_epochs: 10 
+-  gamma: 0.99 
+-  gae_lambda: 0.95 
+-  clip_range: 0.2 
+-  clip_range_vf: null 
+-  ent_coef: 0.0 
+-  vf_coef: 0.5 
+-  max_grad_norm: 0.5
+-  use_sde: False 
+-  sde_sample_freq: -1 
+-  target_kl: null 
+-  create_eval_env: False 
+-  policy_kwargs: null
+-  verbose: 1 
+-  seed: null
+-  device: 'auto' 
+-  _init_setup_model: True
+-  # net_arch: 
+-  #   - pi: [256, 128]    # Custom actor network
+-  #     vf: [256, 128]    # Value function network
+-
+-# Specify environment
+-robosuite:
+-  env_id: "Lift_edit"
+-  robots: "IIWA_14"
+-  gripper_types: "Robotiq85Gripper_iiwa_14"      
+-  has_renderer: False                    
+-  has_offscreen_renderer: True           
+-  control_freq: 20                       
+-  horizon: 400
+-  camera_heights: 300                          
+-  use_object_obs: False                  
+-  use_camera_obs: True
+-  reward_shaping: True
+-  camera_names: "custom"
+-  custom_camera_name: "custom" 
+-  custom_camera_trans_matrix: [ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
+-                                [ 0.961834,  0.241668,  0.128340, -129.767868], 
+-                                [ 0.273397, -0.868215, -0.414073,  503.424103], 
+-                                [ 0.000000,  0.000000,  0.000000,  1.000000] ]
+-  custom_camera_conversion: True
+-  custom_camera_attrib:  {"fovy": 36}
+-  controller_configs: 
+-    type: "OSC_POSE"
+-    input_max: 1
+-    input_min: -1
+-    output_max: [0.05, 0.05, 0.05, 0.5, 0.5, 0.5]
+-    output_min: [-0.05, -0.05, -0.05, -0.5, -0.5, -0.5]
+-    kp: 150
+-    damping_ratio: 1
+-    impedance_mode: "fixed"
+-    kp_limits: [0, 300]
+-    damping_ratio_limits: [0, 10]
+-    position_limits": null
+-    orientation_limits: null
+-    uncouple_pos_ori: true
+-    control_delta: true
+-    interpolation: null
+-    ramp_ratio: 0.2
+-  
+-wandb_callback:
+-  gradient_save_freq: 10000
+-  verbose: 2
+-
+-eval_callback:
+-  callback_on_new_best: null
+-  n_eval_episodes: 20
+-  eval_freq: 4096 
+-  log_path: './logs_real/' 
+-  best_model_save_path: './logs_real/'
+-  deterministic: False
+-  render: False 
+-  verbose: 1 
+-  warn: True
+-
+-gymwrapper:
+-  observations: ["custom_image"]
+-  smaller_action_space: True
+-
+-wandb:
+-  project: "sb3_lift_real"
+-  sync_tensorboard: True 
+-  save_code: True
+-
+-
+-# Settings used for file handling and logging (save/load destination etc)
+-file_handling:
+-  # Logging with Tensorboard and saving trained models
+-  tb_log_folder: "ppo_lift_4_objects_tensorboard"
+-  tb_log_name: "rgb_4_objects_plot"
+-  save_model_folder: "trained_models"
+-  save_model_filename: "rgb_4_objects"
+-  # Loading of trained models
+-  load_model_folder: "trained_models"
+-  load_model_filename: "rgb_4_objects"
+-  # Path to model which should be continued to train
+-  continue_training_model_folder: "trained_models"
+-  continue_training_model_filename: null       # is null when training a new model
