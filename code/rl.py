@@ -73,12 +73,6 @@ if __name__ == '__main__':
     continue_training_model_folder = file_handling["continue_training_model_folder"]
     continue_training_model_filename = file_handling["continue_training_model_filename"]
 
-    # Join paths
-    save_model_path = os.path.join(save_model_folder, save_model_filename)
-    save_vecnormalize_path = os.path.join(save_model_folder, 'vec_normalize_' + save_model_filename + '.pkl')
-    load_model_path = os.path.join(load_model_folder, load_model_filename)
-    load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
-
     # Settings for pipeline
     training = config["training"]
     seed = config["seed"]
@@ -120,15 +114,11 @@ if __name__ == '__main__':
 
             # Join file paths
             continue_training_model_path = os.path.join(continue_training_model_folder, continue_training_model_filename)
-            continue_training_vecnormalize_path = os.path.join(continue_training_model_folder, 'vec_normalize_' + continue_training_model_filename + '.pkl')
 
             print(f"Continual training on model located at {continue_training_model_path}")
 
-            # Load normalized env 
-            env = VecNormalize.load(continue_training_vecnormalize_path, env)
-
             # Load model
-            model = PPO.load(continue_training_model_path, env=env)
+            model = PPO.load(continue_training_model_path, env=env, print_system_info= True)
         
         # Training
         print("starting to train")
@@ -137,8 +127,7 @@ if __name__ == '__main__':
         run.finish()
 
         # Save trained model
-        model.save(save_model_path)
-        env.save(save_vecnormalize_path)
+        model.save(continue_training_model_path)
 
         env.close()
 
