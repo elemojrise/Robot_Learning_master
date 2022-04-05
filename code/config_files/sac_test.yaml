@@ -3,9 +3,9 @@ training: True   # Whether to train a model or not
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 20
+  total_timesteps: 2000000
   check_pt_interval: 1000 #1.0e+6
-  num_procs: 1
+  num_procs: 24
   policy: SAC
 
 
@@ -17,29 +17,15 @@ norm_obs_keys: ['robot0_eef_pos']    #List of obs keys to normalize
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
-  learning_rate: 0.03 
-  n_steps: 1024
-  batch_size: 64 
-  n_epochs: 10 
+  learning_rate: 0.0003 
+  batch_size: 64
+  buffer_size: 1000000 
   gamma: 0.99 
-  gae_lambda: 0.95 
-  clip_range: 0.2 
-  clip_range_vf: null 
-  ent_coef: 0.0 
-  vf_coef: 0.5 
-  max_grad_norm: 0.5
-  use_sde: False 
-  sde_sample_freq: -1 
-  target_kl: null 
-  create_eval_env: False 
   policy_kwargs: null
   verbose: 1 
   seed: null
   device: 'auto' 
-  _init_setup_model: True
-  # net_arch: 
-  #   - pi: [256, 128]    # Custom actor network
-  #     vf: [256, 128]    # Value function network
+
 
 # Specify environment
 robosuite:

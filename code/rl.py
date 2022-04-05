@@ -33,7 +33,7 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
 
     yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/sac_test.yaml" 
+    #yaml_file = "config_files/sac_test.yaml" 
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
         
@@ -113,14 +113,15 @@ if __name__ == '__main__':
 
     # Train new model
     if load_model_filename is None:
-        print(env)
         if normalize_obs or normalize_rew:
             env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
         # Create model
         if policy == 'PPO':
             model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
-        elif policy == SAC:
+            print("PPO")
+        elif policy == 'SAC':
             model = SAC(policy_type, env = env, **policy_kwargs,tensorboard_log=f"runs/{run.id}")
+            print("SAC")
         else: ("-----------ERRROR no policy selected------------")
 
         print("Created a new model")
