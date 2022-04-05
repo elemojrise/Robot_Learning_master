@@ -117,3 +117,4 @@ file_handling:
   load_model_filename: Null
   # Path to model which should be continued to train
 
+wandb_filename: "ppo_wandb_test"

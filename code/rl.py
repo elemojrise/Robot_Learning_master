@@ -33,7 +33,7 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
 
     yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/ppo_test.yaml" 
+    yaml_file = "config_files/sac_test.yaml" 
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
         
@@ -96,21 +96,23 @@ if __name__ == '__main__':
 
     #Settings for wandb
     wandb_settings = config["wandb"]
+    wandb_filename = config["wandb_filename"]
 
     # RL pipeline
     #Create ENV
     print("making")
     env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
-
-    # Train new model
-    if load_model_filename is None:
-        run = wandb.init(
+    run = wandb.init(
         **wandb_settings,
         config=config,
         resume="allow",
-        id="1234",
+        id=wandb_filename,
         )
-        run.save
+    run.save
+
+
+    # Train new model
+    if load_model_filename is None:
         print(env)
         if normalize_obs or normalize_rew:
             env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
@@ -142,8 +144,12 @@ if __name__ == '__main__':
             env = VecNormalize.load(load_vecnormalize_path, env)
 
         # Load model
-        model = PPO.load(load_model_path, env=env)
-        model.get
+        if policy == 'PPO':
+             model = PPO.load(load_model_path, env=env)
+        elif policy == SAC:
+            model = SAC.load(load_model_path, env=env)
+        
+        
     
     # Training
     print("starting to train")
