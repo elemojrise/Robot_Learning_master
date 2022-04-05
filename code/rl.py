@@ -120,20 +120,13 @@ if __name__ == '__main__':
         if policy == 'PPO':
             model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
         elif policy == SAC:
-            model = SAC(policy_type, env = env, **policy_kwargs)
+            model = SAC(policy_type, env = env, **policy_kwargs,tensorboard_log=f"runs/{run.id}")
         else: ("-----------ERRROR no policy selected------------")
 
         print("Created a new model")
 
     #Continual training
     else:
-        run = wandb.restore(
-            name = "vocal-dragon-36",
-            run_path= "ludvikka/sac_testing/"
-        )
-        run.save
-        
-
 
         load_model_path = os.path.join(load_model_folder, load_model_filename)
         load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
@@ -161,7 +154,6 @@ if __name__ == '__main__':
     eval_callback = EvalCallback(env, **messages_to_eval_callback)
     callback = CallbackList([wandb_callback, eval_callback])
 
-    print(model.learning_rate)
     model.learn(total_timesteps=training_timesteps, callback=callback)
 
     run.finish()
