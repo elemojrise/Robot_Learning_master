@@ -155,7 +155,7 @@ if __name__ == '__main__':
     eval_callback = EvalCallback(env, **messages_to_eval_callback)
     callback = CallbackList([wandb_callback, eval_callback])
 
-    model.learn(total_timesteps=training_timesteps, callback=callback)
+    model.learn(total_timesteps=training_timesteps, callback=callback, reset_num_timesteps=False)
 
     run.finish()
 
