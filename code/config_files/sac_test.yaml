@@ -3,7 +3,7 @@ training: True   # Whether to train a model or not
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 2000000
+  total_timesteps: 20000
   check_pt_interval: 1000 #1.0e+6
   num_procs: 24
   policy: SAC
