@@ -1,4 +1,6 @@
+from email import policy
 from locale import normalize
+from unicodedata import name
 import numpy as np
 import robosuite as suite
 import os
@@ -10,12 +12,11 @@ from wandb.integration.sb3 import WandbCallback
 from robosuite.models.robots.robot_model import register_robot
 from robosuite.environments.base import register_env
 
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecTransposeImage
 from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList
-
 
 from src.environments import Lift_4_objects, Lift_edit
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
@@ -24,8 +25,6 @@ from src.helper_functions.register_new_models import register_gripper, register_
 from src.helper_functions.wrap_env import make_multiprocess_env, make_singel_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 
-
-
 if __name__ == '__main__':
     register_robot(IIWA_14)
     register_gripper(Robotiq85Gripper_iiwa_14)
@@ -33,8 +32,15 @@ if __name__ == '__main__':
     register_env(Lift_edit)
     register_env(Lift_4_objects)
 
-    with open("rl_oj.yaml", 'r') as stream:
+    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    yaml_file = "config_files/ppo_test.yaml" 
+    with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
+        
+    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
+    if answer != "y":
+        exit()
+
 
     # Environment specifications
     env_options = config["robosuite"]
@@ -59,6 +65,7 @@ if __name__ == '__main__':
     training_timesteps = sb_config["total_timesteps"]
     check_pt_interval = sb_config["check_pt_interval"]
     num_procs = sb_config["num_procs"]
+    policy = sb_config['policy']
 
 
     messages_to_wand_callback = config["wandb_callback"]
@@ -90,29 +97,42 @@ if __name__ == '__main__':
     #Settings for wandb
     wandb_settings = config["wandb"]
 
-
-
     # RL pipeline
+    #Create ENV
     print("making")
     env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
 
-    run = wandb.init(
-        **wandb_settings,
-        config=config,
-    )
-    print(env)
-    
     # Train new model
     if load_model_filename is None:
+        run = wandb.init(
+        **wandb_settings,
+        config=config,
+        resume="allow",
+        id="1234",
+        )
+        run.save
+        print(env)
         if normalize_obs or normalize_rew:
             env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
         # Create model
-        model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
+        if policy == 'PPO':
+            model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
+        elif policy == SAC:
+            model = SAC(policy_type, env = env, **policy_kwargs)
+        else: ("-----------ERRROR no policy selected------------")
 
         print("Created a new model")
 
-    # Continual training
+    #Continual training
     else:
+        run = wandb.restore(
+            name = "vocal-dragon-36",
+            run_path= "ludvikka/sac_testing/"
+        )
+        run.save
+        
+
+
         load_model_path = os.path.join(load_model_folder, load_model_filename)
         load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
         print(f"Continual training on model located at {load_model_path}")
@@ -123,20 +143,19 @@ if __name__ == '__main__':
 
         # Load model
         model = PPO.load(load_model_path, env=env)
+        model.get
     
     # Training
     print("starting to train")
 
     # Create callback
-    print(env.training)
     env.training = False
-    print(env.training)
 
     wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
     eval_callback = EvalCallback(env, **messages_to_eval_callback)
     callback = CallbackList([wandb_callback, eval_callback])
 
-    
+    print(model.learning_rate)
     model.learn(total_timesteps=training_timesteps, callback=callback)
 
     run.finish()
