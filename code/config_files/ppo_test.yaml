@@ -6,7 +6,7 @@ sb_config:
   total_timesteps: 20000
   check_pt_interval: 1000 #1.0e+6
   num_procs: 8
-  policy: PPO
+  policy: 'PPO'
 
 
 # Settings for normalization
