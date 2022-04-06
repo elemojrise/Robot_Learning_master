@@ -22,6 +22,7 @@ from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 from src.helper_functions.wrap_env import make_multiprocess_env, make_singel_env
 from src.helper_functions.camera_functions import adjust_width_of_image
+from src.helper_functions.hyperparameters import linear_schedule
 
 
 
@@ -58,6 +59,9 @@ if __name__ == '__main__':
     # Settings for stable-baselines policy
     policy_kwargs = config["sb_policy"]
     policy_type = policy_kwargs.pop("type")
+
+    if config["learning_rate_schedular"]:
+        policy_kwargs["learning_rate"] = linear_schedule(policy_kwargs["learning_rate"])
 
     # Settings used for file handling and logging (save/load destination etc)
     file_handling = config["file_handling"]

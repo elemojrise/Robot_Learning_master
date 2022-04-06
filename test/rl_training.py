@@ -7,6 +7,7 @@ from robosuite.environments.base import register_env
 from robosuite import load_controller_config
 from robosuite.wrappers import GymWrapper
 from src.wrapper.GymWrapper_multiinput import GymWrapper_multiinput
+from src.helper_functions.hyperparameters import linear_schedule
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
@@ -33,8 +34,8 @@ env = GymWrapper_multiinput(
             gripper_types="Robotiq85Gripper",      
             has_renderer=False,                    
             has_offscreen_renderer=True,           
-            control_freq=20,                       
-            horizon= 100,
+            control_freq=10,                       
+            horizon= 4,
             ignore_done = False, 
             camera_heights = 48,
             camera_widths = 48,                          
@@ -43,7 +44,7 @@ env = GymWrapper_multiinput(
             reward_shaping= True,
             #camera_names = ["all-robotview"]                   
         ),  
-        keys = ["agentview_image"]#,"robot0_joint_pos"],
+        keys = ["agentview_image","robot0_eef_pos", 'robot0_gripper_qpos'],
         #smaller_action_space= True
 )
 env = wrap_env(env)
@@ -57,22 +58,20 @@ env = wrap_env(env)
 # print(temp_env.metadata)
 # print(temp_env.get_attr("metadata")[0])
 
-env = VecVideoRecorder(env, "videos", record_video_trigger=lambda x: x % 300 == 0, video_length=200)
+# env = VecVideoRecorder(env, "videos", record_video_trigger=lambda x: x % 300 == 0, video_length=200)
 
-eval_callback = EvalCallback(env, callback_on_new_best=None, #callback_after_eval=None, 
-                            n_eval_episodes=3, eval_freq=200, log_path='./logs/', 
-                            best_model_save_path='best_model/logs/', deterministic=False, render=False, 
-                            verbose=1, warn=True)
-filename = 'test'
+# eval_callback = EvalCallback(env, callback_on_new_best=None, #callback_after_eval=None, 
+#                             n_eval_episodes=3, eval_freq=200, log_path='./logs/', 
+#                             best_model_save_path='best_model/logs/', deterministic=False, render=False, 
+#                             verbose=1, warn=True)
+# filename = 'test'
 
 obs = env.reset()
 
-print(obs)
-
-model = PPO('MultiInputPolicy', env, n_steps = 400, verbose=1)
+model = PPO('MultiInputPolicy', env, learning_rate= linear_schedule(1), n_steps = 8, batch_size= 2, verbose=1, device= "cpu")
 print("starting to learn")
 
-model.learn(total_timesteps=12000, callback = eval_callback)
+model.learn(total_timesteps=40)
 
 print("finished learning")
 

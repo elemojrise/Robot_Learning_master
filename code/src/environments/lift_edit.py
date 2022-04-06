@@ -460,4 +460,4 @@ class Lift_edit(SingleArmEnv):
         table_height = self.model.mujoco_arena.table_offset[2]
 
         # cube is higher than the table top above a margin
-        return cube_height > table_height + 0.04
+        return cube_height > table_height + 0.04 and self._check_grasp(gripper=self.robots[0].gripper, object_geoms=self.cube)

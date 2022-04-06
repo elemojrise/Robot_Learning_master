@@ -33,39 +33,41 @@ def wrap_env(env):
 
 config = load_controller_config(default_controller="OSC_POSE")
 
-env = GymWrapper_multiinput(
-        suite.make(
+#env = #GymWrapper_multiinput(
+env =    suite.make(
             env_name="Lift_edit",
             robots = "IIWA_14",
             controller_configs = config, 
             gripper_types="Robotiq85Gripper_iiwa_14",      
-            has_renderer=True,                    
-            has_offscreen_renderer=False,           
+            has_renderer=False,                    
+            has_offscreen_renderer=True,           
             control_freq=20,                       
             horizon=10000,
             camera_heights = 48,
             camera_widths = 48,                          
             use_object_obs=False,                  
-            use_camera_obs=False,                   
-        ), ["robot0_joint_pos_cos"]
-)
+            use_camera_obs=True,                   
+        )#, ["robot0_joint_pos_cos"]
+#)
 
 #env = wrap_env(env)
 
 #Denne koden sjekker om environmentet er godkjent for å trene med stable_baseline
-check_env(env)
+#check_env(env)
 
 #print("Getting observations")
 
 obs = env.reset()
 
-for i in range(10000):
-    env.render()
-    action = env.action_space.sample()
-    obs, reward, done, info = env.step(action)
+print(obs)
 
-    if done:
-        env.reset()
+# for i in range(10000):
+#     env.render()
+#     action = env.action_space.sample()
+#     obs, reward, done, info = env.step(action)
+
+#     if done:
+#         env.reset()
 
 
 #image = np.reshape(obs, (256,256,3))

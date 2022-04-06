@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--environment", type=str, default="Lift_edit")
-    parser.add_argument("--robots", nargs="+", type=str, default="IIWA", help="Which robot(s) to use in the env")
+    parser.add_argument("--robots", nargs="+", type=str, default="IIWA_14", help="Which robot(s) to use in the env")
     parser.add_argument(
         "--config", type=str, default="single-arm-opposed", help="Specified environment configuration if necessary"
     )
@@ -134,14 +134,15 @@ if __name__ == "__main__":
     # Create environment
     env = suite.make(
         **config,
-        gripper_types="Robotiq85Gripper",
+        gripper_types="Robotiq85Gripper_iiwa_14",
         has_renderer=True,
         has_offscreen_renderer=False,
         render_camera="frontview",
         ignore_done=True,
         use_camera_obs=False,
+        reward_scale = 2.25,
         reward_shaping=True,
-        control_freq=20,
+        control_freq=10,
         hard_reset=False,
     )
 
