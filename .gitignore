@@ -2,6 +2,10 @@
 trained_models/
 models/
 wandb/
+best_model/
+logs/
+ppo_lift_4_objects_tensorboard/
+runs/
 
 # Editors
 .vscode/
