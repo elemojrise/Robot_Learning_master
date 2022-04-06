@@ -1,0 +1,106 @@
+seed: 0
+training: True   # Whether to train a model or not
+
+# Settings for stable-baselines RL algorithm
+sb_config:
+  total_timesteps: 2000000
+  check_pt_interval: 1000 #1.0e+6
+  num_procs: 24
+  policy: SAC
+
+
+# Settings for normalization
+normalize_obs: True
+normalize_rew: True
+norm_obs_keys: ['robot0_eef_pos']    #List of obs keys to normalize
+
+# Policy settings
+sb_policy:
+  type: "MultiInputPolicy"
+  learning_rate: 0.0003 
+  batch_size: 64
+  buffer_size: 1000000 
+  gamma: 0.99 
+  policy_kwargs: null
+  verbose: 1 
+  seed: null
+  device: 'auto' 
+
+
+# Specify environment
+robosuite:
+  env_id: "Lift_edit"
+  robots: "IIWA_14"
+  gripper_types: "Robotiq85Gripper_iiwa_14"      
+  has_renderer: False                    
+  has_offscreen_renderer: True           
+  control_freq: 20                       
+  horizon: 500
+  camera_heights: 250                          
+  use_object_obs: False                  
+  use_camera_obs: True
+  reward_shaping: True
+  camera_names: "custom"
+  custom_camera_name: "custom" 
+  custom_camera_trans_matrix: [ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
+                                [ 0.961834,  0.241668,  0.128340, -129.767868], 
+                                [ 0.273397, -0.868215, -0.414073,  503.424103], 
+                                [ 0.000000,  0.000000,  0.000000,  1.000000] ]
+  custom_camera_conversion: True
+  custom_camera_attrib:  {"fovy": 36}
+  controller_configs: 
+    type: "OSC_POSE"
+    input_max: 1
+    input_min: -1
+    output_max: [0.05, 0.05, 0.05, 0.5, 0.5, 0.5]
+    output_min: [-0.05, -0.05, -0.05, -0.5, -0.5, -0.5]
+    kp: 150
+    damping_ratio: 1
+    impedance_mode: "fixed"
+    kp_limits: [0, 300]
+    damping_ratio_limits: [0, 10]
+    position_limits": null
+    orientation_limits: null
+    uncouple_pos_ori: True
+    control_delta: true
+    interpolation: null
+    ramp_ratio: 0.2
+  
+wandb_callback:
+  gradient_save_freq: 10000
+  verbose: 2
+
+eval_callback:
+  callback_on_new_best: null
+  n_eval_episodes: 20
+  eval_freq: 4000 
+  log_path: './logs_real/' 
+  best_model_save_path: './logs_real/'
+  deterministic: False
+  render: False 
+  verbose: 1 
+  warn: True
+
+gymwrapper:
+  observations: ["custom_image",'robot0_eef_pos']
+  smaller_action_space: True
+
+wandb:
+  project: "sb3_lift_real"
+  sync_tensorboard: True 
+  save_code: True
+
+
+# Settings used for file handling and logging (save/load destination etc)
+file_handling:
+  # Logging with Tensorboard and saving trained models
+  tb_log_folder: "ppo_lift_4_objects_tensorboard"
+  tb_log_name: "rgb_4_objects_plot"
+  save_model_folder: "trained_models"
+  save_model_filename: "baseline_test_1"
+  # Loading of trained models
+  load_model_folder: "trained_models"
+  load_model_filename: Null
+  # Path to model which should be continued to train
+
+wandb_filename: "sac_wandb_test"
