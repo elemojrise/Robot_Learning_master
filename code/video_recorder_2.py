@@ -6,8 +6,13 @@ import robosuite as suite
 import os
 import yaml
 
-import wandb
-from wandb.integration.sb3 import WandbCallback
+import numpy as np
+import imageio
+import robosuite.utils.macros as macros
+from scipy import ndimage
+import matplotlib.pyplot as plt
+from PIL import Image
+
 
 from robosuite.models.robots.robot_model import register_robot
 from robosuite.environments.base import register_env
@@ -16,7 +21,6 @@ from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecTransposeImage
 from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
-from stable_baselines3.common.callbacks import EvalCallback, CallbackList
 
 from src.environments import Lift_4_objects, Lift_edit
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
@@ -25,6 +29,41 @@ from src.helper_functions.register_new_models import register_gripper, register_
 from src.helper_functions.wrap_env import make_multiprocess_env, make_singel_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 
+def record_video(env, model, video_length,num_episodes, fps, name_of_video_file):
+    macros.IMAGE_CONVENTION = "opencv"
+    # create a video writer with imageio
+    writer = imageio.get_writer(name_of_video_file+".mp4", fps=fps)
+
+    for j in range(num_episodes):
+        obs = env.reset()
+        reward_plot = []
+        step_plot = []
+        for i in range(video_length+10):
+
+            action = model.predict(obs)
+            obs, reward, done, info = env.step(action)
+            reward_plot.append(reward)
+            step_plot.append(i)
+            frame = obs["custom" + "_image"][0]
+            img = Image.fromarray(frame, 'RGB')
+            img = img.rotate(180)
+
+            frame = np.asarray(img)
+            #frame = ndimage.rotate(frame, 180)
+            writer.append_data(frame)
+            if done:
+                plt.plot(step_plot,reward_plot)
+                plt.xlabel('Reward')
+                plt.ylabel('Timestep')
+                plt.title(str(j) + "epsiode")
+                plt.savefig(name_of_video_file + "_plot_" + str(j+1))
+                plt.show()
+
+                break
+
+    writer.close()
+
+
 if __name__ == '__main__':
     register_robot(IIWA_14)
     register_gripper(Robotiq85Gripper_iiwa_14)
@@ -32,14 +71,19 @@ if __name__ == '__main__':
     register_env(Lift_edit)
     register_env(Lift_4_objects)
 
+
+
     yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    #yaml_file = "config_files/sac_test.yaml" 
+    ###########yaml_file = "config_files/ppo_test.yaml" 
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
         
-    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
+    answer = input("Have you dobbel checked if you are using the correct load files? \n  [y/n] ") 
     if answer != "y":
         exit()
+
+    num_episodes = int(input("How many epsiodes do you want to record?   "))
+    name_of_video_file = input("What should video file be called?   ") 
 
 
     # Environment specifications
@@ -47,6 +91,10 @@ if __name__ == '__main__':
     env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
+
+    #Video_settings
+    control_freq = env_options['control_freq']
+    horizon = env_options['horizon']
 
     #normalize obs and rew
     
@@ -65,11 +113,7 @@ if __name__ == '__main__':
     training_timesteps = sb_config["total_timesteps"]
     check_pt_interval = sb_config["check_pt_interval"]
     num_procs = sb_config["num_procs"]
-    policy = sb_config['policy']
-
-
-    messages_to_wand_callback = config["wandb_callback"]
-    messages_to_eval_callback = config["eval_callback"]
+    policy = sb_config["policy"]
 
     # Settings for stable-baselines policy
     policy_kwargs = config["sb_policy"]
@@ -91,79 +135,35 @@ if __name__ == '__main__':
     save_vecnormalize_path = os.path.join(save_model_folder, 'vec_normalize_' + save_model_filename + '.pkl')
 
     # Settings for pipeline
-    training = config["training"]
     seed = config["seed"]
 
-    #Settings for wandb
-    wandb_settings = config["wandb"]
-    wandb_filename = config["wandb_filename"]
-
-    # RL pipeline
     #Create ENV
     print("making")
-    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
-    run = wandb.init(
-        **wandb_settings,
-        config=config,
-        resume="allow",
-        id=wandb_filename,
-        )
-    run.save
+    num_procs = 1   #overwrites the yaml file in order 
+    env = (SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
+    #env = make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed)
 
 
-    # Train new model
-    if load_model_filename is None:
+    load_model_path = os.path.join(load_model_folder, load_model_filename)
+    load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
 
-        if normalize_obs or normalize_rew:
-            env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
-        # Create model
-        if policy == 'PPO':
-            model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
-            print("PPO")
-        elif policy == 'SAC':
-            model = SAC(policy_type, env = env, **policy_kwargs,tensorboard_log=f"runs/{run.id}")
-            print("SAC")
-        else: 
-            ("-----------ERRROR no policy selected------------")
+    # Load normalized env
+    if normalize_obs or normalize_rew:
+        env = VecNormalize.load(load_vecnormalize_path, env)
 
-        print("Created a new model")
-
-    #Continual training
-    else:
-
-        load_model_path = os.path.join(load_model_folder, load_model_filename)
-        load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
-        print(f"Continual training on model located at {load_model_path}")
-
-        # Load normalized env
-        if normalize_obs or normalize_rew:
-            env = VecNormalize.load(load_vecnormalize_path, env)
-
-        # Load model
-        if policy == 'PPO':
-             model = PPO.load(load_model_path, env=env)
-        elif policy == 'SAC':
-            model = SAC.load(load_model_path, env=env)
+    # Load model
+    if policy == 'PPO':
+            model = PPO.load(load_model_path, env=env)
+    elif policy == SAC:
+        model = SAC.load(load_model_path, env=env)
         
-        
-    
-    # Training
-    print("starting to train")
-
-    # Create callback
     env.training = False
 
-    wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
-    eval_callback = EvalCallback(env, **messages_to_eval_callback)
-    callback = CallbackList([wandb_callback, eval_callback])
-
-    model.learn(total_timesteps=training_timesteps, callback=callback, reset_num_timesteps=False)
-
-    run.finish()
-
-    # Save trained model
-    model.save(save_model_path)
-    if normalize_obs or normalize_rew:
-        env.save(save_vecnormalize_path)
-
+    record_video(
+        env=env, 
+        model=model,
+        video_length = horizon, 
+        num_episodes= num_episodes, 
+        name_of_video_file=name_of_video_file,
+        fps = control_freq)
     env.close()

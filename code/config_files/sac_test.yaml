@@ -3,9 +3,9 @@ training: True   # Whether to train a model or not
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 20000
+  total_timesteps: 2000000
   check_pt_interval: 1000 #1.0e+6
-  num_procs: 12
+  num_procs: 24
   policy: SAC
 
 
@@ -35,8 +35,8 @@ robosuite:
   has_renderer: False                    
   has_offscreen_renderer: True           
   control_freq: 20                       
-  horizon: 400
-  camera_heights: 200                          
+  horizon: 500
+  camera_heights: 250                          
   use_object_obs: False                  
   use_camera_obs: True
   reward_shaping: True
@@ -61,7 +61,7 @@ robosuite:
     damping_ratio_limits: [0, 10]
     position_limits": null
     orientation_limits: null
-    uncouple_pos_ori: true
+    uncouple_pos_ori: True
     control_delta: true
     interpolation: null
     ramp_ratio: 0.2
@@ -73,7 +73,7 @@ wandb_callback:
 eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 20
-  eval_freq: 4096 
+  eval_freq: 4000 
   log_path: './logs_real/' 
   best_model_save_path: './logs_real/'
   deterministic: False

@@ -14,7 +14,7 @@ from src.helper_functions.register_new_models import register_gripper, register_
 from robosuite.environments.base import register_env
 from robosuite import load_controller_config
 
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, SAC
 
 register_robot(IIWA_14)
 register_gripper(Robotiq85Gripper_iiwa_14)
