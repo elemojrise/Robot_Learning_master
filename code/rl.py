@@ -60,6 +60,7 @@ if __name__ == '__main__':
     policy_kwargs = config["sb_policy"]
     policy_type = policy_kwargs.pop("type")
 
+    #Implementing learning rate schedular if 
     if config["learning_rate_schedular"]:
         policy_kwargs["learning_rate"] = linear_schedule(policy_kwargs["learning_rate"])
 
