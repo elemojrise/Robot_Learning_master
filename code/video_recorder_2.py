@@ -154,7 +154,7 @@ if __name__ == '__main__':
     # Load model
     if policy == 'PPO':
             model = PPO.load(load_model_path, env=env)
-    elif policy == SAC:
+    elif policy == 'SAC':
         model = SAC.load(load_model_path, env=env)
         
     env.training = False
