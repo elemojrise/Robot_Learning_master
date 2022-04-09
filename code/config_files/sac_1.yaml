@@ -3,7 +3,7 @@ training: True   # Whether to train a model or not
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 2000000
+  total_timesteps: 4000000
   check_pt_interval: 1000 #1.0e+6
   num_procs: 24
   policy: SAC
@@ -97,7 +97,7 @@ file_handling:
   tb_log_folder: "ppo_lift_4_objects_tensorboard"
   tb_log_name: "rgb_4_objects_plot"
   save_model_folder: "trained_models"
-  save_model_filename: "sac_1_6m"
+  save_model_filename: "sac_1_8m"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: "sac_1_6m"
