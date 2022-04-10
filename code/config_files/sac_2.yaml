@@ -3,9 +3,9 @@ training: True   # Whether to train a model or not
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 4000000
+  total_timesteps: 3000000
   check_pt_interval: 1000 #1.0e+6
-  num_procs: 24
+  num_procs: 48
   policy: SAC
 
 
@@ -100,7 +100,7 @@ file_handling:
   save_model_filename: "sac_1_8m"
   # Loading of trained models
   load_model_folder: "trained_models"
-  load_model_filename: "sac_1_6m"
+  load_model_filename: Null
   # Path to model which should be continued to train
 
-wandb_filename: "sac_1"
+wandb_filename: "sac_2"
