@@ -56,7 +56,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
                 plt.xlabel('Reward')
                 plt.ylabel('Timestep')
                 plt.title(str(j) + "epsiode")
-                plt.savefig(name_of_video_file + "_plot_" + str(j+1))
+                plt.savefig(name_of_video_file + "_plots/plot_" + str(j+1))
                 plt.show()
 
                 break
