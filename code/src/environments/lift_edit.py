@@ -275,13 +275,13 @@ class Lift_edit(SingleArmEnv):
             cube_pos = self.sim.data.body_xpos[self.cube_body_id]
             gripper_site_pos = self.sim.data.site_xpos[self.robots[0].eef_site_id]
             dist = np.linalg.norm(gripper_site_pos - cube_pos)
-            reaching_reward = (1 - np.tanh(10.0 * dist))*0.05
+            reaching_reward = (1 - np.tanh(10.0 * dist))*0.0
             reward += reaching_reward 
 
             # grasping reward
             if self._check_grasp(gripper=self.robots[0].gripper, object_geoms=self.cube):
                 print("Detected grasp")
-                reward += 0.75
+                reward += 0.25
 
         # Scale reward if requested
         if self.reward_scale is not None:

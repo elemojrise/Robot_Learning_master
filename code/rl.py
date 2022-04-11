@@ -101,7 +101,7 @@ if __name__ == '__main__':
     # RL pipeline
     #Create ENV
     print("making")
-    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
+    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  rank=i, seed=seed) for i in range(num_procs)]))
     run = wandb.init(
         **wandb_settings,
         config=config,
