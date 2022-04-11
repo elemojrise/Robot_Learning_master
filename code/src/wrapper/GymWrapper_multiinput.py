@@ -124,6 +124,7 @@ class GymWrapper_multiinput(Wrapper, Env):
         self.grasp_success = 0
 
         ob_dict = self.env.reset()
+        print("------reseting env-----")
         return self._multiinput_obs(ob_dict)
 
     def step(self, action):
