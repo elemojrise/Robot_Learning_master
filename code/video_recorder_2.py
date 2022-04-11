@@ -143,19 +143,15 @@ if __name__ == '__main__':
     env = (SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
     #env = make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed)
 
-
-    load_model_path = os.path.join(load_model_folder, load_model_filename)
-    load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
-
     # Load normalized env
     if normalize_obs or normalize_rew:
-        env = VecNormalize.load(load_vecnormalize_path, env)
+        env = VecNormalize.load(save_vecnormalize_path, env)
 
     # Load model
     if policy == 'PPO':
-            model = PPO.load(load_model_path, env=env)
+            model = PPO.load(save_model_path, env=env)
     elif policy == 'SAC':
-        model = SAC.load(load_model_path, env=env)
+        model = SAC.load(save_model_path, env=env)
         
     env.training = False
 
