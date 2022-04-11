@@ -13,6 +13,7 @@ from scipy import ndimage
 import matplotlib.pyplot as plt
 from PIL import Image
 
+import os
 
 from robosuite.models.robots.robot_model import register_robot
 from robosuite.environments.base import register_env
@@ -31,8 +32,12 @@ from src.helper_functions.camera_functions import adjust_width_of_image
 
 def record_video(env, model, video_length,num_episodes, fps, name_of_video_file):
     macros.IMAGE_CONVENTION = "opencv"
+
+    save_path = "video_files/" + name_of_video_file + "/"
+    os.mkdir(save_path)
+
     # create a video writer with imageio
-    writer = imageio.get_writer(name_of_video_file+".mp4", fps=fps)
+    writer = imageio.get_writer(save_path + name_of_video_file+".mp4", fps=fps)
 
     for j in range(num_episodes):
         obs = env.reset()
@@ -56,7 +61,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
                 plt.xlabel('Reward')
                 plt.ylabel('Timestep')
                 plt.title(str(j) + "epsiode")
-                plt.savefig(name_of_video_file + "_plots/plot_" + str(j+1))
+                plt.savefig(save_path + name_of_video_file + "_plot_" + str(j+1))
                 plt.show()
 
                 break
@@ -154,7 +159,7 @@ if __name__ == '__main__':
         model = SAC.load(save_model_path, env=env)
         
     env.training = False
-
+    
     record_video(
         env=env, 
         model=model,
