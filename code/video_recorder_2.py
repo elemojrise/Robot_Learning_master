@@ -6,6 +6,8 @@ import robosuite as suite
 import os
 import yaml
 
+import random
+
 import numpy as np
 import imageio
 import robosuite.utils.macros as macros
@@ -140,7 +142,7 @@ if __name__ == '__main__':
     save_vecnormalize_path = os.path.join(save_model_folder, 'vec_normalize_' + save_model_filename + '.pkl')
 
     # Settings for pipeline
-    seed = config["seed"]
+    seed = random.randint(0,256)
 
     #Create ENV
     print("making")
