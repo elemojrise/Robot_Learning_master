@@ -97,7 +97,7 @@ file_handling:
   tb_log_folder: "ppo_lift_4_objects_tensorboard"
   tb_log_name: "rgb_4_objects_plot"
   save_model_folder: "trained_models"
-  save_model_filename: "sac_sac_long_step
+  save_model_filename: "sac_sac_long_step"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: Null
