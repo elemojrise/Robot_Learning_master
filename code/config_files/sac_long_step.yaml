@@ -36,7 +36,7 @@ robosuite:
   has_offscreen_renderer: True           
   control_freq: 1                       
   horizon: 20
-  camera_heights: 240                          
+  camera_heights: 300        
   use_object_obs: False                  
   use_camera_obs: True
   reward_shaping: True
