@@ -151,7 +151,7 @@ if __name__ == '__main__':
     print("starting to train")
 
     # Create callback
-    env.training = False
+    #env.training = False
 
     wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
     eval_callback = EvalCallback(env, **messages_to_eval_callback)

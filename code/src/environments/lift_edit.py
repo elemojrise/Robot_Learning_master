@@ -345,7 +345,7 @@ class Lift_edit(SingleArmEnv):
             self.placement_initializer = UniformRandomSampler(
                 name="ObjectSampler",
                 mujoco_objects=self.cube,
-                x_range=[-0.1, 0.1], #From middle of table in x direction (not world frame og robot frame) (with [-0.1,0.1] it will be between 0-6 and 0.8 from robot/world frame)
+                x_range=[-0.1, 0.0], #From middle of table in x direction (not world frame og robot frame) (with [-0.1,0.1] it will be between 0-6 and 0.8 from robot/world frame)
                 y_range=[-0.15, 0.15], #From middle of table in y direction
                 rotation=None,
                 ensure_object_boundary_in_range=False,

@@ -68,12 +68,12 @@ env = suite.make(
     use_camera_obs=True,                   # provide image observations to agent
     camera_names="custom",
     render_camera = None,               # use "agentview" camera for observations
-    camera_heights=300,                      # image height
-    camera_widths=adjust_width_of_image(300),                       # image width
+    camera_heights=84,                      # image height
+    camera_widths= 84, #adjust_width_of_image(100),                       # image width
     # reward_shaping=False,
     custom_camera_name = "custom",
-    custom_camera_trans_matrix = Trans_matrix_20_points,
-    custom_camera_conversion= True,
+    custom_camera_trans_matrix = Trans_matrix,
+    custom_camera_conversion= False,
     custom_camera_attrib = {"fovy": 36},
 )
 
@@ -92,7 +92,7 @@ action = [env.action_space.sample()]
 print(action)
 obs, reward, done, info = env.step(action)  # take action in the environment
 
-print(obs)
+#print(obs)
 
 # cam_move = CameraMover(env= env, camera = "custom", init_camera_pos= cam_pose , init_camera_quat= np.array([[0.653], [0.271], [0.271], [0.653]]).flatten() )
 
@@ -107,8 +107,6 @@ img = Image.fromarray(image, 'RGB')
 img = img.rotate(180)
 
 rot_img = np.asarray(img)
-print(rot_img.shape)
-print(rot_img)
 img.save('20_points.png')
 
 
