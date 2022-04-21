@@ -4,6 +4,7 @@ from torch import nn
 
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.common.preprocessing import is_image_space, get_flattened_obs_dim
+from stable_baselines3.common.type_aliases import TensorDict
 
 class CustomCombinedExtractor(BaseFeaturesExtractor):
     """

@@ -24,6 +24,7 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecTransposeImage, VecVideoRecorder
 from stable_baselines3.common.callbacks import EvalCallback
 
+
 print("doing")
 def wrap_env(env):
     wrapped_env = Monitor(env, info_keywords = ("is_success",))                          # Needed for extracting eprewmean and eplenmean
@@ -33,27 +34,30 @@ def wrap_env(env):
     wrapped_env = VecTransposeImage(wrapped_env)
     return wrapped_env
 
+print("before controller config")
 controller_config = load_controller_config(default_controller="OSC_POSE")
 
+print("before register")
 register_robot(IIWA_14)
 register_gripper(Robotiq85Gripper_iiwa_14)
 register_robot_class_mapping("IIWA_14")
 register_env(Lift_edit)
 
+print("making env")
 # Training
 env = GymWrapper_multiinput(
         suite.make(
-            env_name="Lift_edit",
-            robots = "IIWA_14",
+            env_name="Lift",
+            robots = "IIWA",
             controller_configs = controller_config, 
-            gripper_types="Robotiq85Gripper_iiwa_14",      
+            gripper_types="Robotiq85Gripper",      
             has_renderer=False,                    
             has_offscreen_renderer=True,           
-            control_freq=10,                       
+            control_freq=20,                       
             horizon= 4,
             ignore_done = False, 
-            camera_heights = 48,
-            camera_widths = 48,                          
+            camera_heights = 84,
+            camera_widths = 84,                          
             use_object_obs=False,                  
             use_camera_obs=True,
             reward_shaping= True,
@@ -62,6 +66,7 @@ env = GymWrapper_multiinput(
         keys = ["agentview_image","robot0_eef_pos", 'robot0_gripper_qpos'],
         #smaller_action_space= True
 )
+print("starting to wrap")
 env = wrap_env(env)
 
 # print(env.metadata)
@@ -89,6 +94,7 @@ policy_kwargs = dict(
 
 obs = env.reset()
 
+print("crating the model")
 model = PPO('MultiInputPolicy', env, policy_kwargs = policy_kwargs, n_steps = 8, batch_size= 2, verbose=1, device= "auto")
 print("starting to learn")
 
