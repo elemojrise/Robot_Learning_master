@@ -28,8 +28,8 @@ from stable_baselines3.common.callbacks import EvalCallback
 print("doing")
 def wrap_env(env):
     wrapped_env = Monitor(env, info_keywords = ("is_success",))                          # Needed for extracting eprewmean and eplenmean
-    wrapped_env = SubprocVecEnv([wrapped_env])
-    #wrapped_env = DummyVecEnv([lambda : wrapped_env])   # Needed for all environments (e.g. used for mulit-processing)
+    #wrapped_env = SubprocVecEnv([wrapped_env])
+    wrapped_env = DummyVecEnv([lambda : wrapped_env])   # Needed for all environments (e.g. used for mulit-processing)
     #wrapped_env = VecNormalize(wrapped_env)             # Needed for improving training when using MuJoCo envs?
     wrapped_env = VecTransposeImage(wrapped_env)
     return wrapped_env
@@ -88,7 +88,6 @@ env = wrap_env(env)
 
 policy_kwargs = dict(
     features_extractor_class=CustomCombinedExtractor,
-    features_extractor_kwargs=dict(features_dim=128),
     net_arch=[dict(pi=[300, 200], vf=[300, 200])]
 )
 
