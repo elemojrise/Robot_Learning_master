@@ -27,7 +27,6 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
         for key, subspace in observation_space.spaces.items():
             if is_image_space(subspace):
                 extractors[key] = CustomNatureCNN(subspace, features_dim=cnn_output_dim) # Denne sier størrelsen på linear layer
-                print("cnn_output_dim", cnn_output_dim)
                 total_concat_size += cnn_output_dim
             else:
                 # The observation key is a vector, flatten it if needed
@@ -49,19 +48,16 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
 
         for key, extractor in self.extractors.items():
             encoded_tensor_list.append(extractor(observations[key]))
-        print("concatinated",th.cat(encoded_tensor_list, dim=1))
-
+        
         """Trying to implement LSTM"""
         before_LSTM = th.cat(encoded_tensor_list, dim=1)
+        before_LSTM = before_LSTM.unsqueeze(0)
+        end_feature_extract, _ = self.rnn_stem(before_LSTM, None)
 
-        end_feature_extract, _ = self.rnn_stem(before_LSTM)
+        end_feature_extract = th.squeeze(end_feature_extract,1)
 
-        print("end_feature_extract", end_feature_extract)
-
-        #TODO må se hva end_feature_extracotr er hvordan jeg kan få det likt som det som er returneret tidlilgere
-
-
-        return th.cat(encoded_tensor_list, dim=1)
+       
+        return end_feature_extract #th.cat(encoded_tensor_list, dim=1)
 
 
 class CustomNatureCNN(BaseFeaturesExtractor):
@@ -100,8 +96,6 @@ class CustomNatureCNN(BaseFeaturesExtractor):
         with th.no_grad():
             n_flatten = self.cnn(th.as_tensor(observation_space.sample()[None]).float()).shape[1]
 
-        print("n_flatten", n_flatten)
-        print("fetures_dim", features_dim)
         self.linear = nn.Sequential(nn.Linear(n_flatten, features_dim), nn.ReLU())
 
     def forward(self, observations: th.Tensor) -> th.Tensor:
