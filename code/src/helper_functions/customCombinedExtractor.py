@@ -39,7 +39,7 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
         self._features_dim = total_concat_size
 
         self.rnn_stem = nn.LSTM(input_size = total_concat_size,
-                                hidden_size = 100, #Det er dette Surreal bruker
+                                hidden_size = 256, #Det er dette Surreal bruker
                                 num_layers = 1,
                                 batch_first=True)
 
@@ -56,7 +56,13 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
 
         end_feature_extract = th.squeeze(end_feature_extract,1)
 
-       
+        print(th.cat(encoded_tensor_list, dim=1).shape)
+        print(end_feature_extract.shape)
+        print(len(end_feature_extract.shape))
+        if len(end_feature_extract.shape) == 3:
+            end_feature_extract = th.squeeze(end_feature_extract)
+
+        print(end_feature_extract.shape)
         return end_feature_extract #th.cat(encoded_tensor_list, dim=1)
 
 

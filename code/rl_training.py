@@ -88,7 +88,7 @@ env = wrap_env(env)
 
 policy_kwargs = dict(
     features_extractor_class=CustomCombinedExtractor,
-    net_arch=[dict(pi=[300, 200], vf=[300, 200])]
+    net_arch=[dict(pi=[100, 300, 200], vf=[100, 300, 200])]
 )
 
 obs = env.reset()
