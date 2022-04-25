@@ -53,17 +53,12 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
         before_LSTM = th.cat(encoded_tensor_list, dim=1)
         before_LSTM = before_LSTM.unsqueeze(0)
         end_feature_extract, _ = self.rnn_stem(before_LSTM, None)
-
         end_feature_extract = th.squeeze(end_feature_extract,1)
-
-        print(th.cat(encoded_tensor_list, dim=1).shape)
-        print(end_feature_extract.shape)
-        print(len(end_feature_extract.shape))
         if len(end_feature_extract.shape) == 3:
             end_feature_extract = th.squeeze(end_feature_extract)
 
-        print(end_feature_extract.shape)
-        return end_feature_extract #th.cat(encoded_tensor_list, dim=1)
+
+        return th.cat(encoded_tensor_list, dim=1)
 
 
 class CustomNatureCNN(BaseFeaturesExtractor):
