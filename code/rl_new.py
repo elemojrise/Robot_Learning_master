@@ -66,7 +66,6 @@ if __name__ == '__main__':
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
     training_timesteps = sb_config["total_timesteps"]
-    check_pt_interval = sb_config["check_pt_interval"]
     num_procs = sb_config["num_procs"]
     policy = sb_config['policy']
 
@@ -87,11 +86,10 @@ if __name__ == '__main__':
         policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
     else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
 
+    print(policy_kwargs["policy_kwargs"])
+
     # Settings used for file handling and logging (save/load destination etc)
     file_handling = config["file_handling"]
-
-    tb_log_folder = file_handling["tb_log_folder"]
-    tb_log_name = file_handling["tb_log_name"]
 
     save_model_folder = file_handling["save_model_folder"]
     save_model_filename = file_handling["save_model_filename"]

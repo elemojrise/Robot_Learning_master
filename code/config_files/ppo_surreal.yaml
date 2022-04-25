@@ -21,7 +21,7 @@ norm_obs_keys: ['robot0_eef_pos', 'robot0_gripper_qpos']    #List of obs keys to
 sb_policy:
   type: "MultiInputPolicy"
   learning_rate: 0.0003 
-  n_steps: 400
+  n_steps: 2048
   batch_size: 64 
   n_epochs: 10 
   gamma: 0.99 
@@ -43,9 +43,13 @@ sb_policy:
   policy_kwargs:
     features_extractor_class: true 
     net_arch:
-      100 
-      pi: [300, 200]    # Custom actor network
-      vf: [300, 200]    # Value function network
+      - 100 
+      - pi: 
+        - 300
+        - 200    # Custom actor network
+        vf: 
+        - 300
+        - 200    # Value function network
 
 # Specify environment
 robosuite:
