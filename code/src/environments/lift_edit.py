@@ -164,7 +164,7 @@ class Lift_edit(SingleArmEnv):
         placement_initializer=None,
         has_renderer=False,
         has_offscreen_renderer=True,
-        render_camera="birdview",
+        render_camera="frontview",
         render_collision_mesh=False,
         render_visual_mesh=True,
         render_gpu_device_id=-1,
@@ -381,6 +381,28 @@ class Lift_edit(SingleArmEnv):
         """
         observables = super()._setup_observables()
 
+        #Creating sensor for height over table
+        modality = "gripper"
+        @sensor(modality=modality)
+        def gripper_height(obs_cache):
+            return np.array([self.sim.data.get_site_xpos(self.robots[0].gripper.important_sites["grip_site"])[-1] - self.model.mujoco_arena.table_offset[2]]) 
+
+        observables["gripper_height"] = Observable(
+                                name= "gripper_height",
+                                sensor = gripper_height, 
+                                sampling_rate=self.control_freq,
+        )
+
+        modality = "gripper"
+        @sensor(modality=modality)
+        def gripper_status(obs_cache):
+            return np.array([int(self.robots[0].gripper.current_action)])
+
+        observables["gripper_status"] = Observable(
+                                name= "gripper_status",
+                                sensor = gripper_status, 
+                                sampling_rate=self.control_freq,
+        )
         # low-level object information
         if self.use_object_obs:
             # Get robot prefix and define observables modality

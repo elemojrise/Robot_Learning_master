@@ -86,6 +86,7 @@ class GymWrapper_multiinput(Wrapper, Env):
         low, high = self.env.action_spec
         if self.smaller_action_space:
             low, high = low[:-2], high[:-2] #trekker fra a og b som mulige inputs
+        low[-1] = 0
         self.action_space = spaces.Box(low=np.float32(low), high=np.float32(high))
 
         for key in image_list:
@@ -145,7 +146,14 @@ class GymWrapper_multiinput(Wrapper, Env):
             action = np.insert(action, 3, 0)
             action = np.insert(action, 4, 0)
 
+        #Trying to discretise the gripper action
+        
+        # if action[-1] >= 0:
+        #     action[-1] = 1
+        # else: action[-1] = -1
         ob_dict, reward, done, info = self.env.step(action)
+
+        
 
         # It will now keep being 1 until reset
         if self.env._check_success():
