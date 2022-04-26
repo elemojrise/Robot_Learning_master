@@ -164,7 +164,7 @@ class Lift_edit(SingleArmEnv):
         placement_initializer=None,
         has_renderer=False,
         has_offscreen_renderer=True,
-        render_camera="frontview",
+        render_camera="birdview",
         render_collision_mesh=False,
         render_visual_mesh=True,
         render_gpu_device_id=-1,
@@ -188,7 +188,7 @@ class Lift_edit(SingleArmEnv):
         self.table_full_size = table_full_size
         self.table_friction = table_friction
         self.table_offset = np.array((0.7, 0, 0.8)) #Hallaballa
-        self.rbot_base_frame = np.array((0, 0, 0.8))
+        self.robot_base_frame = np.array((0, 0, 0.8))
 
         # settings for custom camera
         self.custom_camera_name = custom_camera_name
@@ -292,23 +292,20 @@ class Lift_edit(SingleArmEnv):
         xpos = (0, 0, 0.8)
         self.robots[0].robot_model.set_base_xpos(xpos)
 
-        loc = os.getcwd() 
-
-        if loc == '/home/kukauser/dev_ws': #if we are using the MANULAB computer and running policy node from dev_ws
-            loc = '/home/kukauser/Robot_Learning_master/code'
+        loc = os.getcwd() + "/src"
         # load model for table top workspace
         mujoco_arena = TableArena(
             table_full_size=self.table_full_size,
             table_friction=self.table_friction,
             table_offset=self.table_offset,
-            xml= loc + "/src/models/assets/arenas/lab_arena.xml", #hallaballa
+            xml= loc + "/models/assets/arenas/lab_arena.xml", #hallaballa
         )
 
         # Arena always gets set to zero origin
         mujoco_arena.set_origin([0, 0, 0])
 
         if self.custom_camera_name != None:
-            custom_camera_pos, custom_camera_quat = get_pos_and_quat_from_trans_matrix(self.custom_camera_trans_matrix, self.rbot_base_frame, self.custom_camera_conversion)
+            custom_camera_pos, custom_camera_quat = get_pos_and_quat_from_trans_matrix(self.custom_camera_trans_matrix, self.robot_base_frame, self.custom_camera_conversion)
             mujoco_arena.set_camera(self.custom_camera_name, custom_camera_pos, custom_camera_quat, self.custom_camera_attrib)
 
         # initialize objects of interest
@@ -345,8 +342,8 @@ class Lift_edit(SingleArmEnv):
             self.placement_initializer = UniformRandomSampler(
                 name="ObjectSampler",
                 mujoco_objects=self.cube,
-                x_range=[-0.3, 0.0], #Skjønner ikke helt hvor dette er definert ut ifra
-                y_range=[-0.15, 0.15],
+                x_range=[-0.1, 0.0], #From middle of table in x direction (not world frame og robot frame) (with [-0.1,0.1] it will be between 0-6 and 0.8 from robot/world frame)
+                y_range=[-0.15, 0.15], #From middle of table in y direction
                 rotation=None,
                 ensure_object_boundary_in_range=False,
                 ensure_valid_placement=True,

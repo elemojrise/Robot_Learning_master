@@ -1,19 +1,28 @@
-seed: 0
+seed: 3
 training: True   # Whether to train a model or not
+
+wandb_filename: "ppo_wandb_surreal_longer_training"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 4.0e+6
+  total_timesteps: 2.5e+6 
   num_procs: 12
+  policy: 'PPO'
 
 learning_rate_schedular: true
+
+
+# Settings for normalization
+normalize_obs: True
+normalize_rew: False
+norm_obs_keys: ['robot0_eef_pos', 'robot0_gripper_qpos']    #List of obs keys to normalize
 
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
-  learning_rate: 0.0003 
-  n_steps: 1024 
-  batch_size: 64 
+  learning_rate: 0.00024 
+  n_steps: 3072
+  batch_size: 512 
   n_epochs: 10 
   gamma: 0.99 
   gae_lambda: 0.95 
@@ -31,9 +40,16 @@ sb_policy:
   seed: null
   device: 'auto' 
   _init_setup_model: True
-  # net_arch: 
-  #   - pi: [256, 128]    # Custom actor network
-  #     vf: [256, 128]    # Value function network
+  policy_kwargs:
+    features_extractor_class: true 
+    net_arch:
+      - 100 
+      - pi: 
+        - 300
+        - 200    # Custom actor network
+        vf: 
+        - 300
+        - 200    # Value function network
 
 # Specify environment
 robosuite:
@@ -42,9 +58,10 @@ robosuite:
   gripper_types: "Robotiq85Gripper_iiwa_14"      
   has_renderer: False                    
   has_offscreen_renderer: True           
-  control_freq: 20                       
-  horizon: 400
-  camera_heights: 300                          
+  control_freq: 10                       
+  horizon: 200
+  camera_heights: 84
+  camera_widths: 84                          
   use_object_obs: False                  
   use_camera_obs: True
   reward_shaping: True
@@ -54,7 +71,7 @@ robosuite:
                                 [ 0.961834,  0.241668,  0.128340, -129.767868], 
                                 [ 0.273397, -0.868215, -0.414073,  503.424103], 
                                 [ 0.000000,  0.000000,  0.000000,  1.000000] ]
-  custom_camera_conversion: True
+  custom_camera_conversion: False
   custom_camera_attrib:  {"fovy": 36}
   controller_configs: 
     type: "OSC_POSE"
@@ -80,17 +97,17 @@ wandb_callback:
 
 eval_callback:
   callback_on_new_best: null
-  n_eval_episodes: 10
-  eval_freq: 2048 
-  log_path: './logs_real_smaller_action_space/' 
-  best_model_save_path: './logs_real_smaller_action_space/'
-  deterministic: true
+  n_eval_episodes: 20
+  eval_freq: 6144 
+  log_path: './logs_surreal_ppo_longer_train/' 
+  best_model_save_path: './logs_surreal_ppo_longer_train/'
+  deterministic: False
   render: False 
   verbose: 1 
   warn: True
 
 gymwrapper:
-  observations: ["custom_image"]
+  observations: ["custom_image",'robot0_eef_pos', 'robot0_gripper_qpos']
   smaller_action_space: True
 
 wandb:
@@ -98,9 +115,13 @@ wandb:
   sync_tensorboard: True 
   save_code: True
 
-
 # Settings used for file handling and logging (save/load destination etc)
 file_handling:
-  # Path to model which should be continued to train
-  continue_training_model_folder: "logs_real_smaller_action_space"
-  continue_training_model_filename: "best_model" # is null when training a new model
+  # Logging with Tensorboard and saving trained models
+  save_model_folder: "trained_models"
+  save_model_filename: "ppo_surreal_longer_train"
+  # Loading of trained models
+  load_model_folder: "trained_models"
+  load_model_filename: null
+
+

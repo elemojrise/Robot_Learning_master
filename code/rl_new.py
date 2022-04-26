@@ -22,9 +22,10 @@ from src.environments import Lift_4_objects, Lift_edit
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
-from src.helper_functions.wrap_env import make_multiprocess_env, make_singel_env
+from src.helper_functions.wrap_env import make_multiprocess_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 from src.helper_functions.hyperparameters import linear_schedule
+from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor
 
 if __name__ == '__main__':
     register_robot(IIWA_14)
@@ -45,7 +46,8 @@ if __name__ == '__main__':
 
     # Environment specifications
     env_options = config["robosuite"]
-    env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
+    if env_options["custom_camera_conversion"]:
+        env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
 
@@ -64,7 +66,6 @@ if __name__ == '__main__':
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
     training_timesteps = sb_config["total_timesteps"]
-    check_pt_interval = sb_config["check_pt_interval"]
     num_procs = sb_config["num_procs"]
     policy = sb_config['policy']
 
@@ -79,12 +80,16 @@ if __name__ == '__main__':
     #Implementing learning rate schedular if 
     if config["learning_rate_schedular"]:
         policy_kwargs["learning_rate"] = linear_schedule(policy_kwargs["learning_rate"])
+    
+    #Implementing custom feature extractor
+    if policy_kwargs["policy_kwargs"]["features_extractor_class"]:
+        policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
+    else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
+
+    print(policy_kwargs["policy_kwargs"])
 
     # Settings used for file handling and logging (save/load destination etc)
     file_handling = config["file_handling"]
-
-    tb_log_folder = file_handling["tb_log_folder"]
-    tb_log_name = file_handling["tb_log_name"]
 
     save_model_folder = file_handling["save_model_folder"]
     save_model_filename = file_handling["save_model_filename"]
@@ -106,7 +111,7 @@ if __name__ == '__main__':
     # RL pipeline
     #Create ENV
     print("making")
-    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  rank=i, seed=seed) for i in range(num_procs)]))
+    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
     run = wandb.init(
         **wandb_settings,
         config=config,
@@ -156,7 +161,7 @@ if __name__ == '__main__':
     print("starting to train")
 
     # Create callback
-    env.training = False
+    #env.training = False
 
     wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
     eval_callback = EvalCallback(env, **messages_to_eval_callback)

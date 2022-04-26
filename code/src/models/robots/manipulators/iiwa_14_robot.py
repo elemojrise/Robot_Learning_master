@@ -33,7 +33,7 @@ class IIWA_14(ManipulatorModel):
 
     @property
     def init_qpos(self):
-        return np.array([0.000, 0.650, 0.000, -1.890, 0.000, 0.600, 0.000])
+        return np.array([0.000, 0.85, 0.000, -1.5, 0.000, 0.600, 0.000]) # [0.000, 0.650, 0.000, -1.890, 0.000, 0.600, 0.000])
 
     @property
     def base_xpos_offset(self):

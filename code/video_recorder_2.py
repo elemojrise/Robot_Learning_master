@@ -95,7 +95,8 @@ if __name__ == '__main__':
 
     # Environment specifications
     env_options = config["robosuite"]
-    env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
+    if env_options["custom_camera_conversion"]:
+        env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
 
@@ -118,7 +119,6 @@ if __name__ == '__main__':
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
     training_timesteps = sb_config["total_timesteps"]
-    check_pt_interval = sb_config["check_pt_interval"]
     num_procs = sb_config["num_procs"]
     policy = sb_config["policy"]
 
@@ -128,9 +128,6 @@ if __name__ == '__main__':
 
     # Settings used for file handling and logging (save/load destination etc)
     file_handling = config["file_handling"]
-
-    tb_log_folder = file_handling["tb_log_folder"]
-    tb_log_name = file_handling["tb_log_name"]
 
     save_model_folder = file_handling["save_model_folder"]
     save_model_filename = file_handling["save_model_filename"]

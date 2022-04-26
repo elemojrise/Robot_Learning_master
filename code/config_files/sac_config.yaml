@@ -3,37 +3,29 @@ training: True   # Whether to train a model or not
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 4.0e+6
-  num_procs: 12
+  total_timesteps: 2000000
+  check_pt_interval: 1000 #1.0e+6
+  num_procs: 24
+  policy: SAC
 
-learning_rate_schedular: true
+
+# Settings for normalization
+normalize_obs: True
+normalize_rew: True
+norm_obs_keys: ['robot0_eef_pos']    #List of obs keys to normalize
 
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
   learning_rate: 0.0003 
-  n_steps: 1024 
-  batch_size: 64 
-  n_epochs: 10 
+  batch_size: 64
+  buffer_size: 1000000 
   gamma: 0.99 
-  gae_lambda: 0.95 
-  clip_range: 0.2 
-  clip_range_vf: null 
-  ent_coef: 0.0 
-  vf_coef: 0.5 
-  max_grad_norm: 0.5
-  use_sde: False 
-  sde_sample_freq: -1 
-  target_kl: null 
-  create_eval_env: False 
   policy_kwargs: null
   verbose: 1 
   seed: null
   device: 'auto' 
-  _init_setup_model: True
-  # net_arch: 
-  #   - pi: [256, 128]    # Custom actor network
-  #     vf: [256, 128]    # Value function network
+
 
 # Specify environment
 robosuite:
@@ -43,8 +35,8 @@ robosuite:
   has_renderer: False                    
   has_offscreen_renderer: True           
   control_freq: 20                       
-  horizon: 400
-  camera_heights: 300                          
+  horizon: 500
+  camera_heights: 250                          
   use_object_obs: False                  
   use_camera_obs: True
   reward_shaping: True
@@ -69,7 +61,7 @@ robosuite:
     damping_ratio_limits: [0, 10]
     position_limits": null
     orientation_limits: null
-    uncouple_pos_ori: true
+    uncouple_pos_ori: True
     control_delta: true
     interpolation: null
     ramp_ratio: 0.2
@@ -80,17 +72,17 @@ wandb_callback:
 
 eval_callback:
   callback_on_new_best: null
-  n_eval_episodes: 10
-  eval_freq: 2048 
-  log_path: './logs_real_smaller_action_space/' 
-  best_model_save_path: './logs_real_smaller_action_space/'
-  deterministic: true
+  n_eval_episodes: 20
+  eval_freq: 4000 
+  log_path: './logs_real/' 
+  best_model_save_path: './logs_real/'
+  deterministic: False
   render: False 
   verbose: 1 
   warn: True
 
 gymwrapper:
-  observations: ["custom_image"]
+  observations: ["custom_image",'robot0_eef_pos']
   smaller_action_space: True
 
 wandb:
@@ -101,6 +93,14 @@ wandb:
 
 # Settings used for file handling and logging (save/load destination etc)
 file_handling:
+  # Logging with Tensorboard and saving trained models
+  tb_log_folder: "ppo_lift_4_objects_tensorboard"
+  tb_log_name: "rgb_4_objects_plot"
+  save_model_folder: "trained_models"
+  save_model_filename: "baseline_test_1"
+  # Loading of trained models
+  load_model_folder: "trained_models"
+  load_model_filename: Null
   # Path to model which should be continued to train
-  continue_training_model_folder: "logs_real_smaller_action_space"
-  continue_training_model_filename: "best_model" # is null when training a new model
+
+wandb_filename: "sac_wandb_test"
