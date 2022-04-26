@@ -88,7 +88,8 @@ if __name__ == '__main__':
 
     # Environment specifications
     env_options = config["robosuite"]
-    env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
+    if env_options["custom_camera_conversion"]:
+        env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
 
@@ -111,7 +112,6 @@ if __name__ == '__main__':
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
     training_timesteps = sb_config["total_timesteps"]
-    check_pt_interval = sb_config["check_pt_interval"]
     num_procs = sb_config["num_procs"]
     policy = sb_config["policy"]
 
@@ -121,9 +121,6 @@ if __name__ == '__main__':
 
     # Settings used for file handling and logging (save/load destination etc)
     file_handling = config["file_handling"]
-
-    tb_log_folder = file_handling["tb_log_folder"]
-    tb_log_name = file_handling["tb_log_name"]
 
     save_model_folder = file_handling["save_model_folder"]
     save_model_filename = file_handling["save_model_filename"]
@@ -147,14 +144,21 @@ if __name__ == '__main__':
     load_model_path = os.path.join(load_model_folder, load_model_filename)
     load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
 
-    # Load normalized env
-    if normalize_obs or normalize_rew:
-        env = VecNormalize.load(load_vecnormalize_path, env)
+    normalize_env = str(input("Do you want to make a new normalized env or load from file? \n  [make_new/load_file]"))
 
+    if normalize_env == "make_new" and (normalize_obs or normalize_rew):
+        env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
+    # Load normalized env
+    elif normalize_env == "load_file" and (normalize_obs or normalize_rew):
+        env = VecNormalize.load(load_vecnormalize_path, env)
+    else: 
+        exit("Write either make_new or load_file")
+
+    
     # Load model
     if policy == 'PPO':
             model = PPO.load(load_model_path, env=env)
-    elif policy == SAC:
+    elif policy == 'SAC':
         model = SAC.load(load_model_path, env=env)
         
     env.training = False
