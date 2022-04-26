@@ -3,28 +3,54 @@ training: True   # Whether to train a model or not
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 4000000
+  total_timesteps: 1000000
   check_pt_interval: 1000 #1.0e+6
   num_procs: 24
-  policy: SAC
+  policy: PPO
+
+learning_rate_schedular: False
 
 
 # Settings for normalization
 normalize_obs: True
 normalize_rew: True
-norm_obs_keys: ['robot0_eef_pos']    #List of obs keys to normalize
+norm_obs_keys: ['robot0_eef_pos','robot0_gripper_qpos']    #List of obs keys to normalize
 
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
   learning_rate: 0.0003 
-  batch_size: 64
-  buffer_size: 1000000 
+  n_steps: 2048
+  batch_size: 64 
+  n_epochs: 10 
   gamma: 0.99 
+  gae_lambda: 0.95 
+  clip_range: 0.2 
+  clip_range_vf: null 
+  ent_coef: 0.0 
+  vf_coef: 0.5 
+  max_grad_norm: 0.5
+  use_sde: False 
+  sde_sample_freq: -1 
+  target_kl: null 
+  create_eval_env: False 
   policy_kwargs: null
   verbose: 1 
   seed: null
   device: 'auto' 
+  _init_setup_model: True
+  policy_kwargs:
+    features_extractor_class: true 
+    net_arch:
+      - 100 
+      - pi: 
+        - 300
+        - 200    # Custom actor network
+        vf: 
+        - 300
+        - 200    # Value function network
+
+
 
 
 # Specify environment
@@ -36,7 +62,8 @@ robosuite:
   has_offscreen_renderer: True           
   control_freq: 10                       
   horizon: 200
-  camera_heights: 250                          
+  camera_heights: 84
+  camera_widths: 84                          
   use_object_obs: False                  
   use_camera_obs: True
   reward_shaping: True
@@ -46,7 +73,7 @@ robosuite:
                                 [ 0.961834,  0.241668,  0.128340, -129.767868], 
                                 [ 0.273397, -0.868215, -0.414073,  503.424103], 
                                 [ 0.000000,  0.000000,  0.000000,  1.000000] ]
-  custom_camera_conversion: True
+  custom_camera_conversion: False
   custom_camera_attrib:  {"fovy": 36}
   controller_configs: 
     type: "OSC_POSE"
@@ -61,7 +88,7 @@ robosuite:
     damping_ratio_limits: [0, 10]
     position_limits": null
     orientation_limits: null
-    uncouple_pos_ori: True
+    uncouple_pos_ori: true
     control_delta: true
     interpolation: null
     ramp_ratio: 0.2
@@ -82,25 +109,22 @@ eval_callback:
   warn: True
 
 gymwrapper:
-  observations: ["custom_image",'robot0_eef_pos']
+  observations: ["custom_image",'robot0_eef_pos','robot0_gripper_qpos']
   smaller_action_space: True
 
 wandb:
-  project: "sac_lift"
+  project: "ppo_new"
   sync_tensorboard: True 
   save_code: True
 
 
 # Settings used for file handling and logging (save/load destination etc)
 file_handling:
-  # Logging with Tensorboard and saving trained models
-  tb_log_folder: "ppo_lift_4_objects_tensorboard"
-  tb_log_name: "rgb_4_objects_plot"
   save_model_folder: "trained_models"
-  save_model_filename: "sac_1_8m"
+  save_model_filename: "ppo_new_1m"
   # Loading of trained models
   load_model_folder: "trained_models"
-  load_model_filename: "sac_1_6m"
+  load_model_filename: Null
   # Path to model which should be continued to train
 
 wandb_filename: "sac_1"
