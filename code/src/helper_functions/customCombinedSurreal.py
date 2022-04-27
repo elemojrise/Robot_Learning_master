@@ -7,7 +7,7 @@ from stable_baselines3.common.preprocessing import is_image_space, get_flattened
 from stable_baselines3.common.type_aliases import TensorDict
 import torch
 
-class CustomCombinedExtractor(BaseFeaturesExtractor):
+class CustomCombinedSurreal(BaseFeaturesExtractor):
     """
     Combined feature extractor for Dict observation spaces.
     Builds a feature extractor for each key of the space. Input from each space
@@ -20,7 +20,7 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
 
     def __init__(self, observation_space: gym.spaces.Dict, cnn_output_dim: int = 256):
         # TODO we do not know features-dim here before going over all the items, so put something there. This is dirty!
-        super(CustomCombinedExtractor, self).__init__(observation_space, features_dim=1)
+        super(CustomCombinedSurreal, self).__init__(observation_space, features_dim=1)
 
         extractors = {}
 

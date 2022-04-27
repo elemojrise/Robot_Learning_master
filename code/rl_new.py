@@ -26,6 +26,7 @@ from src.helper_functions.wrap_env import make_multiprocess_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 from src.helper_functions.hyperparameters import linear_schedule
 from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor
+from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
 if __name__ == '__main__':
     register_robot(IIWA_14)
@@ -83,7 +84,7 @@ if __name__ == '__main__':
     
     #Implementing custom feature extractor
     if policy_kwargs["policy_kwargs"]["features_extractor_class"]:
-        policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
+        policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedSurreal
     else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
 
     print(policy_kwargs["policy_kwargs"])
@@ -146,7 +147,13 @@ if __name__ == '__main__':
         print(f"Continual training on model located at {load_model_path}")
 
         # Load normalized env
-        if normalize_obs or normalize_rew:
+        normalize_env = str(input("Do you want to make a new normalized env or load from file? \n  [make_new/load_file]"))
+
+        if normalize_env == "make_new" and (normalize_obs or normalize_rew):
+            print("make_new")
+            env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
+        # Load normalized env
+        elif normalize_env == "load_file" and (normalize_obs or normalize_rew):
             env = VecNormalize.load(load_vecnormalize_path, env)
 
         # Load model

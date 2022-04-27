@@ -63,10 +63,6 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
         # end_feature_extract = th.squeeze(end_feature_extract,1)
         # if len(end_feature_extract.shape) == 3:
         #     end_feature_extract = th.squeeze(end_feature_extract)
-        #for elem in encoded_tensor_list:
-            #print(elem)
-            #print(elem.shape)
-
         return th.cat(encoded_tensor_list, dim=1)
 
 

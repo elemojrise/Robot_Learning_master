@@ -9,7 +9,7 @@ sb_config:
   num_procs: 12
   policy: 'PPO'
 
-learning_rate_schedular: true
+learning_rate_schedular: False
 
 
 # Settings for normalization
@@ -20,7 +20,7 @@ norm_obs_keys: ['robot0_eef_pos', 'robot0_gripper_qpos']    #List of obs keys to
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
-  learning_rate: 0.00024 
+  learning_rate: 0.0001 
   n_steps: 3072
   batch_size: 512 
   n_epochs: 10 
