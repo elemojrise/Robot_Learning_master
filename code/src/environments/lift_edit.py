@@ -385,7 +385,7 @@ class Lift_edit(SingleArmEnv):
         modality = "gripper"
         @sensor(modality=modality)
         def gripper_height(obs_cache):
-            return np.array([self.sim.data.get_site_xpos(self.robots[0].gripper.important_sites["grip_site"])[-1] - self.model.mujoco_arena.table_offset[2]]) 
+            return np.array(self.sim.data.get_site_xpos(self.robots[0].gripper.important_sites["grip_site"])[-1] - self.model.mujoco_arena.table_offset[2]) 
 
         observables["gripper_height"] = Observable(
                                 name= "gripper_height",
@@ -396,7 +396,7 @@ class Lift_edit(SingleArmEnv):
         modality = "gripper"
         @sensor(modality=modality)
         def gripper_status(obs_cache):
-            return np.array([int(self.robots[0].gripper.current_action)])
+            return np.array(self.robots[0].gripper.current_action)
 
         observables["gripper_status"] = Observable(
                                 name= "gripper_status",
