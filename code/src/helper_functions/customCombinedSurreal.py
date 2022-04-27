@@ -39,10 +39,10 @@ class CustomCombinedSurreal(BaseFeaturesExtractor):
         # Update the features dim manually
         self._features_dim = total_concat_size
 
-        # self.rnn_stem = nn.LSTM(input_size = total_concat_size,
-        #                         hidden_size = 100, #Det er dette Surreal bruker
-        #                         num_layers = 1,
-        #                         batch_first=True)
+        self.rnn_stem = nn.LSTM(input_size = total_concat_size,
+                                hidden_size = 100, #Det er dette Surreal bruker
+                                num_layers = 1,
+                                batch_first=True)
 
     def forward(self, observations: TensorDict) -> th.Tensor:
         encoded_tensor_list = []
