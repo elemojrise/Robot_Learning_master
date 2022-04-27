@@ -5,7 +5,6 @@ from torch import nn
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.common.preprocessing import is_image_space, get_flattened_obs_dim
 from stable_baselines3.common.type_aliases import TensorDict
-import torch
 
 class CustomCombinedSurreal(BaseFeaturesExtractor):
     """
@@ -40,7 +39,7 @@ class CustomCombinedSurreal(BaseFeaturesExtractor):
         self._features_dim = total_concat_size
 
         self.rnn_stem = nn.LSTM(input_size = total_concat_size,
-                                hidden_size = 256, #100 Det er dette Surreal bruker
+                                hidden_size = 256, #Det er dette Surreal bruker
                                 num_layers = 1,
                                 batch_first=True)
 
@@ -51,12 +50,13 @@ class CustomCombinedSurreal(BaseFeaturesExtractor):
             encoded_tensor_list.append(extractor(observations[key]))
         
         """Trying to implement LSTM"""
-        # before_LSTM = th.cat(encoded_tensor_list, dim=1)
-        # before_LSTM = before_LSTM.unsqueeze(0)
-        # end_feature_extract, _ = self.rnn_stem(before_LSTM, None)
-        # end_feature_extract = th.squeeze(end_feature_extract,1)
-        # if len(end_feature_extract.shape) == 3:
-        #     end_feature_extract = th.squeeze(end_feature_extract)
+        before_LSTM = th.cat(encoded_tensor_list, dim=1)
+        before_LSTM = before_LSTM.unsqueeze(0)
+        end_feature_extract, _ = self.rnn_stem(before_LSTM, None)
+        end_feature_extract = th.squeeze(end_feature_extract,1)
+        if len(end_feature_extract.shape) == 3:
+            end_feature_extract = th.squeeze(end_feature_extract)
+
 
         return th.cat(encoded_tensor_list, dim=1)
 
