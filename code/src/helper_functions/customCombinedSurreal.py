@@ -27,7 +27,7 @@ class CustomCombinedSurreal(BaseFeaturesExtractor):
         total_concat_size = 0
         for key, subspace in observation_space.spaces.items():
             if is_image_space(subspace):
-                extractors[key] = CustomNatureCNN(subspace, features_dim=cnn_output_dim) # Denne sier størrelsen på linear layer
+                extractors[key] = CustomNatureCNNSurreal(subspace, features_dim=cnn_output_dim) # Denne sier størrelsen på linear layer
                 total_concat_size += cnn_output_dim
             else:
                 # The observation key is a vector, flatten it if needed
@@ -40,7 +40,7 @@ class CustomCombinedSurreal(BaseFeaturesExtractor):
         self._features_dim = total_concat_size
 
         self.rnn_stem = nn.LSTM(input_size = total_concat_size,
-                                hidden_size = 100, #Det er dette Surreal bruker
+                                hidden_size = 256, #100 Det er dette Surreal bruker
                                 num_layers = 1,
                                 batch_first=True)
 
@@ -61,7 +61,7 @@ class CustomCombinedSurreal(BaseFeaturesExtractor):
         return th.cat(encoded_tensor_list, dim=1)
 
 
-class CustomNatureCNN(BaseFeaturesExtractor):
+class CustomNatureCNNSurreal(BaseFeaturesExtractor):
     """
     CNN from DQN nature paper:
         Mnih, Volodymyr, et al.
@@ -73,7 +73,7 @@ class CustomNatureCNN(BaseFeaturesExtractor):
     """
 
     def __init__(self, observation_space: gym.spaces.Box, features_dim: int = 256): #tror feature dim er det de refererer til som size
-        super(CustomNatureCNN, self).__init__(observation_space, features_dim)
+        super(CustomNatureCNNSurreal, self).__init__(observation_space, features_dim)
         # We assume CxHxW images (channels first)
         # Re-ordering will be done by pre-preprocessing or wrapper
         assert is_image_space(observation_space, check_channels=False), (
