@@ -86,7 +86,6 @@ class GymWrapper_multiinput(Wrapper, Env):
         low, high = self.env.action_spec
         if self.smaller_action_space:
             low, high = low[:-2], high[:-2] #trekker fra a og b som mulige inputs
-        low[-1] = 0
         self.action_space = spaces.Box(low=np.float32(low), high=np.float32(high))
 
         for key in image_list:
