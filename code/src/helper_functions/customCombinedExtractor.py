@@ -53,7 +53,7 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
             
             to_extractor = observations[key]
             if len(to_extractor.shape) == 1:
-                to_extractor = to_extractor.unsqueeze(0)
+                to_extractor = to_extractor.unsqueeze(1)
             encoded_tensor_list.append(extractor(to_extractor))
         
         """Trying to implement LSTM"""
@@ -63,7 +63,9 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
         # end_feature_extract = th.squeeze(end_feature_extract,1)
         # if len(end_feature_extract.shape) == 3:
         #     end_feature_extract = th.squeeze(end_feature_extract)
-
+        #for elem in encoded_tensor_list:
+            #print(elem)
+            #print(elem.shape)
 
         return th.cat(encoded_tensor_list, dim=1)
 
