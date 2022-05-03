@@ -31,15 +31,13 @@ def make_multiprocess_env(env_id, options, observations, smaller_action_space, r
         register_gripper(Robotiq85Gripper_iiwa_14)
         register_robot_class_mapping("IIWA_14")
 
-        env =  suite.make(env_id, **options)
+        env = GymWrapper_multiinput(suite.make(env_id, **options), observations, smaller_action_space)
+            
+        env = Monitor(env, info_keywords = ("is_success",)) 
+        env.seed(seed + rank)
 
         if use_domain_rand:
             env = DomainRandomizationWrapper(env, **domain_rand_args)
-        
-        GymWrapper_multiinput(env, observations, smaller_action_space)
-
-        env = Monitor(env, info_keywords = ("is_success",)) 
-        env.seed(seed + rank)
         return env
     set_random_seed(seed)
     return _init
