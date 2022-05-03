@@ -34,13 +34,12 @@ def make_multiprocess_env(env_id, options, observations, smaller_action_space, r
         env = GymWrapper_multiinput(suite.make(env_id, **options), observations, smaller_action_space)
         
         if use_domain_rand:
-            env = DomainRandomizationWrapper(env, **domain_rand_args)
+            env = DomainRandomizationWrapper(env, seed= seed + rank, **domain_rand_args)
+            env = Monitor(env, info_keywords = ("is_success",))
+        else:
+            env = Monitor(env, info_keywords = ("is_success",))
+            env.seed(seed + rank)
 
-        env = Monitor(env, info_keywords = ("is_success",)) 
-        print(env)
-        print(seed + rank)
-        
-        env.seed(seed + rank)
         return env
     set_random_seed(seed)
     return _init

@@ -1,6 +1,5 @@
 
 domain_rand_args:
-  seed: null
   randomize_color: True
   randomize_camera: True
   randomize_lighting: True
