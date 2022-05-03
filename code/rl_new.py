@@ -11,6 +11,7 @@ from wandb.integration.sb3 import WandbCallback
 
 from robosuite.models.robots.robot_model import register_robot
 from robosuite.environments.base import register_env
+from robosuite.wrappers import DomainRandomizationWrapper
 
 from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
@@ -36,10 +37,13 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
 
     yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    #yaml_file = "config_files/sac_test.yaml" 
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
-        
+    
+    domain_yaml_file = "config_files/domain_rand_args.yaml"
+    with open(domain_yaml_file, 'r') as stream:
+        domain_config = yaml.safe_load(stream)
+
     answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
     if answer != "y":
         exit()
@@ -57,7 +61,10 @@ if __name__ == '__main__':
     normalize_obs = config['normalize_obs']
     normalize_rew = config['normalize_rew']
     norm_obs_keys = config['norm_obs_keys']
-
+    
+    #use domain randomization
+    use_domain_rand = config["use_domain_rand"]
+    domain_rand_args = domain_config["domain_rand_args"]
 
     # Observations
     obs_config = config["gymwrapper"]
@@ -112,7 +119,14 @@ if __name__ == '__main__':
     # RL pipeline
     #Create ENV
     print("making")
-    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
+    if use_domain_rand:
+        print("Using Domain Randomization")
+        env = VecTransposeImage(SubprocVecEnv([DomainRandomizationWrapper(make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed)) for i in range(num_procs)]))
+        
+    else:
+        env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
+
+        
     run = wandb.init(
         **wandb_settings,
         config=config,
