@@ -11,7 +11,6 @@ from wandb.integration.sb3 import WandbCallback
 
 from robosuite.models.robots.robot_model import register_robot
 from robosuite.environments.base import register_env
-from robosuite.wrappers import DomainRandomizationWrapper
 
 from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
@@ -66,6 +65,8 @@ if __name__ == '__main__':
     use_domain_rand = config["use_domain_rand"]
     domain_rand_args = domain_config["domain_rand_args"]
 
+    if use_domain_rand:
+        print("using domain randomization")
     # Observations
     obs_config = config["gymwrapper"]
     obs_list = obs_config["observations"] 
@@ -119,14 +120,10 @@ if __name__ == '__main__':
     # RL pipeline
     #Create ENV
     print("making")
-    if use_domain_rand:
-        print("Using Domain Randomization")
-        env = VecTransposeImage(SubprocVecEnv([DomainRandomizationWrapper(make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed)) for i in range(num_procs)]))
-        
-    else:
-        env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
+    
+    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
 
-        
+
     run = wandb.init(
         **wandb_settings,
         config=config,

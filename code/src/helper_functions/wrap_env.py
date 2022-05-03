@@ -1,6 +1,7 @@
 import robosuite as suite
 
 from robosuite.models.robots.robot_model import register_robot
+from robosuite.wrappers import DomainRandomizationWrapper
 
 from src.wrapper import GymWrapper_multiinput
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
@@ -16,7 +17,7 @@ from stable_baselines3.common.utils import set_random_seed
 
 
 
-def make_multiprocess_env(env_id, options, observations, smaller_action_space, rank, seed=0):
+def make_multiprocess_env(env_id, options, observations, smaller_action_space, rank, seed=0, use_domain_rand=False, domain_rand_args=None):
     """
     Utility function for multiprocessed env.
     :param env_id: (str) the environment ID
@@ -31,8 +32,11 @@ def make_multiprocess_env(env_id, options, observations, smaller_action_space, r
         register_robot_class_mapping("IIWA_14")
 
         env = GymWrapper_multiinput(suite.make(env_id, **options), observations, smaller_action_space)
+
+        if use_domain_rand:
+            env = DomainRandomizationWrapper(env, **domain_rand_args)
+            
         env = Monitor(env, info_keywords = ("is_success",)) 
-        #env = VecTransposeImage(env)
         env.seed(seed + rank)
         return env
     set_random_seed(seed)
