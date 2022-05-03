@@ -6,7 +6,7 @@ wandb_filename: "ppo_skikkelig_test"
 # Settings for stable-baselines RL algorithm
 sb_config:
   total_timesteps: 4.5e+6 
-  num_procs: 12
+  num_procs: 16
   policy: 'PPO'
 
 learning_rate_schedular: True

@@ -84,7 +84,7 @@ if __name__ == '__main__':
     
     #Implementing custom feature extractor
     if policy_kwargs["policy_kwargs"]["features_extractor_class"]:
-        policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor_object_obs
+        policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
     else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
 
     print(policy_kwargs["policy_kwargs"])

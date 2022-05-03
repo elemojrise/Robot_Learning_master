@@ -1,21 +1,21 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_wandb_surreal_longer_training"
+wandb_filename: "ppo_wandb_24_norm_reward"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 2.5e+6 
-  num_procs: 12
+  total_timesteps: 10.0e+6 
+  num_procs: 24
   policy: 'PPO'
 
-learning_rate_schedular: False
+learning_rate_schedular: True
 
 
 # Settings for normalization
 normalize_obs: True
-normalize_rew: False
-norm_obs_keys: ['robot0_eef_pos', 'robot0_gripper_qpos']    #List of obs keys to normalize
+normalize_rew: True
+norm_obs_keys: ['robot0_eef_pos', 'gripper_status']    #List of obs keys to normalize
 
 # Policy settings
 sb_policy:
@@ -35,7 +35,6 @@ sb_policy:
   sde_sample_freq: -1 
   target_kl: null 
   create_eval_env: False 
-  policy_kwargs: null
   verbose: 1 
   seed: null
   device: 'auto' 
@@ -99,15 +98,15 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 20
   eval_freq: 6144 
-  log_path: './logs_surreal_ppo_longer_train_cont/' 
-  best_model_save_path: './logs_surreal_ppo_longer_train_cont/'
+  log_path: './logs_24_cpu_norm_reward/' 
+  best_model_save_path: './logs_24_cpu_norm_reward/'
   deterministic: False
   render: False 
   verbose: 1 
   warn: True
 
 gymwrapper:
-  observations: ["custom_image",'robot0_eef_pos', 'robot0_gripper_qpos']
+  observations: ["custom_image",'robot0_eef_pos', 'gripper_status']
   smaller_action_space: True
 
 wandb:
@@ -119,9 +118,9 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_surreal_longer_train"
+  save_model_filename: "ppo_24_cpu_norm_reward"
   # Loading of trained models
-  load_model_folder: "logs_surreal_ppo_longer_train"
-  load_model_filename: "best_model"
+  load_model_folder: "trained_models"
+  load_model_filename: null
 
 
