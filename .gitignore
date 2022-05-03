@@ -1,6 +1,5 @@
 #trained models
 trained_models/
-models/
 wandb/
 best_model/
 logs/

@@ -19,7 +19,7 @@ from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList
 
 from src.environments import Lift_4_objects, Lift_edit
-from src.models.robots.manipulators.iiwa_14_robot import IIWA_14
+from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 from src.helper_functions.wrap_env import make_multiprocess_env
@@ -29,9 +29,11 @@ from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor
 from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
 if __name__ == '__main__':
+    register_robot(IIWA_14_modified)
     register_robot(IIWA_14)
     register_gripper(Robotiq85Gripper_iiwa_14)
     register_robot_class_mapping("IIWA_14")
+    register_robot_class_mapping("IIWA_14_modified")
     register_env(Lift_edit)
     register_env(Lift_4_objects)
 
