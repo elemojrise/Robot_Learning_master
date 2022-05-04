@@ -26,7 +26,7 @@ class GymWrapper_multiinput(Wrapper, Env):
         AssertionError: [Object observations must be enabled if no keys]
     """
 
-    def __init__(self, env, keys=None, smaller_action_space = False):
+    def __init__(self, env, keys=None, smaller_action_space = False, xyz_action_space = False):
         # Run super method
         super().__init__(env=env)
         # Create name for gym
@@ -37,6 +37,7 @@ class GymWrapper_multiinput(Wrapper, Env):
         self.reward_range = (0, self.env.reward_scale)
 
         self.smaller_action_space = smaller_action_space
+        self.xyz_action_space = xyz_action_space
 
         if keys is None:
             keys = []
@@ -81,11 +82,14 @@ class GymWrapper_multiinput(Wrapper, Env):
 
         self.observation_space = spaces.Dict(observation_space_dict)
         
-        #print(self.observation_space)
-
+        #Changing the value of the action space
         low, high = self.env.action_spec
         if self.smaller_action_space:
             low, high = low[:-2], high[:-2] #trekker fra a og b som mulige inputs
+
+        if self.xyz_action_space:
+            low, high = low[:-1], high[:-1] #trekker fra c som mulige input
+
         self.action_space = spaces.Box(low=np.float32(low), high=np.float32(high))
 
         for key in image_list:
@@ -145,11 +149,8 @@ class GymWrapper_multiinput(Wrapper, Env):
             action = np.insert(action, 3, 0)
             action = np.insert(action, 4, 0)
 
-        #Trying to discretise the gripper action
-        
-        # if action[-1] >= 0:
-        #     action[-1] = 1
-        # else: action[-1] = -1
+        if self.xyz_action_space:
+            action = np.insert(action, 5, 0)    
         ob_dict, reward, done, info = self.env.step(action)
 
         
