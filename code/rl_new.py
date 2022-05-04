@@ -73,6 +73,7 @@ if __name__ == '__main__':
     obs_config = config["gymwrapper"]
     obs_list = obs_config["observations"] 
     smaller_action_space = obs_config["smaller_action_space"]
+    xyz_action_space = obs_config["xyz_action_space"]
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
@@ -123,7 +124,7 @@ if __name__ == '__main__':
     #Create ENV
     print("making")
     
-    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
+    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
 
 
     run = wandb.init(
