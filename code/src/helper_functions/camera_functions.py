@@ -43,8 +43,8 @@ def get_pos_and_quat_from_trans_matrix(Trans_matrix, rbot_base_frame, conversion
         rotation_matrix_enu = Trans_matrix[:3,:3]@Ned_to_Enu_conversion_x_neg_y_neg_z
         
     else:
-        cam_pose = np.array([1.23, 0, 1.25]) # Original [1.53, 0, 1.45]
-        rotation_matrix_enu = Rot_z(np.pi/2)@Rot_x(np.pi/3) # Original Rot_z(np.pi/2)@Rot_x(np.pi/2.65)
+        cam_pose = np.array([1.53, 0, 1.45]) # Original [1.53, 0, 1.45]
+        rotation_matrix_enu = Rot_z(np.pi/2)@Rot_x(np.pi/2.65) # Original Rot_z(np.pi/2)@Rot_x(np.pi/2.65)
     
     cam_quat = R.from_matrix(rotation_matrix_enu).as_quat()[[3, 0, 1, 2]]
     return cam_pose, cam_quat
