@@ -4,7 +4,7 @@ from robosuite.models.robots.robot_model import register_robot
 from robosuite.wrappers import DomainRandomizationWrapper
 
 from src.wrapper import GymWrapper_multiinput
-from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified
+from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 
@@ -29,9 +29,11 @@ def make_multiprocess_env(env_id, options, observations, smaller_action_space, x
     def _init():
         register_robot(IIWA_14)
         register_robot(IIWA_14_modified)
+        register_robot(IIWA_14_modified_flange)
         register_gripper(Robotiq85Gripper_iiwa_14)
         register_robot_class_mapping("IIWA_14")
         register_robot_class_mapping("IIWA_14_modified")
+        register_robot_class_mapping("IIWA_14_modified_flange")
 
         env = GymWrapper_multiinput(suite.make(env_id, **options), observations, smaller_action_space, xyz_action_space)
         

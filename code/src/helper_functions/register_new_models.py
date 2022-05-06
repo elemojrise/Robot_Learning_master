@@ -9,7 +9,7 @@ def register_gripper(target_class):
 
 #Funksjon for å registrer det nye robotnavnet
 def register_robot_class_mapping(robot_name):
-    if robot_name == "IIWA_14" or robot_name == "IIWA_14_modified":
+    if robot_name == "IIWA_14" or robot_name == "IIWA_14_modified" or robot_name == "IIWA_14_modified_flange":
         ROBOT_CLASS_MAPPING[robot_name] = SingleArm
     else:
         raise ValueError("{robot_name}, is not a defined robot")
