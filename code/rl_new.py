@@ -16,8 +16,9 @@ from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.save_util import save_to_zip_file, load_from_zip_file
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecTransposeImage
 from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
-from stable_baselines3.common.callbacks import EvalCallback, CallbackList
+from stable_baselines3.common.callbacks import CallbackList
 
+from src.callback.progresscallback import CustomEvalCallback
 from src.environments import Lift_4_objects, Lift_edit
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
@@ -185,7 +186,7 @@ if __name__ == '__main__':
     #env.training = False
 
     wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
-    eval_callback = EvalCallback(env, **messages_to_eval_callback)
+    eval_callback = CustomEvalCallback(env, **messages_to_eval_callback)
     callback = CallbackList([wandb_callback, eval_callback])
 
     model.learn(total_timesteps=training_timesteps, callback=callback, reset_num_timesteps=False)
