@@ -27,7 +27,7 @@ from src.helper_functions.camera_functions import get_pos_and_quat_from_trans_ma
 
 
 
-class Lift_edit(SingleArmEnv):
+class Lift_edit_green(SingleArmEnv):
     """
     This class corresponds to the lifting task for a single robot arm.
 
