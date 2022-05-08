@@ -54,7 +54,7 @@ sb_policy:
 
 # Specify environment
 robosuite:
-  env_id: "Lift_edit"
+  env_id: "Lift_edit_green"
   robots: "IIWA_14_modified_flange"
   gripper_types: "Robotiq85Gripper_iiwa_14_longer_finger"      
   has_renderer: False                    

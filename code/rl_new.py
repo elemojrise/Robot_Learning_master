@@ -19,7 +19,7 @@ from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
 from stable_baselines3.common.callbacks import CallbackList
 
 from src.callback.progresscallback import CustomEvalCallback
-from src.environments import Lift_4_objects, Lift_edit
+from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
@@ -40,6 +40,7 @@ if __name__ == '__main__':
     register_robot_class_mapping("IIWA_14_modified_flange")
     register_env(Lift_edit)
     register_env(Lift_4_objects)
+    register_env(Lift_edit_green)
 
     yaml_file = "config_files/" + input("Which yaml file to load config from: ")
     with open(yaml_file, 'r') as stream:
