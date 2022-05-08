@@ -5,7 +5,7 @@ from robosuite.wrappers import DomainRandomizationWrapper
 
 from src.wrapper import GymWrapper_multiinput
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
-from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 
 from stable_baselines3.common.monitor import Monitor
@@ -31,6 +31,7 @@ def make_multiprocess_env(env_id, options, observations, smaller_action_space, x
         register_robot(IIWA_14_modified)
         register_robot(IIWA_14_modified_flange)
         register_gripper(Robotiq85Gripper_iiwa_14)
+        register_gripper(Robotiq85Gripper_iiwa_14_longer_finger)
         register_robot_class_mapping("IIWA_14")
         register_robot_class_mapping("IIWA_14_modified")
         register_robot_class_mapping("IIWA_14_modified_flange")
