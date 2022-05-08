@@ -139,7 +139,7 @@ class IIWA_14_modified_flange(ManipulatorModel):
 
     @property
     def init_qpos(self):
-        return np.array([0.00, 0.88, 0.00, -1.27, 0.00, 0.90, 0.00]) # [0.000, 0.650, 0.000, -1.890, 0.000, 0.600, 0.000])
+        return np.array([0.00, 0.88, 0.00, -1.30, 0.00, 0.90, 0.00]) # Petter forslag [0.00, 0.88, 0.00, -1.30, 0.00, 0.90, 0.00],  [0.00, 0.88, 0.00, -1.27, 0.00, 0.90, 0.00], [0.000, 0.650, 0.000, -1.890, 0.000, 0.600, 0.000])
 
     @property
     def base_xpos_offset(self):
