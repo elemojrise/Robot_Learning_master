@@ -12,6 +12,10 @@
     <texture file="../textures/manulab.png" type="cube" name="tex-felt"/>
     <material name="table_felt" reflectance="0.0" shininess="0.0" specular="0.2" texrepeat="1 1" texture="tex-felt" />
 
+    <!-- ceramic table texture and material-->
+    <texture file="../textures/new_green.png" type="cube" name="tex-felt1"/>
+    <material name="table_felt_green" reflectance="0.0" shininess="0.0" specular="0.2" texrepeat="1 1" texture="tex-felt1" />
+
     <!-- steel legs -->
     <texture file="../textures/steel-brushed.png" type="cube" name="tex-steel-brushed"/>
     <material name="table_legs_metal" reflectance="0.8" shininess="0.8" texrepeat="1 1" texture="tex-steel-brushed" />
@@ -41,7 +45,7 @@
     <!-- Table body -->
     <body name="table" pos="0 0 0.4">
       <geom pos="0 0 0" size="0.4 0.4 0.4" type="box" group="0" name="table_collision" friction="1 0.005 0.0001"/>
-      <geom pos="0 0 0" size="0.4 0.4 0.4" type="box" conaffinity="0" contype="0" group="1" name="table_visual" material="table_felt"/>
+      <geom pos="0 0 0" size="0.4 0.4 0.4" type="box" conaffinity="0" contype="0" group="1" name="table_visual" material="table_felt_green"/>
       <site pos="0 0 0.4" name="table_top" size="0.001 0.001 0.001" rgba="0 0 0 0"/>
       <!-- Legs (visual only) -->
       <geom pos="0 0 0" size="0.05 0.1" type="cylinder" conaffinity="0" contype="0" group="1" name="table_leg1_visual" material="table_legs_metal"/>
