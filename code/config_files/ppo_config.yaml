@@ -5,9 +5,9 @@ wandb_filename: "ppo_wandb_test"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 200000
+  total_timesteps: 300000
   check_pt_interval: 1000 #1.0e+6
-  num_procs: 8
+  num_procs: 24
   policy: 'PPO'
 
 

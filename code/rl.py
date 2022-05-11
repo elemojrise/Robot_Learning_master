@@ -77,8 +77,8 @@ if __name__ == '__main__':
     policy_type = policy_kwargs.pop("type")
 
     #Implementing learning rate schedular if 
-    if config["learning_rate_schedular"]:
-        policy_kwargs["learning_rate"] = linear_schedule(policy_kwargs["learning_rate"])
+    #if config["learning_rate_schedular"]:
+    #    policy_kwargs["learning_rate"] = linear_schedule(policy_kwargs["learning_rate"])
 
     # Settings used for file handling and logging (save/load destination etc)
     file_handling = config["file_handling"]
