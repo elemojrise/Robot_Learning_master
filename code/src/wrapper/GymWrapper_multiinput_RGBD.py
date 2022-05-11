@@ -11,7 +11,7 @@ from robosuite.wrappers import Wrapper
 from stable_baselines3.common.preprocessing import get_flattened_obs_dim, is_image_space
 
 
-class GymWrapper_multiinput(Wrapper, Env):
+class GymWrapper_multiinput_RGBD(Wrapper, Env):
     """
     Initializes the Gym wrapper. Mimics many of the required functionalities of the Wrapper class
     found in the gym.core module
@@ -40,49 +40,43 @@ class GymWrapper_multiinput(Wrapper, Env):
         self.smaller_action_space = smaller_action_space
         self.xyz_action_space = xyz_action_space
 
-        if keys is None:
-            keys = []
-            # Add object obs if requested
-            if self.env.use_object_obs:
-                keys += ["object-state"]
-            # Add image obs if requested
-            if self.env.use_camera_obs:
-                keys += [f"{cam_name}_image" for cam_name in self.env.camera_names]
-            # Iterate over all robots to add to state
-            for idx in range(len(self.env.robots)):
-                keys += ["robot{}_proprio-state".format(idx)]
+        assert keys is not None, (
+            "You need to specifi which observation keys to use when using the CustomGymWrapper "
+        )
         self.keys = keys
 
+        
         # Gym specific attributes
         self.env.spec = None
         self.metadata = None
 
-        # set up observation and action spaces
+        # set up observation
+
+        #### Everything above is good
         obs = self.env.reset()
-        #self.modality_dims = {key: obs[key].shape for key in self.keys}
-
-        observation_space_dict = {}
-        image_list = []
-
-        for cam_name in self.env.camera_names:
-            key = cam_name + "_image"
-            if key in self.keys:
-                self.keys.remove(key)
-                image_list.append(key)
-                low, high = 0, 255
-                d_type = np.uint8
-
-                observation_space_dict.update({key: spaces.Box(low = low,high = high, shape=(obs[key].shape), dtype= d_type)})
+        temp_dict = {}
+        
 
         for key in self.keys:
-            low, high = -np.inf, np.inf
-            d_type = np.float32
-            
-            #mulig jeg må vurdere å flate ut         
-            observation_space_dict.update({key: spaces.Box(low = low,high = high, shape=(obs[key].shape), dtype= d_type)})
-
-        self.observation_space = spaces.Dict(observation_space_dict)
+            low = -np.inf
+            high = np.inf
+            dtype = np.float32
+            if "RGBD" in key:
+                low = 0
+                high = 255
+                dtype = np.uint8      ####Currently uint8
+                shape = (obs[self.env.camera_names[0]+"_image"].shape)
+                shape_list = list(shape)
+                shape_list[2] = shape_list[2] + 1
+                shape = shape_list
+                temp_dict[self.env.camera_names[0] + "_RGBD"] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
+            else:
+                shape = (obs[key].shape)
+                temp_dict[key] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
+        self.observation_space = spaces.Dict(temp_dict)
         
+        #### Everyting below is good
+        #Setting up action space
         #Changing the value of the action space
         low, high = self.env.action_spec
         if self.smaller_action_space:
@@ -93,8 +87,6 @@ class GymWrapper_multiinput(Wrapper, Env):
 
         self.action_space = spaces.Box(low=np.float32(low), high=np.float32(high))
 
-        for key in image_list:
-            self.keys.insert(0,key)
 
         #variable for checking grasp sucess
         self.grasp_success = 0
@@ -112,10 +104,23 @@ class GymWrapper_multiinput(Wrapper, Env):
         """
         ob_lst = {}
         for key in self.keys:
-            if key in obs_dict:
+            if self.env.camera_names[0] in key:
+                cam_name = self.env.camera_names[0]
+                depth_array_normalized = obs_dict[cam_name +"_depth"]
+
+                depth_map = np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(255/3), 0,255)    ## maps from 0-3 to 0-255 and cuts all values over 255
+                #obs_dict[key] = np.clip(get_real_depth_map(self.sim, old_array)*(255/3), 0,255).astype(np.uint8)
+                #depth_array = np.clip(get_real_depth_map(self.sim, old_depth_array)*(65535/3), 0,65535).astype(np.uint16)     #65535
+
+
+                depth_array = depth_map
+                rgb_array = obs_dict[cam_name + "_image"]
+                new_array = np.concatenate((rgb_array, depth_array), axis=-1)
+                ob_lst[key] = new_array
+            elif key in obs_dict:
                 if verbose:
                     print("adding key: {}".format(key))
-                ob_lst.update({key: obs_dict[key]})
+                ob_lst[key] =obs_dict[key]
         return ob_lst
     
 
