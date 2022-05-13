@@ -117,7 +117,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 cam_name = self.env.camera_names[0]
                 depth_array_normalized = obs_dict[cam_name +"_depth"]
 
-                depth_map = np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(255/3), 0,255)    ## maps from 0-3 to 0-255 and cuts all values over 255
+                depth_map = np.uint8(np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(255/3), 0,255))   ## maps from 0-3 to 0-255 and cuts all values over 255
                 #obs_dict[key] = np.clip(get_real_depth_map(self.sim, old_array)*(255/3), 0,255).astype(np.uint8)
                 #depth_array = np.clip(get_real_depth_map(self.sim, old_depth_array)*(65535/3), 0,65535).astype(np.uint16)     #65535
 

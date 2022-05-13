@@ -23,12 +23,17 @@ from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
-from src.helper_functions.wrap_env import make_multiprocess_env
+from src.helper_functions.wrap_env import make_multiprocess_env, make_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 from src.helper_functions.hyperparameters import linear_schedule
 from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor, CustomCombinedExtractor_object_obs
 from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
+
+
+#temp
+from src.wrapper.GymWrapper_multiinput_RGBD import GymWrapper_multiinput_RGBD
+from src.wrapper.GymWrapper_multiinput import GymWrapper_multiinput
 if __name__ == '__main__':
     register_robot(IIWA_14_modified)
     register_robot(IIWA_14)
@@ -42,8 +47,8 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
     register_env(Lift_edit_green)
 
-    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    #yaml_file = "config_files/test.yaml"
+    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    yaml_file = "config_files/test.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -51,9 +56,9 @@ if __name__ == '__main__':
     with open(domain_yaml_file, 'r') as stream:
         domain_config = yaml.safe_load(stream)
 
-    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
-    if answer != "y":
-        exit()
+    #answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
+    #if answer != "y":
+    #    exit()
 
 
     # Environment specifications
@@ -129,21 +134,22 @@ if __name__ == '__main__':
     #overwriting certain variables to make testing easier
     num_procs = 1
 
-    envs = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
-    
-    #env = SubprocVecEnv(envs)
+    #env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
+    #env = make_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, 6, seed=0, use_domain_rand=False, domain_rand_args=None)
+    #env = SubprocVecEnv(env)
+    env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
 
-    if normalize_obs or normalize_rew:
-        env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
+    #if normalize_obs or normalize_rew:
+    #    env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
     # Create model
-    if policy == 'PPO':
-        model = PPO(policy_type, env= env, **policy_kwargs)
-        print("PPO")
-    elif policy == 'SAC':
-        model = SAC(policy_type, env = env, **policy_kwargs)
-        print("SAC")
-    else: 
-        ("-----------ERRROR no policy selected------------")
+    #if policy == 'PPO':
+    #    model = PPO(policy_type, env= env, **policy_kwargs)
+    #    print("PPO")
+    #elif policy == 'SAC':
+    #    model = SAC(policy_type, env = env, **policy_kwargs)
+    #    print("SAC")
+    #else: 
+    #    ("-----------ERRROR no policy selected------------")
 
     print("Created a new model")        
     
@@ -151,16 +157,29 @@ if __name__ == '__main__':
     # Create callback
     #env.training = False
 
-    eval_callback = CustomEvalCallback(env, **messages_to_eval_callback)
-    callback = CallbackList([eval_callback])
+    #eval_callback = CustomEvalCallback(env, **messages_to_eval_callback)
+    #callback = CallbackList([eval_callback])
 
     #Settup tests!
-    print("Env action space", env.action_space)
-    print("Emv observation space", env.observation_space)
+    #print("Env action space", env.action_space)
+    #print("Emv observation space", env.observation_space)
     
     obs = env.reset()
     
-    print(obs)
+    #print(obs['custom_image_rgbd'][0][0][0].dtype)
+    #print(obs['custom_image_rgbd'][0][0][3].dtype)
+    
 
+    frame_rgb = obs['custom_image_rgbd'][:,:,:3]
+
+    frame_d = obs['custom_image_rgbd'][:,:,:1]
+    #print(frame_rgb)
+    print(obs['custom_image_rgbd'])
+    print(frame_d)
+    
+    #print(frame_d.shape)
+    #img = Image.fromarray(frame, 'RGB')
+    #img = img.rotate(180)
+    #frame = np.asarray(img)
 
     env.close()

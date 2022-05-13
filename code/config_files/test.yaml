@@ -68,6 +68,7 @@ robosuite:
   reward_shaping: True
   camera_names: "custom"
   custom_camera_name: "custom" 
+  camera_depths: True
   custom_camera_trans_matrix: [ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
                                 [ 0.961834,  0.241668,  0.128340, -129.767868], 
                                 [ 0.273397, -0.868215, -0.414073,  503.424103], 
@@ -108,10 +109,10 @@ eval_callback:
   warn: True
 
 gymwrapper:
-  observations: ["custom_image",'robot0_eef_pos', 'gripper_status']
+  observations: ["custom_image_rgbd",'robot0_eef_pos', 'gripper_status']
   smaller_action_space: True
   xyz_action_space: False
-  rgbd: True
+  rgbd: False
 
 wandb:
   project: "sb3_lift_real"
