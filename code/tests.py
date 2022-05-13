@@ -43,6 +43,7 @@ if __name__ == '__main__':
     register_env(Lift_edit_green)
 
     yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    #yaml_file = "config_files/test.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -86,13 +87,13 @@ if __name__ == '__main__':
     num_procs = sb_config["num_procs"]
     policy = sb_config['policy']
 
-
-    messages_to_wand_callback = config["wandb_callback"]
-    messages_to_eval_callback = config["eval_callback"]
-
     # Settings for stable-baselines policy
     policy_kwargs = config["sb_policy"]
     policy_type = policy_kwargs.pop("type")
+
+    #Eval callback
+    messages_to_eval_callback = config["eval_callback"]
+
 
     #Implementing learning rate schedular if 
     if config["learning_rate_schedular"]:
@@ -121,85 +122,45 @@ if __name__ == '__main__':
     training = config["training"]
     seed = config["seed"]
 
-    #Settings for wandb
-    wandb_settings = config["wandb"]
-    wandb_filename = config["wandb_filename"]
-
     # RL pipeline
     #Create ENV
     print("making")
     
-    env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
+    #overwriting certain variables to make testing easier
+    num_procs = 1
 
-
-    run = wandb.init(
-        **wandb_settings,
-        config=config,
-        resume="allow",
-        id=wandb_filename,
-        )
-    run.save
-
-
-    # Train new model
-    if load_model_filename is None:
-
-        if normalize_obs or normalize_rew:
-            env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
-        # Create model
-        if policy == 'PPO':
-            model = PPO(policy_type, env= env, **policy_kwargs, tensorboard_log=f"runs/{run.id}")
-            print("PPO")
-        elif policy == 'SAC':
-            model = SAC(policy_type, env = env, **policy_kwargs,tensorboard_log=f"runs/{run.id}")
-            print("SAC")
-        else: 
-            ("-----------ERRROR no policy selected------------")
-
-        print("Created a new model")
-
-    #Continual training
-    else:
-
-        load_model_path = os.path.join(load_model_folder, load_model_filename)
-        load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_' + load_model_filename + '.pkl')
-        print(f"Continual training on model located at {load_model_path}")
-
-        # Load normalized env
-        normalize_env = str(input("Do you want to make a new normalized env or load from file? \n  [make_new/load_file]"))
-
-        if normalize_env == "make_new" and (normalize_obs or normalize_rew):
-            print("make_new")
-            env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
-        # Load normalized env
-        elif normalize_env == "load_file" and (normalize_obs or normalize_rew):
-            env = VecNormalize.load(load_vecnormalize_path, env)
-
-        # Load model
-        if policy == 'PPO':
-             model = PPO.load(load_model_path, env=env)
-        elif policy == 'SAC':
-            model = SAC.load(load_model_path, env=env)
-        
-        
+    envs = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
     
-    # Training
-    print("starting to train")
+    #env = SubprocVecEnv(envs)
+
+    if normalize_obs or normalize_rew:
+        env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
+    # Create model
+    if policy == 'PPO':
+        model = PPO(policy_type, env= env, **policy_kwargs)
+        print("PPO")
+    elif policy == 'SAC':
+        model = SAC(policy_type, env = env, **policy_kwargs)
+        print("SAC")
+    else: 
+        ("-----------ERRROR no policy selected------------")
+
+    print("Created a new model")        
+    
 
     # Create callback
     #env.training = False
 
-    wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
     eval_callback = CustomEvalCallback(env, **messages_to_eval_callback)
-    callback = CallbackList([wandb_callback, eval_callback])
+    callback = CallbackList([eval_callback])
 
-    model.learn(total_timesteps=training_timesteps, callback=callback, reset_num_timesteps=False)
+    #Settup tests!
+    print("Env action space", env.action_space)
+    print("Emv observation space", env.observation_space)
+    
+    obs = env.reset()
+    
+    print(obs)
 
-    run.finish()
-
-    # Save trained model
-    model.save(save_model_path)
-    if normalize_obs or normalize_rew:
-        env.save(save_vecnormalize_path)
 
     env.close()

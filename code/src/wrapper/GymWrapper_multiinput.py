@@ -64,6 +64,7 @@ class GymWrapper_multiinput(Wrapper, Env):
         observation_space_dict = {}
         image_list = []
 
+
         for cam_name in self.env.camera_names:
             key = cam_name + "_image"
             if key in self.keys:
@@ -110,6 +111,7 @@ class GymWrapper_multiinput(Wrapper, Env):
         Returns:
             np.array: observations flattened into a 1d array
         """
+
         ob_lst = {}
         for key in self.keys:
             if key in obs_dict:

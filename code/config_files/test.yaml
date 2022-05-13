@@ -111,7 +111,7 @@ gymwrapper:
   observations: ["custom_image",'robot0_eef_pos', 'gripper_status']
   smaller_action_space: True
   xyz_action_space: False
-  rgbd: False
+  rgbd: True
 
 wandb:
   project: "sb3_lift_real"

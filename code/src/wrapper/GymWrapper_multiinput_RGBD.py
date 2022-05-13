@@ -8,6 +8,7 @@ import numpy as np
 from gym import spaces
 from gym.core import Env
 from robosuite.wrappers import Wrapper
+from robosuite.utils.camera_utils import get_real_depth_map
 from stable_baselines3.common.preprocessing import get_flattened_obs_dim, is_image_space
 
 
@@ -55,13 +56,15 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         #### Everything above is good
         obs = self.env.reset()
         temp_dict = {}
+
+        print("----------------------Starting inniting")
         
 
         for key in self.keys:
             low = -np.inf
             high = np.inf
             dtype = np.float32
-            if "RGBD" in key:
+            if "rgbd" in key:
                 low = 0
                 high = 255
                 dtype = np.uint8      ####Currently uint8
@@ -69,7 +72,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 shape_list = list(shape)
                 shape_list[2] = shape_list[2] + 1
                 shape = shape_list
-                temp_dict[self.env.camera_names[0] + "_RGBD"] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
+                temp_dict[self.env.camera_names[0] + "rgbd"] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
             else:
                 shape = (obs[key].shape)
                 temp_dict[key] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
@@ -91,6 +94,9 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         #variable for checking grasp sucess
         self.grasp_success = 0
 
+
+        print("----------------------Donne inniting")
+
     def _multiinput_obs(self, obs_dict, verbose=False):
         """
         Filters keys of interest out and concatenate the information.
@@ -102,6 +108,9 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         Returns:
             np.array: observations flattened into a 1d array
         """
+
+
+        print("----------------------Running multiinputs_obs")
         ob_lst = {}
         for key in self.keys:
             if self.env.camera_names[0] in key:

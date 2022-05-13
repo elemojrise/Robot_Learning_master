@@ -1,12 +1,12 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_dont_crash_in_table"
+wandb_filename: "ludvik_basetest_ppo_dont"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 14.0e+6 
-  num_procs: 24
+  total_timesteps: 7.0e+6 
+  num_procs: 48
   policy: 'PPO'
 
 learning_rate_schedular: True
@@ -100,8 +100,8 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 20
   eval_freq: 6144 
-  log_path: './logs_dont_crash_in_table/' 
-  best_model_save_path: './logs_dont_crash_in_table/'
+  log_path: './logs_ludvik_basetest_ppo_dont/' 
+  best_model_save_path: './logs_ludvik_basetest_ppo_dont/'
   deterministic: False
   render: False 
   verbose: 1 
@@ -113,7 +113,7 @@ gymwrapper:
   xyz_action_space: False
 
 wandb:
-  project: "sb3_lift_real"
+  project: "ludvik_final_tests"
   sync_tensorboard: True 
   save_code: True
 
@@ -121,7 +121,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_dont_crash_in_table"
+  save_model_filename: "ludvik_basetest_ppo_dont"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: null
