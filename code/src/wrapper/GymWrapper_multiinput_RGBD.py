@@ -114,18 +114,28 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         ob_lst = {}
         for key in self.keys:
             if self.env.camera_names[0] in key:
+                from scipy import ndimage
+                from PIL import Image
+
+
                 cam_name = self.env.camera_names[0]
                 depth_array_normalized = obs_dict[cam_name +"_depth"]
 
                 depth_map = np.uint8(np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(255/3), 0,255))   ## maps from 0-3 to 0-255 and cuts all values over 255
-                #obs_dict[key] = np.clip(get_real_depth_map(self.sim, old_array)*(255/3), 0,255).astype(np.uint8)
-                #depth_array = np.clip(get_real_depth_map(self.sim, old_depth_array)*(65535/3), 0,65535).astype(np.uint16)     #65535
-
+                # print(depth_map.shape)
+                # rgb_img = ndimage.rotate(depth_map, 180)
+                # rgb_img = np.squeeze(rgb_img, axis=2) 
+                # rgb_img = Image.fromarray(rgb_img)
+                # rgb_img.show()
+                depth_map = np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(65535/3), 0,65535).astype(np.uint16)   #65535
 
                 depth_array = depth_map
                 rgb_array = obs_dict[cam_name + "_image"]
+
                 new_array = np.concatenate((rgb_array, depth_array), axis=-1)
+
                 ob_lst[key] = new_array
+
             elif key in obs_dict:
                 if verbose:
                     print("adding key: {}".format(key))

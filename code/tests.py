@@ -6,6 +6,8 @@ import robosuite as suite
 import os
 import yaml
 
+from PIL import Image
+
 import wandb
 from wandb.integration.sb3 import WandbCallback
 
@@ -172,14 +174,22 @@ if __name__ == '__main__':
 
     frame_rgb = obs['custom_image_rgbd'][:,:,:3]
 
-    frame_d = obs['custom_image_rgbd'][:,:,:1]
+    frame_d = obs['custom_image_rgbd'][:,:,3]
     #print(frame_rgb)
-    print(obs['custom_image_rgbd'])
-    print(frame_d)
-    
-    #print(frame_d.shape)
-    #img = Image.fromarray(frame, 'RGB')
-    #img = img.rotate(180)
-    #frame = np.asarray(img)
 
-    env.close()
+    #print(frame_d.shape)
+
+    #img.save('my.png')
+    from scipy import ndimage
+    # rgb_img = ndimage.rotate(frame_rgb, 180)
+    # rgb_img = Image.fromarray(rgb_img, 'RGB')
+    # rgb_img.save('rgb.png')
+    # rgb_img.show()
+
+    # d_img = ndimage.rotate(frame_d, 180)
+    # d_img = Image.fromarray(d_img)
+    # d_img.save('d.png')
+    # d_img.show()
+
+
+
