@@ -6,7 +6,7 @@ wandb_filename: "ludvik_basetest_ppo_dont"
 # Settings for stable-baselines RL algorithm
 sb_config:
   total_timesteps: 7.0e+6 
-  num_procs: 1
+  num_procs: 24
   policy: 'PPO'
 
 learning_rate_schedular: True
