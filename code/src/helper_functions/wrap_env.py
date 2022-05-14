@@ -4,7 +4,9 @@ import robosuite as suite
 from robosuite.models.robots.robot_model import register_robot
 from robosuite.wrappers import DomainRandomizationWrapper
 
-from src.wrapper import GymWrapper_multiinput, GymWrapper_multiinput_RGBD
+from src.wrapper.GymWrapper_multiinput import GymWrapper_multiinput
+from src.wrapper.GymWrapper_multiinput_RGBD import GymWrapper_multiinput_RGBD
+
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
