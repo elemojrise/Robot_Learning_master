@@ -70,7 +70,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 shape_list = list(shape)
                 shape_list[2] = shape_list[2] + 1
                 shape = shape_list
-                temp_dict[self.env.camera_names[0] + "rgbd"] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
+                temp_dict[self.env.camera_names[0] + "_image_rgbd"] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
             else:
                 shape = (obs[key].shape)
                 temp_dict[key] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
@@ -103,9 +103,6 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         Returns:
             np.array: observations flattened into a 1d array
         """
-
-
-        print("----------------------Running multiinputs_obs")
         ob_lst = {}
         for key in self.keys:
             if self.env.camera_names[0] in key:
