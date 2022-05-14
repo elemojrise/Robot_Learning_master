@@ -1,5 +1,6 @@
 from email import policy
 from locale import normalize
+from tokenize import PlainToken
 from unicodedata import name
 import numpy as np
 import robosuite as suite
@@ -170,11 +171,22 @@ if __name__ == '__main__':
     
     #print(obs['custom_image_rgbd'][0][0][0].dtype)
     #print(obs['custom_image_rgbd'][0][0][3].dtype)
-    
+    from scipy import ndimage
 
     frame_rgb = obs['custom_image_rgbd'][:,:,:3]
 
     frame_d = obs['custom_image_rgbd'][:,:,3]
+
+    import sys
+    np.set_printoptions(threshold=sys.maxsize)
+
+    cropped_d = frame_d[4:30,29:55]
+    #cropped_d = frame_d[4:14,45:55]
+    cropped_d = ndimage.rotate(cropped_d, 180)
+
+    # crop image 
+    # print nicely
+    # see printing from machine learning
     #print(frame_rgb)
 
     #print(frame_d.shape)
@@ -186,10 +198,15 @@ if __name__ == '__main__':
     # rgb_img.save('rgb.png')
     # rgb_img.show()
 
-    # d_img = ndimage.rotate(frame_d, 180)
-    # d_img = Image.fromarray(d_img)
-    # d_img.save('d.png')
-    # d_img.show()
 
+    d_img = Image.fromarray(cropped_d)
+    d_img.save('d.png')
+    d_img.show()
+
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(20,5))  
+    sns.heatmap(cropped_d, vmin = 88, vmax=110, annot=True, fmt='g')
+    plt.show()
 
 

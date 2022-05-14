@@ -127,7 +127,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 # rgb_img = np.squeeze(rgb_img, axis=2) 
                 # rgb_img = Image.fromarray(rgb_img)
                 # rgb_img.show()
-                depth_map = np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(65535/3), 0,65535).astype(np.uint16)   #65535
+                # depth_map = np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(65535/3), 0,65535).astype(np.uint16)   #65535
 
                 depth_array = depth_map
                 rgb_array = obs_dict[cam_name + "_image"]
