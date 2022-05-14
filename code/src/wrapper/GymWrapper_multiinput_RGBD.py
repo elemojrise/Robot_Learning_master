@@ -56,8 +56,6 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         #### Everything above is good
         obs = self.env.reset()
         temp_dict = {}
-
-        print("----------------------Starting inniting")
         
 
         for key in self.keys:
@@ -93,9 +91,6 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
 
         #variable for checking grasp sucess
         self.grasp_success = 0
-
-
-        print("----------------------Donne inniting")
 
     def _multiinput_obs(self, obs_dict, verbose=False):
         """
