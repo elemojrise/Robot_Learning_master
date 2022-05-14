@@ -66,6 +66,7 @@ robosuite:
   use_object_obs: False                  
   use_camera_obs: True
   reward_shaping: True
+  camera_depths: True
   camera_names: "custom"
   custom_camera_name: "custom" 
   custom_camera_trans_matrix: [ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
