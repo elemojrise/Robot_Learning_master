@@ -55,7 +55,7 @@ sb_policy:
 # Specify environment
 robosuite:
   env_id: "Lift_edit"
-  robots: "IIWA_14_modified_flange_joint_lim"
+  robots: "IIWA_14_modified_flange_joint_limit"
   gripper_types: "Robotiq85Gripper_iiwa_14_longer_finger"      
   has_renderer: False                    
   has_offscreen_renderer: True           
