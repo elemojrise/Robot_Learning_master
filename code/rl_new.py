@@ -57,8 +57,6 @@ if __name__ == '__main__':
 
     # Environment specifications
     env_options = config["robosuite"]
-    if env_options["custom_camera_conversion"]:
-        env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
 
