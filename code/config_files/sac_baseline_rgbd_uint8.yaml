@@ -111,7 +111,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ssac_baseline_rgbd_uint8_idun""
+  save_model_filename: "sac_baseline_rgbd_uint8_idun"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: null
