@@ -99,7 +99,7 @@ wandb_callback:
 eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 20
-  eval_freq: 4096 
+  eval_freq: 6144 
   log_path: './logs_calibrated_domain_rand/' 
   best_model_save_path: './logs_calibrated_domain_rand/'
   deterministic: False
