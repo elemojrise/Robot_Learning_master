@@ -73,7 +73,11 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 temp_dict[self.env.camera_names[0] + "_image_rgbd"] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
             else:
                 shape = (obs[key].shape)
-                temp_dict[key] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
+                if key == 'gripper_status':
+                    temp_dict[key] = spaces.Box(low = low,high = high, shape=(1,), dtype= dtype)
+                else:
+                    temp_dict[key] = spaces.Box(low = low,high = high, shape=shape,dtype= dtype)
+
         self.observation_space = spaces.Dict(temp_dict)
         
         #### Everyting below is good
@@ -131,7 +135,10 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
             elif key in obs_dict:
                 if verbose:
                     print("adding key: {}".format(key))
-                ob_lst[key] =obs_dict[key]
+                if key == 'gripper_status':
+                    ob_lst[key] =   np.array(obs_dict[key]).flatten()
+                else:
+                    ob_lst[key] =obs_dict[key]
         return ob_lst
     
 

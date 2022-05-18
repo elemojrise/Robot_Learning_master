@@ -42,7 +42,8 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
     register_env(Lift_edit_green)
 
-    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -50,9 +51,9 @@ if __name__ == '__main__':
     with open(domain_yaml_file, 'r') as stream:
         domain_config = yaml.safe_load(stream)
 
-    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
-    if answer != "y":
-        exit()
+    # answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
+    # if answer != "y":
+    #     exit()
 
 
     # Environment specifications
@@ -100,7 +101,7 @@ if __name__ == '__main__':
     
     #Implementing custom feature extractor
     if policy_kwargs["policy_kwargs"]["features_extractor_class"]:
-        policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
+         policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
     else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
 
     print(policy_kwargs["policy_kwargs"])

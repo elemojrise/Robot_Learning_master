@@ -51,7 +51,7 @@ if __name__ == '__main__':
     register_env(Lift_edit_green)
 
     #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/test.yaml"
+    yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -108,11 +108,11 @@ if __name__ == '__main__':
         policy_kwargs["learning_rate"] = linear_schedule(policy_kwargs["learning_rate"])
     
     #Implementing custom feature extractor
-    if policy_kwargs["policy_kwargs"]["features_extractor_class"]:
-        policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
-    else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
+    # if policy_kwargs["policy_kwargs"]["features_extractor_class"]:
+    #     policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
+    # else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
 
-    print(policy_kwargs["policy_kwargs"])
+    # print(policy_kwargs["policy_kwargs"])
 
     # Settings used for file handling and logging (save/load destination etc)
     file_handling = config["file_handling"]
@@ -141,6 +141,7 @@ if __name__ == '__main__':
     #env = make_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, 6, seed=0, use_domain_rand=False, domain_rand_args=None)
     #env = SubprocVecEnv(env)
     env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
+
 
     #if normalize_obs or normalize_rew:
     #    env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
@@ -171,18 +172,11 @@ if __name__ == '__main__':
     
     #print(obs['custom_image_rgbd'][0][0][0].dtype)
     #print(obs['custom_image_rgbd'][0][0][3].dtype)
-    from scipy import ndimage
 
-    frame_rgb = obs['custom_image_rgbd'][:,:,:3]
 
-    frame_d = obs['custom_image_rgbd'][:,:,3]
+    # frame_rgb = obs['custom_image_rgbd'][:,:,:3]
 
-    import sys
-    np.set_printoptions(threshold=sys.maxsize)
-
-    cropped_d = frame_d[4:30,29:55]
-    #cropped_d = frame_d[4:14,45:55]
-    cropped_d = ndimage.rotate(cropped_d, 180)
+    # frame_d = obs['custom_image_rgbd'][:,:,3]
 
     # crop image 
     # print nicely
@@ -192,21 +186,35 @@ if __name__ == '__main__':
     #print(frame_d.shape)
 
     #img.save('my.png')
-    from scipy import ndimage
+
     # rgb_img = ndimage.rotate(frame_rgb, 180)
     # rgb_img = Image.fromarray(rgb_img, 'RGB')
     # rgb_img.save('rgb.png')
     # rgb_img.show()
+    
+    
 
+    from stable_baselines3.common.env_checker import check_env
 
-    d_img = Image.fromarray(cropped_d)
-    d_img.save('d.png')
-    d_img.show()
+    check_env(env)
 
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(figsize=(20,5))  
-    sns.heatmap(cropped_d, vmin = 88, vmax=110, annot=True, fmt='g')
-    plt.show()
+# heat map plot
+    import sys
+    np.set_printoptions(threshold=sys.maxsize)
+    from scipy import ndimage
+
+    # cropped_d = frame_d[4:30,29:55]
+    # #cropped_d = frame_d[4:14,45:55]
+    # cropped_d = ndimage.rotate(cropped_d, 180)
+
+    # d_img = Image.fromarray(cropped_d)
+    # d_img.save('d.png')
+    # d_img.show()
+
+    # import seaborn as sns
+    # import matplotlib.pyplot as plt
+    # fig, ax = plt.subplots(figsize=(20,5))  
+    # sns.heatmap(cropped_d, vmin = 88, vmax=110, annot=True, fmt='g')
+    # plt.show()
 
 

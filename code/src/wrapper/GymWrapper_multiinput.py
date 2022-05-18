@@ -82,7 +82,10 @@ class GymWrapper_multiinput(Wrapper, Env):
             d_type = np.float32
             
             #mulig jeg må vurdere å flate ut         
-            observation_space_dict.update({key: spaces.Box(low = low,high = high, shape=(obs[key].shape), dtype= d_type)})
+            if key == 'gripper_status':
+                observation_space_dict.update({key: spaces.Box(low = low,high = high, shape=(1,), dtype= d_type)})
+            else:
+                observation_space_dict.update({key: spaces.Box(low = low,high = high, shape=(obs[key].shape), dtype= d_type)})
 
         self.observation_space = spaces.Dict(observation_space_dict)
         
@@ -119,7 +122,10 @@ class GymWrapper_multiinput(Wrapper, Env):
             if key in obs_dict:
                 if verbose:
                     print("adding key: {}".format(key))
-                ob_lst.update({key: obs_dict[key]})
+                if key == 'gripper_status':
+                    ob_lst.update({key: np.array(obs_dict[key]).flatten()})
+                else:
+                    ob_lst.update({key: obs_dict[key]})
         return ob_lst
     
 
