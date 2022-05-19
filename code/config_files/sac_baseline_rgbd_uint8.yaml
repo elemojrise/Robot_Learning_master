@@ -14,7 +14,7 @@ learning_rate_schedular: True
 
 # Settings for normalization
 normalize_obs: True
-normalize_rew: True
+normalize_rew: False
 norm_obs_keys: ['robot0_eef_pos', 'gripper_status']    #List of obs keys to normalize
 
 use_domain_rand: False
