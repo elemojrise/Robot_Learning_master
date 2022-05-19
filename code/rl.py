@@ -42,8 +42,8 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
     register_env(Lift_edit_green)
 
-    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
+    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    #yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -51,9 +51,9 @@ if __name__ == '__main__':
     with open(domain_yaml_file, 'r') as stream:
         domain_config = yaml.safe_load(stream)
 
-    # answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
-    # if answer != "y":
-    #     exit()
+    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
+    if answer != "y":
+         exit()
 
 
     # Environment specifications

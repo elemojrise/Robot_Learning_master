@@ -39,10 +39,10 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
         # Update the features dim manually
         self._features_dim = total_concat_size
 
-        self.rnn_stem = nn.LSTM(input_size = total_concat_size,
-                                hidden_size = 256, #Det er dette Surreal bruker
-                                num_layers = 1,
-                                batch_first=True)
+        # self.rnn_stem = nn.LSTM(input_size = total_concat_size,
+        #                         hidden_size = 256, #Det er dette Surreal bruker
+        #                         num_layers = 1,
+        #                         batch_first=True)
 
     def forward(self, observations: TensorDict) -> th.Tensor:
         encoded_tensor_list = []
@@ -54,12 +54,12 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
             encoded_tensor_list.append(extractor(to_extractor))
         
         """Trying to implement LSTM"""
-        before_LSTM = th.cat(encoded_tensor_list, dim=1)
-        before_LSTM = before_LSTM.unsqueeze(0)
-        end_feature_extract, _ = self.rnn_stem(before_LSTM, None)
-        end_feature_extract = th.squeeze(end_feature_extract,1)
-        if len(end_feature_extract.shape) == 3:
-            end_feature_extract = th.squeeze(end_feature_extract)
+        # before_LSTM = th.cat(encoded_tensor_list, dim=1)
+        # before_LSTM = before_LSTM.unsqueeze(0)
+        # end_feature_extract, _ = self.rnn_stem(before_LSTM, None)
+        # end_feature_extract = th.squeeze(end_feature_extract,1)
+        # if len(end_feature_extract.shape) == 3:
+        #     end_feature_extract = th.squeeze(end_feature_extract)
 
 
         return th.cat(encoded_tensor_list, dim=1)

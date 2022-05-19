@@ -50,8 +50,8 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
     register_env(Lift_edit_green)
 
-    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
+    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    #yaml_file = "config_files/test.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -108,11 +108,11 @@ if __name__ == '__main__':
         policy_kwargs["learning_rate"] = linear_schedule(policy_kwargs["learning_rate"])
     
     #Implementing custom feature extractor
-    # if policy_kwargs["policy_kwargs"]["features_extractor_class"]:
-    #     policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
-    # else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
+    if policy_kwargs["policy_kwargs"]["features_extractor_class"]:
+        policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
+    else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
 
-    # print(policy_kwargs["policy_kwargs"])
+    print(policy_kwargs["policy_kwargs"])
 
     # Settings used for file handling and logging (save/load destination etc)
     file_handling = config["file_handling"]
@@ -142,18 +142,15 @@ if __name__ == '__main__':
     #env = SubprocVecEnv(env)
     env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
 
-
-    #if normalize_obs or normalize_rew:
-    #    env = VecNormalize(env, norm_obs=normalize_obs,norm_reward=normalize_rew,norm_obs_keys=norm_obs_keys)
     # Create model
-    #if policy == 'PPO':
-    #    model = PPO(policy_type, env= env, **policy_kwargs)
-    #    print("PPO")
-    #elif policy == 'SAC':
-    #    model = SAC(policy_type, env = env, **policy_kwargs)
-    #    print("SAC")
-    #else: 
-    #    ("-----------ERRROR no policy selected------------")
+    if policy == 'PPO':
+       model = PPO(policy_type, env= env, **policy_kwargs)
+       print("PPO")
+    elif policy == 'SAC':
+       model = SAC(policy_type, env = env, **policy_kwargs)
+       print("SAC")
+    else: 
+       ("-----------ERRROR no policy selected------------")
 
     print("Created a new model")        
     
@@ -196,7 +193,9 @@ if __name__ == '__main__':
 
     from stable_baselines3.common.env_checker import check_env
 
-    check_env(env)
+    #check_env(env)
+
+    print(model.policy)
 
 # heat map plot
     import sys

@@ -1,7 +1,7 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "sac_baseline_rgbd_uint8_idun"
+wandb_filename: "sac_baseline_rgbd_uint8_idun_2"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
@@ -36,10 +36,7 @@ sb_policy:
   _init_setup_model: True
   policy_kwargs:
     features_extractor_class: true 
-    net_arch:
-     - 100 
-     - 300
-     - 200 
+    net_arch: [64,64]
 # Specify environment
 robosuite:
   env_id: "Lift_edit"
