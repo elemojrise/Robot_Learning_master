@@ -50,8 +50,8 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
     register_env(Lift_edit_green)
 
-    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    #yaml_file = "config_files/test.yaml"
+    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    yaml_file = "config_files/ppo_baseline_rgbd_uint8.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -140,7 +140,8 @@ if __name__ == '__main__':
     #env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
     #env = make_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, 6, seed=0, use_domain_rand=False, domain_rand_args=None)
     #env = SubprocVecEnv(env)
-    env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
+    env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
+    env = VecTransposeImage(SubprocVecEnv(env))
 
     # Create model
     if policy == 'PPO':
@@ -166,7 +167,7 @@ if __name__ == '__main__':
     #print("Emv observation space", env.observation_space)
     
     obs = env.reset()
-    
+
     #print(obs['custom_image_rgbd'][0][0][0].dtype)
     #print(obs['custom_image_rgbd'][0][0][3].dtype)
 
@@ -192,10 +193,12 @@ if __name__ == '__main__':
     
 
     from stable_baselines3.common.env_checker import check_env
-
+    from stable_baselines3.common.utils import obs_as_tensor
     #check_env(env)
+    obs_tens = obs_as_tensor(obs,model.device)
+    policy = model.policy
+    print(policy.extract_features(obs_tens))
 
-    print(model.policy)
 
 # heat map plot
     import sys
