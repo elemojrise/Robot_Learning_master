@@ -1,7 +1,7 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_rgbd_uint8_2"
+wandb_filename: "ppo_baseline_rgbd_uint8_testings"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
