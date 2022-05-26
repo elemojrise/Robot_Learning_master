@@ -73,9 +73,10 @@ class LargeCNN(BaseFeaturesExtractor):
             nn.Conv2d(64, 64, kernel_size=5, stride=1),
             nn.Conv2d(64, 64, kernel_size=5, stride=1),
             nn.Conv2d(64, 64, kernel_size=5, stride=1),
-            nn.Conv2d(64, 64, kernel_size=5, stride=1),
-            nn.Conv2d(64, 64, kernel_size=5, stride=1),
             nn.MaxPool2d(3),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            nn.MaxPool2d(2),
             nn.Flatten(),
         )
 
