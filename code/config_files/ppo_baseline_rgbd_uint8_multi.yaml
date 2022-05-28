@@ -1,12 +1,12 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_rgbd_uint8_472_smaller"
+wandb_filename: "ppo_baseline_rgbd_uint8_test"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
   total_timesteps: 14.0e+6 
-  num_procs: 24
+  num_procs: 1
   policy: 'PPO'
 
 learning_rate_schedular: True
@@ -54,7 +54,7 @@ sb_policy:
 
 # Specify environment
 robosuite:
-  env_id: "Lift_edit"
+  env_id: "Lift_edit_multiple_objects"
   robots: "IIWA_14_modified"
   gripper_types: "Robotiq85Gripper_iiwa_14"      
   has_renderer: False                    
@@ -101,8 +101,8 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 6144 
-  log_path: './logs_ppo_baseline_rgbd_uint8_472_smaller/' 
-  best_model_save_path: './logs_ppo_baseline_rgbd_uint8_472_smaller/'
+  log_path: './logs_ppo_baseline_rgbd_uint8_test/' 
+  best_model_save_path: './logs_ppo_baseline_rgbd_uint8_test/'
   deterministic: False
   render: False 
   verbose: 1 
@@ -123,9 +123,9 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_baseline_rgbd_uint8_472_smaller"
+  save_model_filename: "ppo_baseline_rgbd_uint8_test"
   # Loading of trained models
   load_model_folder: "trained_models"
-  load_model_filename: nullr
+  load_model_filename: null
 
 

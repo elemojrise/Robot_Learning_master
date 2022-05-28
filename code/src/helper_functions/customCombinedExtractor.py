@@ -67,17 +67,14 @@ class LargeCNN(BaseFeaturesExtractor):
         )
         n_input_channels = observation_space.shape[0]
         self.cnn = nn.Sequential(
-            nn.Conv2d(n_input_channels, 64, kernel_size=6, stride=2),
-            nn.MaxPool2d(3),
-            nn.Conv2d(64, 64, kernel_size=5, stride=1),
-            nn.Conv2d(64, 64, kernel_size=5, stride=1),
-            nn.Conv2d(64, 64, kernel_size=5, stride=1),
-            nn.Conv2d(64, 64, kernel_size=5, stride=1),
-            nn.MaxPool2d(3),
-            nn.Conv2d(64, 64, kernel_size=3, stride=1),
-            nn.Conv2d(64, 64, kernel_size=3, stride=1),
-            nn.MaxPool2d(2),
+            nn.Conv2d(n_input_channels, 16, kernel_size=8, stride=4, padding=0),
+            nn.ReLU(),
+            nn.Conv2d(16, 32, kernel_size=4, stride=2, padding=0),
+            nn.ReLU(),
+            nn.Conv2d(32, 16, kernel_size=4, stride=2, padding=0),
             nn.Flatten(),
+
+
         )
 
         # Compute shape by doing one forward pass

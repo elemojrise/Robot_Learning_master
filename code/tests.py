@@ -22,7 +22,7 @@ from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
 from stable_baselines3.common.callbacks import CallbackList
 
 from src.callback.progresscallback import CustomEvalCallback
-from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green
+from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green, Lift_edit_multiple_objects
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
@@ -49,9 +49,10 @@ if __name__ == '__main__':
     register_env(Lift_edit)
     register_env(Lift_4_objects)
     register_env(Lift_edit_green)
+    register_env(Lift_edit_multiple_objects)
 
-    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    #yaml_file = "config_files/ppo_baseline_rgbd_uint8_472.yaml"
+    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    yaml_file = "config_files/ppo_baseline_rgbd_uint8_multi.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -144,6 +145,7 @@ if __name__ == '__main__':
     #env = SubprocVecEnv(env)
     env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
     env = VecTransposeImage(SubprocVecEnv(env))
+    #env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
 
     # Create model
     if policy == 'PPO':
@@ -173,8 +175,8 @@ if __name__ == '__main__':
     #print(obs['custom_image_rgbd'][0][0][0].dtype)
     #print(obs['custom_image_rgbd'][0][0][3].dtype)
 
-
-    # frame_rgb = obs['custom_image_rgbd'][:,:,:3]
+    
+    #frame_rgb = obs['custom_image_rgbd'][:,:,:3]
 
     # frame_d = obs['custom_image_rgbd'][:,:,3]
 
@@ -200,7 +202,7 @@ if __name__ == '__main__':
     #obs_tens = obs_as_tensor(obs,model.device)
     #policy = model.policy
     #print(policy.extract_features(obs_tens))
-    print(model.policy)
+    #print(model.policy)
 
 
 # heat map plot
@@ -223,3 +225,4 @@ if __name__ == '__main__':
     # plt.show()
 
 
+# Loop reseting env multiple times
