@@ -186,6 +186,9 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         
         info["is_success"] = self.grasp_success
 
+        if reward == 1:
+            done = True       #experimental stuff!
+
         return self._multiinput_obs(ob_dict), reward, done, info
 
     def seed(self, seed=None):

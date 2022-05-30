@@ -27,7 +27,7 @@ from src.helper_functions.camera_functions import get_pos_and_quat_from_trans_ma
 
 
 
-class Lift_edit(SingleArmEnv):
+class Lift_edit_image(SingleArmEnv):
     """
     This class corresponds to the lifting task for a single robot arm.
 
@@ -271,7 +271,7 @@ class Lift_edit(SingleArmEnv):
             cube_pos = self.sim.data.body_xpos[self.cube_body_id]
             gripper_site_pos = self.sim.data.site_xpos[self.robots[0].eef_site_id]
             dist = np.linalg.norm(gripper_site_pos - cube_pos)
-            reaching_reward = (1 - np.tanh(10.0 * dist))*0.1
+            reaching_reward = 1 - np.tanh(10.0 * dist)
             reward += reaching_reward
 
             # grasping reward
@@ -281,7 +281,6 @@ class Lift_edit(SingleArmEnv):
         # Scale reward if requested
         if self.reward_scale is not None:
             reward *= self.reward_scale / 2.25
-
 
         return reward
 
@@ -346,9 +345,9 @@ class Lift_edit(SingleArmEnv):
             self.placement_initializer = UniformRandomSampler(
                 name="ObjectSampler",
                 mujoco_objects=self.cube,
-                x_range=[-0.1, 0.0], #From middle of table in x direction (not world frame og robot frame) (with [-0.1,0.1] it will be between 0-6 and 0.8 from robot/world frame)
-                y_range=[-0.15, 0.15], #From middle of table in y direction
-                rotation=None,
+                x_range=[0, 0.0], #From middle of table in x direction (not world frame og robot frame) (with [-0.1,0.1] it will be between 0-6 and 0.8 from robot/world frame)
+                y_range=[0, 0.0], #From middle of table in y direction
+                rotation=0,
                 ensure_object_boundary_in_range=False,
                 ensure_valid_placement=True,
                 reference_pos=self.table_offset,

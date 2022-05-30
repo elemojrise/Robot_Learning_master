@@ -1,11 +1,11 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_rgbd_uint8_testings"
+wandb_filename: "ppo_baseline_100_reward_test"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 14.0e+6 
+  total_timesteps: 10.0e+6 
   num_procs: 48
   policy: 'PPO'
 
@@ -23,7 +23,7 @@ use_domain_rand: False
 sb_policy:
   type: "MultiInputPolicy"
   learning_rate: 0.0001 
-  n_steps: 3072
+  n_steps: 3072/2
   batch_size: 512 
   n_epochs: 10 
   gamma: 0.99 
@@ -42,9 +42,9 @@ sb_policy:
   device: 'auto' 
   _init_setup_model: True
   policy_kwargs:
-    features_extractor_class: true 
+    features_extractor_class: 'small' 
     net_arch:
-      - 100 
+      - 260 
       - pi: 
         - 300
         - 200    # Custom actor network
@@ -55,26 +55,26 @@ sb_policy:
 # Specify environment
 robosuite:
   env_id: "Lift_edit"
-  robots: "IIWA_14_modified"
-  gripper_types: "Robotiq85Gripper_iiwa_14"      
+  robots: "IIWA_14_modified_flange"
+  gripper_types: "Robotiq85Gripper_iiwa_14_longer_finger"      
   has_renderer: False                    
   has_offscreen_renderer: True           
   control_freq: 10                       
   horizon: 200
-  camera_heights: 83
-  camera_widths: 83                        
+  camera_heights: 100
+  camera_widths: 100                       
   use_object_obs: False                  
   use_camera_obs: True
   reward_shaping: True
   camera_depths: True
   camera_names: "custom"
   custom_camera_name: "custom" 
-  custom_camera_trans_matrix: [ [ 0.011358,  0.433358, -0.901150,  1220.739746], 
-                                [ 0.961834,  0.241668,  0.128340, -129.767868], 
-                                [ 0.273397, -0.868215, -0.414073,  503.424103], 
+  custom_camera_trans_matrix: [ [ 0.007445,  0.588405, -0.808532,  1422.578369], 
+                                [ 0.999970, -0.002809,  0.007163, -19.350439], 
+                                [ 0.001943, -0.808561, -0.588409,  849.809448], 
                                 [ 0.000000,  0.000000,  0.000000,  1.000000] ]
   custom_camera_conversion: False
-  custom_camera_attrib:  {"fovy": 36}
+  custom_camera_attrib:  {"fovy": 29.4}
   controller_configs: 
     type: "OSC_POSE"
     input_max: 1
@@ -86,7 +86,7 @@ robosuite:
     impedance_mode: "fixed"
     kp_limits: [0, 300]
     damping_ratio_limits: [0, 10]
-    position_limits: [[-.inf,-.inf, 0.819],[.inf, .inf, .inf]]
+    position_limits: [[-.inf,-.inf, 0.815],[.inf, .inf, .inf]]
     orientation_limits: null
     uncouple_pos_ori: true
     control_delta: true
@@ -99,10 +99,10 @@ wandb_callback:
 
 eval_callback:
   callback_on_new_best: null
-  n_eval_episodes: 20
+  n_eval_episodes: 100
   eval_freq: 6144 
-  log_path: './logs_ppo_baseline_rgbd_uint8_2/' 
-  best_model_save_path: './logs_ppo_baseline_rgbd_uint8_2/'
+  log_path: './logs_ppo_baseline_100_reward_test/' 
+  best_model_save_path: './logs_ppo_baseline_100_reward_test/'
   deterministic: False
   render: False 
   verbose: 1 
@@ -123,9 +123,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_baseline_rgbd_uint8"
+  save_model_filename: "ppo_baseline_100_reward_test"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: null
-
-

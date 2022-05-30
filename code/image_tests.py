@@ -22,7 +22,7 @@ from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
 from stable_baselines3.common.callbacks import CallbackList
 
 from src.callback.progresscallback import CustomEvalCallback
-from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green, Lift_edit_multiple_objects
+from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green, Lift_edit_multiple_objects, Lift_edit_image
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
@@ -50,9 +50,10 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
     register_env(Lift_edit_green)
     register_env(Lift_edit_multiple_objects)
+    register_env(Lift_edit_image)
 
     #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/ppo_baseline_rgbd_uint8.yaml"
+    yaml_file = "config_files/ppo_baseline_100.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -133,113 +134,86 @@ if __name__ == '__main__':
     training = config["training"]
     seed = config["seed"]
 
-    # RL pipeline
-    #Create ENV
     print("making")
     
-    #overwriting certain variables to make testing easier
-    num_procs = 1
-
-    #env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
-    #env = make_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, 6, seed=0, use_domain_rand=False, domain_rand_args=None)
-    #env = SubprocVecEnv(env)
-    #env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
-    #env = VecTransposeImage(SubprocVecEnv(env))
     env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
 
-    # Create model
-    if policy == 'PPO':
-       model = PPO(policy_type, env= env, **policy_kwargs)
-       print("PPO")
-    elif policy == 'SAC':
-       model = SAC(policy_type, env = env, **policy_kwargs)
-       print("SAC")
-    else: 
-       ("-----------ERRROR no policy selected------------")
-
-    print("Created a new model")        
-    
-    
-    # Create callback
-    #env.training = False
-
-    #eval_callback = CustomEvalCallback(env, **messages_to_eval_callback)
-    #callback = CallbackList([eval_callback])
-
-    #Settup tests!
-    #print("Env action space", env.action_space)
-    #print("Emv observation space", env.observation_space)
-    
-    obs = env.reset()
-
-    action = model.predict()
-
-    #print(obs['custom_image_rgbd'][0][0][0].dtype)
-    #print(obs['custom_image_rgbd'][0][0][3].dtype)
-
-
-    image = obs['custom_image_rgbd']
-
-    frame_rgb = image[:,:,:3]
-
-    frame_d = image[:,:,3]
-
-    # crop image 
-    # print nicely
-    # see printing from machine learning
-    #print(frame_rgb)
-
-    #print(frame_d.shape)
-
-    #img.save('my.png')
-
-    # rgb_img = ndimage.rotate(frame_rgb, 180)
-    # rgb_img = Image.fromarray(rgb_img, 'RGB')
-    # rgb_img.save('rgb.png')
-    # rgb_img.show()
-    
-    
-
-    from stable_baselines3.common.env_checker import check_env
-    from stable_baselines3.common.utils import obs_as_tensor
-    #check_env(env)
-    #obs_tens = obs_as_tensor(obs,model.device)
-    #policy = model.policy
-    #print(policy.extract_features(obs_tens))
-    #print(model.policy)
-
-
-# heat map plot
     import sys
     np.set_printoptions(threshold=sys.maxsize)
     from scipy import ndimage
 
-    cropped_d = frame_d[4:30,29:55]
-    # #cropped_d = frame_d[4:14,45:55]
-    cropped_d = ndimage.rotate(cropped_d, 180)
+    obs = env.reset()
 
-    # d_img = Image.fromarray(cropped_d)
-    # d_img.save('d.png')
-    # d_img.show()ndimage.rotate
+    action = [0,0,0,0,0,0,0]
+    time = 0
+    # for i in range(time):
+    #     obs,reward,done,info = env.step(action)
+    #     joint_pos = obs['robot0_joint_pos']
+    #     print("robot joint position is", joint_pos)
+    # # Setting up variables
+    # joint_pos = obs['robot0_joint_pos']
+    image = obs['custom_image_rgbd']
+    frame_rgb = image[:,:,:3]
+    frame_d = image[:,:,3]
+    #np.save('robosuite_image.npy',image)
+
+
+    #print("robot joint position is", joint_pos)
+
+#     # crop image 
+#     # print nicely
+#     # see printing from machine learning
+#     #print(frame_rgb)
+
+#     #print(frame_d.shape)
+
+#     #img.save('my.png')
+
+    rgb_img = ndimage.rotate(frame_rgb, 180)
+    rgb_img = Image.fromarray(rgb_img, 'RGB')
+    rgb_img.save('rgb.png')    
     
 
-    frame_d = ndimage.rotate(frame_d, 180)
-    frame_d = Image.fromarray(frame_d)
-    frame_d.save('robosuite_d.png')
-
-    frame_rgb = ndimage.rotate(frame_rgb, 180)
-    frame_rgb = Image.fromarray(frame_rgb, 'RGB')
-    frame_rgb.save('robosuite_rgb.png')
-
-
+#     from stable_baselines3.common.env_checker import check_env
+#     from stable_baselines3.common.utils import obs_as_tensor
+#     #check_env(env)
+#     #obs_tens = obs_as_tensor(obs,model.device)
+#     #policy = model.policy
+#     #print(policy.extract_features(obs_tens))
+#     #print(model.policy)
 
 
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(figsize=(20,5))  
-    sns.heatmap(cropped_d, vmin = 88, vmax=110, annot=True, fmt='g')
-    plt.show()
-    plt.savefig('plot_d.png')
+# # heat map plot
+    import sys
+    np.set_printoptions(threshold=sys.maxsize)
+    from scipy import ndimage
+
+#     cropped_d = frame_d[4:30,29:55]
+#     # #cropped_d = frame_d[4:14,45:55]
+#     cropped_d = ndimage.rotate(cropped_d, 180)
+
+#     # d_img = Image.fromarray(cropped_d)
+#     # d_img.save('d.png')
+#     # d_img.show()ndimage.rotate
+    
+
+#     frame_d = ndimage.rotate(frame_d, 180)
+#     frame_d = Image.fromarray(frame_d)
+#     frame_d.save('robosuite_d.png')
+
+#     frame_rgb = ndimage.rotate(frame_rgb, 180)
+#     frame_rgb = Image.fromarray(frame_rgb, 'RGB')
+#     frame_rgb.save('robosuite_rgb.png')
+
+
+
+
+#     import seaborn as sns
+#     import matplotlib.pyplot as plt
+#     fig, ax = plt.subplots(figsize=(20,5))  
+#     sns.heatmap(cropped_d, vmin = 88, vmax=110, annot=True, fmt='g')
+#     plt.show()
+#     plt.savefig('plot_d.png')
 
 
 # Loop reseting env multiple times
