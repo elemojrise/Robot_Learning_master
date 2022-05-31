@@ -182,7 +182,7 @@ if __name__ == '__main__':
 
 
     load_model_path = os.path.join(best_model_save_path, 'best_model.zip')
-    load_vecnormalize_path = os.path.join(load_model_folder, 'vec_normalize_best_model.pkl')
+    load_vecnormalize_path = os.path.join(best_model_save_path, 'vec_normalize_best_model.pkl')
 
     normalize_env = str(input("Do you want to make a new normalized env or load from file? \n  [make_new/load_file]"))
 
