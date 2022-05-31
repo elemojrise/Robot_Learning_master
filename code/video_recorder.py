@@ -39,6 +39,7 @@ from PIL import Image
 def record_video(env, model, video_length,num_episodes, fps, name_of_video_file):
     macros.IMAGE_CONVENTION = "opencv"
     # create a video writer with imageio
+    os.mkdir(name_of_video_file)
     writer = imageio.get_writer(name_of_video_file + "/video.mp4", fps=fps)
 
     for j in range(num_episodes):
