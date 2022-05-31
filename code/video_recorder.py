@@ -39,7 +39,7 @@ from PIL import Image
 def record_video(env, model, video_length,num_episodes, fps, name_of_video_file):
     macros.IMAGE_CONVENTION = "opencv"
     # create a video writer with imageio
-    writer = imageio.get_writer(name_of_video_file+".mp4", fps=fps)
+    writer = imageio.get_writer(name_of_video_file + "/video.mp4", fps=fps)
 
     for j in range(num_episodes):
         obs = env.reset()
@@ -63,7 +63,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
                 plt.xlabel('Reward')
                 plt.ylabel('Timestep')
                 plt.title(str(j) + "epsiode")
-                plt.savefig(name_of_video_file + "_plot_" + str(j+1))
+                plt.savefig(name_of_video_file + "/plot_" + str(j+1))
                 plt.show()
 
                 break
