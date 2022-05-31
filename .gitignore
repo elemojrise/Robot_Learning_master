@@ -6,6 +6,10 @@ logs/
 ppo_lift_4_objects_tensorboard/
 runs/
 
+#downloaded models
+logs*
+
+
 # Editors
 .vscode/
 .idea/

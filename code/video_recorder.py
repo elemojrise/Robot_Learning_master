@@ -23,7 +23,7 @@ from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green, Lift_ed
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
-from src.helper_functions.wrap_env import make_multiprocess_env
+from src.helper_functions.wrap_env import make_multiprocess_env, make_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 from src.helper_functions.hyperparameters import linear_schedule
 from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
@@ -51,7 +51,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
             obs, reward, done, info = env.step(action)
             reward_plot.append(reward)
             step_plot.append(i)
-            frame = obs["custom" + "_image"][0]
+            frame = obs["custom_image_rgbd"][0,:,:,:3]
             img = Image.fromarray(frame, 'RGB')
             img = img.rotate(180)
 
@@ -176,15 +176,15 @@ if __name__ == '__main__':
     #Create ENV
     print("making")
     
+    num_procs = 1
     #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
     env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
-    env = VecTransposeImage(SubprocVecEnv(env))
+    env = SubprocVecEnv(env)
 
 
     load_model_path = os.path.join(best_model_save_path, 'best_model.zip')
     load_vecnormalize_path = os.path.join(best_model_save_path, 'vec_normalize_best_model.pkl')
 
-    normalize_env = str(input("Do you want to make a new normalized env or load from file? \n  [make_new/load_file]"))
 
     if (normalize_obs or normalize_rew):
         env = VecNormalize.load(load_vecnormalize_path, env)
