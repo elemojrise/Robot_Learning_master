@@ -50,7 +50,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
 
             action = model.predict(obs)
             obs, reward, done, info = env.step(action)
-            reward_plot.append(reward)
+            reward_plot.append(env.get_original_reward())
             step_plot.append(i)
             frame = obs["custom_image_rgbd"][0,:,:,:3]
             img = Image.fromarray(frame, 'RGB')
@@ -61,12 +61,11 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
             writer.append_data(frame)
             if done:
                 plt.plot(step_plot,reward_plot)
-                plt.xlabel('Reward')
-                plt.ylabel('Timestep')
+                plt.ylabel('Reward')
+                plt.xlabel('Timestep')
                 plt.title(str(j) + "epsiode")
                 plt.savefig(name_of_video_file + "/plot_" + str(j+1))
-                plt.show()
-
+                plt.clf()
                 break
 
     writer.close()
@@ -199,7 +198,7 @@ if __name__ == '__main__':
 
     num_episodes = int(input("How many epsiodes do you want to record?   "))
     name_of_video_file = input("What should video file be called?   ") 
-
+    
 
 
     record_video(
