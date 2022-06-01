@@ -25,7 +25,7 @@ from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 from src.helper_functions.wrap_env import make_multiprocess_env
 from src.helper_functions.camera_functions import adjust_width_of_image
-from src.helper_functions.hyperparameters import linear_schedule
+from src.helper_functions.hyperparameters import linear_schedule_1,linear_schedule_2
 from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
 from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
@@ -97,8 +97,10 @@ if __name__ == '__main__':
     policy_type = policy_kwargs.pop("type")
 
     #Implementing learning rate schedular if 
-    if config["learning_rate_schedular"]:
-        policy_kwargs["learning_rate"] = linear_schedule(policy_kwargs["learning_rate"])
+    if config["learning_rate_schedular"] == 1:
+        policy_kwargs["learning_rate"] = linear_schedule_1(policy_kwargs["learning_rate"])
+    elif config["learning_rate_schedular"] == 2:
+        policy_kwargs["learning_rate"] = linear_schedule_2(policy_kwargs["learning_rate"])
     
     #Implementing custom feature extractor
     if policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'large':
