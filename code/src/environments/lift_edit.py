@@ -258,7 +258,7 @@ class Lift_edit(SingleArmEnv):
         Returns:
             float: reward value
         """
-        reward = 0.
+        reward = -1.
 
         # sparse completion reward
         if self._check_success():
