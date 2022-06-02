@@ -66,7 +66,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 low = 0
                 high = 255
                 dtype = np.uint8      ####Currently uint8
-                shape = (obs[self.env.camera_names[0]+"_image"].shape)
+                shape = (obs[self.env.camera_names[0]+"_image"][:65,23:177,:].shape)    #must be cleaned up!!
                 shape_list = list(shape)
                 shape_list[2] = shape_list[2] + 1
                 shape = shape_list
@@ -115,7 +115,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
 
 
                 cam_name = self.env.camera_names[0]
-                depth_array_normalized = obs_dict[cam_name +"_depth"]
+                depth_array_normalized = obs_dict[cam_name +"_depth"][:65,23:177,:]          #########NBNBNBNBNB     Clean up!!
 
                 depth_map = np.uint8(np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(255/3), 0,255))   ## maps from 0-3 to 0-255 and cuts all values over 255
                 # print(depth_map.shape)
@@ -126,7 +126,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 # depth_map = np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(65535/3), 0,65535).astype(np.uint16)   #65535
 
                 depth_array = depth_map
-                rgb_array = obs_dict[cam_name + "_image"]
+                rgb_array = obs_dict[cam_name + "_image"][:65,23:177,:]     #########NBNBNBNBNB     Clean up!!
 
                 new_array = np.concatenate((rgb_array, depth_array), axis=-1)
 
@@ -186,8 +186,8 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         
         info["is_success"] = self.grasp_success
 
-        if reward == 1:
-            done = True       #experimental stuff!
+        # if reward == 1:
+        #     done = True       #experimental stuff!
 
         return self._multiinput_obs(ob_dict), reward, done, info
 

@@ -28,7 +28,7 @@ from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 from src.helper_functions.wrap_env import make_multiprocess_env, make_env
 from src.helper_functions.camera_functions import adjust_width_of_image
-from src.helper_functions.hyperparameters import linear_schedule
+
 from src.helper_functions.customCombinedExtractor import LargeCombinedExtractor, CustomCombinedExtractor_object_obs
 from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     register_env(Lift_edit_image)
 
     #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/ppo_baseline_100.yaml"
+    yaml_file = "config_files/ppo_baseline_100_close_img.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -103,11 +103,6 @@ if __name__ == '__main__':
 
     #Eval callback
     messages_to_eval_callback = config["eval_callback"]
-
-
-    #Implementing learning rate schedular if 
-    if config["learning_rate_schedular"]:
-        policy_kwargs["learning_rate"] = linear_schedule(policy_kwargs["learning_rate"])
     
     #Implementing custom feature extractor
     if policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'large':
@@ -157,6 +152,7 @@ if __name__ == '__main__':
     frame_d = image[:,:,3]
     #np.save('robosuite_image.npy',image)
 
+    #cropped_rgb = frame_rgb[:65,23:177,:]
 
     #print("robot joint position is", joint_pos)
 
