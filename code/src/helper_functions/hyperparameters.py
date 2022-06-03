@@ -30,6 +30,6 @@ def linear_schedule_2(initial_value: float) -> Callable[[float], float]:
         :param progress_remaining:
         :return: current learning rate
         """
-        return progress_remaining * progress_remaining * initial_value
+        return (progress_remaining * progress_remaining * initial_value)
 
     return func

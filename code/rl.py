@@ -63,6 +63,7 @@ if __name__ == '__main__':
         env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
+    neg_rew = env_options['neg_rew']
 
     #normalize obs and rew
     normalize_obs = config['normalize_obs']
@@ -103,6 +104,9 @@ if __name__ == '__main__':
     elif config["learning_rate_schedular"] == 2:
         policy_kwargs["learning_rate"] = linear_schedule_2(policy_kwargs["learning_rate"])
     
+
+
+
     #Implementing custom feature extractor
     if policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'large':
         policy_kwargs["policy_kwargs"]["features_extractor_class"] = LargeCombinedExtractor
@@ -137,7 +141,7 @@ if __name__ == '__main__':
     print("making")
     
     #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
-    env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, num_procs)
+    env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, neg_rew, num_procs)
     env = VecTransposeImage(SubprocVecEnv(env))
 
 
@@ -202,7 +206,10 @@ if __name__ == '__main__':
     wandb_callback = WandbCallback(**messages_to_wand_callback, model_save_path=f"models/{run.id}")
     eval_callback = CustomEvalCallback(env, **messages_to_eval_callback)
     callback = CallbackList([wandb_callback, eval_callback])
+    
 
+    print(model.learning_rate)
+    
     model.learn(total_timesteps=training_timesteps, callback=callback, reset_num_timesteps=False)
 
 

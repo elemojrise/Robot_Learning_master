@@ -183,6 +183,7 @@ class Lift_edit(SingleArmEnv):
         custom_camera_trans_matrix = [],
         custom_camera_conversion = True,
         custom_camera_attrib = None,
+        neg_rew = False,
     ):
         # settings for table top
         self.table_full_size = table_full_size
@@ -205,6 +206,9 @@ class Lift_edit(SingleArmEnv):
 
         # object placement initializer
         self.placement_initializer = placement_initializer
+
+
+        self.neg_rew = neg_rew
 
         super().__init__(
             robots=robots,
@@ -258,7 +262,10 @@ class Lift_edit(SingleArmEnv):
         Returns:
             float: reward value
         """
-        reward = -1.
+        if self.neg_rew:
+            reward = -1.
+        else:
+            reward = 0.
 
         # sparse completion reward
         if self._check_success():

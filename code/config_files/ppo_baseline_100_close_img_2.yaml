@@ -9,7 +9,7 @@ sb_config:
   num_procs: 48
   policy: 'PPO'
 
-learning_rate_schedular: 1
+learning_rate_schedular: 2
 
 
 # Settings for normalization
@@ -22,7 +22,7 @@ use_domain_rand: False
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
-  learning_rate: 0.0001 
+  learning_rate: 0.00005 
   n_steps: 1536
   batch_size: 512 
   n_epochs: 10 
@@ -103,7 +103,7 @@ eval_callback:
   n_eval_episodes: 100
   eval_freq: 6144 
   log_path: './logs_ppo_baseline_100_close_img/' 
-  best_model_save_path: './logs_ppo_baseline_100_close_img/'
+  best_model_save_path: './logs_ppo_baseline_100_close_img_2/'
   deterministic: False
   render: False 
   verbose: 1 
@@ -125,7 +125,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_baseline_100_close_img"
+  save_model_filename: "ppo_baseline_100_close_img_2"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: "ppo_baseline_100_close_img"
