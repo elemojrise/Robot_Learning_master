@@ -27,7 +27,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         AssertionError: [Object observations must be enabled if no keys]
     """
 
-    def __init__(self, env, keys=None, smaller_action_space = False, xyz_action_space = False, close_img = False, neg_rew = Fasle):
+    def __init__(self, env, keys=None, smaller_action_space = False, xyz_action_space = False, close_img = False, neg_rew = False):
         # Run super method
         super().__init__(env=env)
         # Create name for gym
