@@ -81,6 +81,7 @@ if __name__ == '__main__':
     smaller_action_space = obs_config["smaller_action_space"]
     xyz_action_space = obs_config["xyz_action_space"]
     use_rgbd = obs_config['rgbd']
+    close_img = obs_config['close_img']
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
@@ -136,7 +137,7 @@ if __name__ == '__main__':
     print("making")
     
     #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
-    env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args,num_procs)
+    env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, num_procs)
     env = VecTransposeImage(SubprocVecEnv(env))
 
 
