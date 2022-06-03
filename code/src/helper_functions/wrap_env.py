@@ -44,10 +44,8 @@ def make_env(neg_rew, close_img, env_id, env_options, obs_list, smaller_action_s
         register_robot_class_mapping("IIWA_14_modified_flange")
 
         
-        if use_rgbd:
-            env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew)
-        else:
-            env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
+
+        env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew)
             
         if use_domain_rand:
             env = DomainRandomizationWrapper(env, seed= seed + rank, **domain_rand_args)
