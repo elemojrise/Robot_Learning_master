@@ -208,7 +208,7 @@ if __name__ == '__main__':
     callback = CallbackList([wandb_callback, eval_callback])
     
 
-    print(model.learning_rate)
+    model.lr_schedule = policy_kwargs["learning_rate"]
     
     model.learn(total_timesteps=training_timesteps, callback=callback, reset_num_timesteps=False)
 

@@ -1,0 +1,131 @@
+seed: 3
+training: True   # Whether to train a model or not
+
+wandb_filename: "ppo_baseline_100_standard_test"
+
+# Settings for stable-baselines RL algorithm
+sb_config:
+  total_timesteps: 10.0e+6 
+  num_procs: 1
+  policy: 'PPO'
+
+learning_rate_schedular: 2
+
+
+# Settings for normalization
+normalize_obs: True
+normalize_rew: True
+norm_obs_keys: ['robot0_eef_pos', 'gripper_status']    #List of obs keys to normalize
+
+use_domain_rand: False
+
+# Policy settings
+sb_policy:
+  type: "MultiInputPolicy"
+  learning_rate: 0.00005 
+  n_steps: 1536
+  batch_size: 512 
+  n_epochs: 10 
+  gamma: 0.99 
+  gae_lambda: 0.95 
+  clip_range: 0.2 
+  clip_range_vf: null 
+  ent_coef: 0.0 
+  vf_coef: 0.5 
+  max_grad_norm: 0.5
+  use_sde: False 
+  sde_sample_freq: -1 
+  target_kl: null 
+  create_eval_env: False 
+  verbose: 1 
+  seed: null
+  device: 'auto' 
+  _init_setup_model: True
+  policy_kwargs:
+    features_extractor_class: 'small' 
+    net_arch:
+      - 260 
+      - pi: 
+        - 300
+        - 200    # Custom actor network
+        vf: 
+        - 300
+        - 200    # Value function network
+
+# Specify environment
+robosuite:
+  env_id: "Lift_edit"
+  robots: "IIWA_14_modified_flange"
+  gripper_types: "Robotiq85Gripper_iiwa_14_longer_finger"      
+  has_renderer: False                    
+  has_offscreen_renderer: True           
+  control_freq: 10                       
+  horizon: 200
+  camera_heights: 100
+  camera_widths: 100                       
+  use_object_obs: False                  
+  use_camera_obs: True
+  reward_shaping: True
+  camera_depths: True
+  camera_names: "custom"
+  custom_camera_name: "custom" 
+  custom_camera_trans_matrix: [ [ 0.007445,  0.588405, -0.808532,  1422.578369], 
+                                [ 0.999970, -0.002809,  0.007163, -19.350439], 
+                                [ 0.001943, -0.808561, -0.588409,  849.809448], 
+                                [ 0.000000,  0.000000,  0.000000,  1.000000] ]
+  custom_camera_conversion: False
+  custom_camera_attrib:  {"fovy": 29.4}
+  controller_configs: 
+    type: "OSC_POSE"
+    input_max: 1
+    input_min: -1
+    output_max: [0.05, 0.05, 0.05, 0.5, 0.5, 0.5]
+    output_min: [-0.05, -0.05, -0.05, -0.5, -0.5, -0.5]
+    kp: 150
+    damping_ratio: 1
+    impedance_mode: "fixed"
+    kp_limits: [0, 300]
+    damping_ratio_limits: [0, 10]
+    position_limits: [[-.inf,-.inf, 0.815],[.inf, .inf, .inf]]
+    orientation_limits: null
+    uncouple_pos_ori: true
+    control_delta: true
+    interpolation: null
+    ramp_ratio: 0.2
+  neg_rew: False
+  
+wandb_callback:
+  gradient_save_freq: 10000
+  verbose: 2
+
+eval_callback:
+  callback_on_new_best: null
+  n_eval_episodes: 100
+  eval_freq: 6144 
+  log_path: './logs_ppo_baseline_100_standard_test/' 
+  best_model_save_path: './logs_ppo_baseline_100_standard_test/'
+  deterministic: False
+  render: False 
+  verbose: 1 
+  warn: True
+
+gymwrapper:
+  observations: ["custom_image_rgbd",'robot0_eef_pos', 'gripper_status']
+  smaller_action_space: True
+  xyz_action_space: False
+  rgbd: True
+  close_img: False
+
+wandb:
+  project: "ludvik_final_tests"
+  sync_tensorboard: True 
+  save_code: True
+
+# Settings used for file handling and logging (save/load destination etc)
+file_handling:
+  # Logging with Tensorboard and saving trained models
+  save_model_folder: "trained_models"
+  save_model_filename: "ppo_baseline_100_standard_test"
+  # Loading of trained models
+  load_model_folder: "trained_models"
+  load_model_filename: "ppo_baseline_100_standard"
