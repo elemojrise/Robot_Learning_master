@@ -123,12 +123,14 @@ if __name__ == '__main__':
     smaller_action_space = obs_config["smaller_action_space"]
     xyz_action_space = obs_config["xyz_action_space"]
     use_rgbd = obs_config['rgbd']
+    close_img = obs_config['close_img']
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
     training_timesteps = sb_config["total_timesteps"]
     num_procs = sb_config["num_procs"]
     policy = sb_config['policy']
+
 
 
     messages_to_wand_callback = config["wandb_callback"]
