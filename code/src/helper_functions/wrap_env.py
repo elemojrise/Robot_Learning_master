@@ -18,7 +18,7 @@ from stable_baselines3.common.utils import set_random_seed
 
 
 def make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img,num_procs):
-
+    print(close_img)
     multi_process_env = [make_env(close_img, use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]
 
     return multi_process_env
@@ -32,6 +32,7 @@ def make_env(close_img, use_rgbd, env_id, env_options, obs_list, smaller_action_
     :param seed: (int) the inital seed for RNG
     :param rank: (int) index of the subprocess
     """
+    print(close_img)
     def _init():
         register_robot(IIWA_14)
         register_robot(IIWA_14_modified)
