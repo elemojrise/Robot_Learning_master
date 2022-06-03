@@ -127,4 +127,4 @@ file_handling:
   save_model_filename: "ppo_baseline_100_close_img"
   # Loading of trained models
   load_model_folder: "trained_models"
-  load_model_filename: null
+  load_model_filename: "ppo_baseline_100_close_img"
