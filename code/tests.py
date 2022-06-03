@@ -180,8 +180,8 @@ if __name__ == '__main__':
     
     obs = env.reset()
 
-    action = model.predict()
-
+    #action = model.predict()
+    print(obs)
     #print(obs['custom_image_rgbd'][0][0][0].dtype)
     #print(obs['custom_image_rgbd'][0][0][3].dtype)
 
