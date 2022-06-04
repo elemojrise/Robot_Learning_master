@@ -44,8 +44,8 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
 
             action = model.predict(obs)
             obs, reward, done, info = env.step(action)
-            if info["is_success"] >= suc_val:
-                print("object_is_lifted")
+            if info[0]["is_success"] >= suc_val:
+                print("object_is_lifted_at_step", i)
                 suc_val += 0.1
             #reward_plot.append(reward)
             #step_plot.append(i)
