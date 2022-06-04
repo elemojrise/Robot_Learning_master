@@ -118,6 +118,7 @@ if __name__ == '__main__':
     obs_config = config["gymwrapper"]
     obs_list = obs_config["observations"] 
     smaller_action_space = obs_config["smaller_action_space"]
+    xyz_action_space = obs_config["xyz_action_space"]
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
@@ -147,7 +148,7 @@ if __name__ == '__main__':
     #Create ENV
     print("making")
     num_procs = 1   #overwrites the yaml file in order 
-    env = (SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed) for i in range(num_procs)]))
+    env = (SubprocVecEnv([make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed) for i in range(num_procs)]))
     #env = make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space,  i, seed)
 
 
