@@ -157,7 +157,7 @@ class GymWrapper_multiinput(Wrapper, Env):
 
         # It will now keep being 1 until reset
         if self.env._check_success():
-            print("succesful_grasp")
+            #print("succesful_grasp")
             self.grasp_success = 1
         
         info["is_success"] = self.grasp_success

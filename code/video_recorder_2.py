@@ -36,14 +36,19 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
 
     for j in range(num_episodes):
         obs = env.reset()
-        reward_plot = []
-        step_plot = []
+        print("new_episode")
+        suc_val = 1
+        #reward_plot = []
+        #step_plot = []
         for i in range(video_length+10):
 
             action = model.predict(obs)
             obs, reward, done, info = env.step(action)
-            reward_plot.append(reward)
-            step_plot.append(i)
+            if info["is_success"] >= suc_val:
+                print("object_is_lifted")
+                suc_val += 0.1
+            #reward_plot.append(reward)
+            #step_plot.append(i)
             frame = obs["custom" + "_image"][0]
             img = Image.fromarray(frame, 'RGB')
             img = img.rotate(180)
@@ -51,15 +56,15 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
             frame = np.asarray(img)
             #frame = ndimage.rotate(frame, 180)
             writer.append_data(frame)
-            if done:
-                plt.plot(step_plot,reward_plot)
-                plt.xlabel('Reward')
-                plt.ylabel('Timestep')
-                plt.title(str(j) + "epsiode")
-                plt.savefig(name_of_video_file + "_plot_" + str(j+1))
-                plt.show()
+            # if done:
+            #     plt.plot(step_plot,reward_plot)
+            #     plt.xlabel('Reward')
+            #     plt.ylabel('Timestep')
+            #     plt.title(str(j) + "epsiode")
+            #     plt.savefig(name_of_video_file + "_plot_" + str(j+1))
+            #     plt.show()
 
-                break
+            #     break
 
     writer.close()
 
