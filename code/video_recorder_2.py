@@ -23,8 +23,8 @@ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecTran
 from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
 
 from src.environments import Lift_4_objects, Lift_edit
-from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified
-from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14
+from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange, IIWA_14_modified_flange_joint_limit
+from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 from src.helper_functions.wrap_env import make_multiprocess_env, make_singel_env
 from src.helper_functions.camera_functions import adjust_width_of_image
@@ -70,11 +70,16 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
 
 
 if __name__ == '__main__':
-    register_robot(IIWA_14)
     register_robot(IIWA_14_modified)
+    register_robot(IIWA_14)
+    register_robot(IIWA_14_modified_flange)
+    register_robot(IIWA_14_modified_flange_joint_limit)
     register_gripper(Robotiq85Gripper_iiwa_14)
+    register_gripper(Robotiq85Gripper_iiwa_14_longer_finger)
     register_robot_class_mapping("IIWA_14")
     register_robot_class_mapping("IIWA_14_modified")
+    register_robot_class_mapping("IIWA_14_modified_flange")
+    register_robot_class_mapping("IIWA_14_modified_flange_joint_limit")
     register_env(Lift_edit)
     register_env(Lift_4_objects)
 
