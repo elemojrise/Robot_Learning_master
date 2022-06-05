@@ -114,7 +114,7 @@ gymwrapper:
   smaller_action_space: True
   xyz_action_space: False
   rgbd: True
-  close_img: True
+  close_img: False
 
 wandb:
   project: "ludvik_final_tests"
