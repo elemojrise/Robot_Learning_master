@@ -233,3 +233,9 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         """
         # Dummy args used to mimic Wrapper interface
         return self.env.reward()
+
+# def add_noice(input):
+#     noice = 
+#         output = input + noice     # stochastic noice Search for function online
+
+#     return

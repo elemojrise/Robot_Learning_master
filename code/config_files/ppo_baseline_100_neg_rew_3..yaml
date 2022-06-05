@@ -1,12 +1,12 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_100_standard_test"
+wandb_filename: "ppo_baseline_100_neg_rew"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 10.0e+6 
-  num_procs: 1
+  total_timesteps: 2.0e+6 
+  num_procs: 48
   policy: 'PPO'
 
 learning_rate_schedular: 2
@@ -92,7 +92,7 @@ robosuite:
     control_delta: true
     interpolation: null
     ramp_ratio: 0.2
-  neg_rew: False
+  neg_rew: True
   
 wandb_callback:
   gradient_save_freq: 10000
@@ -102,8 +102,8 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 6144 
-  log_path: './logs_ppo_baseline_100_standard_test/' 
-  best_model_save_path: './logs_ppo_baseline_100_standard_test/'
+  log_path: './logs_ppo_baseline_100_neg_rew/' 
+  best_model_save_path: './logs_ppo_baseline_100_neg_rew_3/'
   deterministic: False
   render: False 
   verbose: 1 
@@ -114,7 +114,7 @@ gymwrapper:
   smaller_action_space: True
   xyz_action_space: False
   rgbd: True
-  close_img: False
+  close_img: True
 
 wandb:
   project: "ludvik_final_tests"
@@ -125,7 +125,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_baseline_100_standard_test"
+  save_model_filename: "ppo_baseline_100_neg_rew_3"
   # Loading of trained models
   load_model_folder: "trained_models"
-  load_model_filename: "ppo_baseline_100_standard"
+  load_model_filename: "ppo_baseline_100_rneg_rew_2"
