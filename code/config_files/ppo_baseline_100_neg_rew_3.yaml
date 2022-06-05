@@ -128,4 +128,4 @@ file_handling:
   save_model_filename: "ppo_baseline_100_neg_rew_3"
   # Loading of trained models
   load_model_folder: "trained_models"
-  load_model_filename: "ppo_baseline_100_rneg_rew_2"
+  load_model_filename: "ppo_baseline_100_neg_rew_2"
