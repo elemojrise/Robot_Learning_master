@@ -53,7 +53,9 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
             action = model.predict(obs)
             obs, reward, done, info = env.step(action)
             if reward == 1:
+                print("highest_reward")
                 highest_reward = 1
+            print(reward)
             reward_plot.append(env.get_original_reward())
             step_plot.append(i)
             frame = obs["custom_image_rgbd"][0,:,:,:3]
