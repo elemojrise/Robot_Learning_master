@@ -52,10 +52,10 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
 
             action = model.predict(obs)
             obs, reward, done, info = env.step(action)
+            real_reward = env.get_original_reward()
             if reward == 1:
-                print("highest_reward")
                 highest_reward = 1
-            print(reward)
+            
             reward_plot.append(env.get_original_reward())
             step_plot.append(i)
             frame = obs["custom_image_rgbd"][0,:,:,:3]
@@ -215,6 +215,7 @@ if __name__ == '__main__':
         model = SAC.load(load_model_path, env=env)
         
     env.training = False
+
 
     num_episodes = int(input("How many epsiodes do you want to record?   "))
     name_of_video_file = input("What should video file be called?   ") 
