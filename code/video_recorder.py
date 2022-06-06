@@ -41,6 +41,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
     # create a video writer with imageio
     os.mkdir(name_of_video_file)
     writer = imageio.get_writer(name_of_video_file + "/video.mp4", fps=fps)
+    success_count = 0
 
     for j in range(num_episodes):
         obs = env.reset()
@@ -50,6 +51,8 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
 
             action = model.predict(obs)
             obs, reward, done, info = env.step(action)
+            if reward == 1:
+                highest_reward = 1
             reward_plot.append(env.get_original_reward())
             step_plot.append(i)
             frame = obs["custom_image_rgbd"][0,:,:,:3]
@@ -67,6 +70,9 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
                 plt.savefig(name_of_video_file + "/plot_" + str(j+1))
                 plt.clf()
                 break
+        if highest_reward == 1:
+            success_count += 1
+    print("Sucsess rate", success_count/num_episodes)
 
     writer.close()
 
