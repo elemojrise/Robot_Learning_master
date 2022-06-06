@@ -111,6 +111,7 @@ if __name__ == '__main__':
         env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
+    neg_rew = env_options['neg_rew']
 
     #normalize obs and rew
     normalize_obs = config['normalize_obs']
@@ -138,13 +139,21 @@ if __name__ == '__main__':
     policy = sb_config['policy']
 
 
-
     messages_to_wand_callback = config["wandb_callback"]
     messages_to_eval_callback = config["eval_callback"]
 
     # Settings for stable-baselines policy
     policy_kwargs = config["sb_policy"]
     policy_type = policy_kwargs.pop("type")
+
+    #Implementing learning rate schedular if 
+    if config["learning_rate_schedular"] == 1:
+        policy_kwargs["learning_rate"] = linear_schedule_1(policy_kwargs["learning_rate"])
+    elif config["learning_rate_schedular"] == 2:
+        policy_kwargs["learning_rate"] = linear_schedule_2(policy_kwargs["learning_rate"])
+    
+
+
 
     #Implementing custom feature extractor
     if policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'large':
