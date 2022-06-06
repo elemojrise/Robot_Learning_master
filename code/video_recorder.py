@@ -47,6 +47,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
         obs = env.reset()
         reward_plot = []
         step_plot = []
+        highest_reward = 0
         for i in range(video_length+10):
 
             action = model.predict(obs)
