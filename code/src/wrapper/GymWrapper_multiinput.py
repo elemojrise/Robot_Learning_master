@@ -12,7 +12,7 @@ from robosuite.utils.camera_utils import get_real_depth_map
 from stable_baselines3.common.preprocessing import get_flattened_obs_dim, is_image_space
 
 
-class GymWrapper_multiinput_RGBD(Wrapper, Env):
+class GymWrapper_multiinput(Wrapper, Env):
     """
     Initializes the Gym wrapper. Mimics many of the required functionalities of the Wrapper class
     found in the gym.core module
