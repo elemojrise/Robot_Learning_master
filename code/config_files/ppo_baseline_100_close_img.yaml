@@ -93,6 +93,7 @@ robosuite:
     interpolation: null
     ramp_ratio: 0.2
   neg_rew: False
+  use_rgbd: True
   
 wandb_callback:
   gradient_save_freq: 10000

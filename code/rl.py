@@ -64,6 +64,8 @@ if __name__ == '__main__':
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
     neg_rew = env_options['neg_rew']
+    use_rgbd = env_options['use_rgbd']
+    env_options.pop('use_rgbd')
 
     #normalize obs and rew
     normalize_obs = config['normalize_obs']
@@ -81,7 +83,6 @@ if __name__ == '__main__':
     obs_list = obs_config["observations"] 
     smaller_action_space = obs_config["smaller_action_space"]
     xyz_action_space = obs_config["xyz_action_space"]
-    use_rgbd = obs_config['rgbd']
     close_img = obs_config['close_img']
 
     # Settings for stable-baselines RL algorithm
@@ -141,7 +142,7 @@ if __name__ == '__main__':
     print("making")
     
     #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
-    env = make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, neg_rew, num_procs)
+    env = make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, neg_rew, num_procs)
     env = VecTransposeImage(SubprocVecEnv(env))
 
 

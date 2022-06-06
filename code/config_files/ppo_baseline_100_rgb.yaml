@@ -1,15 +1,15 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_100_standard"
+wandb_filename: "ppo_baseline_100_rgb"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 5.0e+6 
+  total_timesteps: 10.0e+6 
   num_procs: 48
   policy: 'PPO'
 
-learning_rate_schedular: 2
+learning_rate_schedular: 1
 
 
 # Settings for normalization
@@ -51,7 +51,7 @@ sb_policy:
         vf: 
         - 300
         - 200    # Value function network
-  
+
 
 # Specify environment
 robosuite:
@@ -93,8 +93,8 @@ robosuite:
     control_delta: true
     interpolation: null
     ramp_ratio: 0.2
-  use_rgbd: True
-  neg_rew: True
+  neg_rew: False
+  use_rgbd: False
   
 wandb_callback:
   gradient_save_freq: 10000
@@ -104,17 +104,18 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 6144 
-  log_path: './logs_ppo_baseline_100_standard/' 
-  best_model_save_path: './logs_ppo_baseline_100_standard_2/'
+  log_path: './logs_ppo_baseline_100_rgb/' 
+  best_model_save_path: './logs_ppo_baseline_100_rgb/'
   deterministic: False
   render: False 
   verbose: 1 
   warn: True
 
 gymwrapper:
-  observations: ["custom_image_rgbd",'robot0_eef_pos', 'gripper_status']
+  observations: ["custom_image",'robot0_eef_pos', 'gripper_status']
   smaller_action_space: True
   xyz_action_space: False
+  rgbd: True
   close_img: False
 
 wandb:
@@ -126,7 +127,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_baseline_100_standard_2"
+  save_model_filename: "ppo_baseline_100_rgb"
   # Loading of trained models
   load_model_folder: "trained_models"
-  load_model_filename: "ppo_baseline_100_standard"
+  load_model_filename: Null
