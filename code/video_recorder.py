@@ -53,7 +53,8 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
             action = model.predict(obs)
             obs, reward, done, info = env.step(action)
             real_reward = env.get_original_reward()
-            if reward == 1:
+            print(real_reward)
+            if real_reward == 1:
                 highest_reward = 1
             
             reward_plot.append(env.get_original_reward())
@@ -74,6 +75,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
                 plt.clf()
                 break
         if highest_reward == 1:
+            print("counted")
             success_count += 1
     print("Sucsess rate", success_count/num_episodes)
 
