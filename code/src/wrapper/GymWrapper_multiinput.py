@@ -119,9 +119,9 @@ class GymWrapper_multiinput(Wrapper, Env):
                 from PIL import Image
             
                 if self.close_img:
-                    rgb_array = obs_dict["key"][:65,23:177,:]  
+                    rgb_array = obs_dict[key][:65,23:177,:]  
                 else:
-                    rgb_array = obs_dict["key"] 
+                    rgb_array = obs_dict[key] 
                 
                 ob_lst[key] = rgb_array
 
