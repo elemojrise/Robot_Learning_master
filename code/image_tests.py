@@ -1,13 +1,14 @@
+
+
+from PIL import Image
+
 from email import policy
 from locale import normalize
-from tokenize import PlainToken
 from unicodedata import name
 import numpy as np
 import robosuite as suite
 import os
 import yaml
-
-from PIL import Image
 
 import wandb
 from wandb.integration.sb3 import WandbCallback
@@ -22,14 +23,14 @@ from stable_baselines3.common.vec_env.vec_normalize import VecNormalize
 from stable_baselines3.common.callbacks import CallbackList
 
 from src.callback.progresscallback import CustomEvalCallback
-from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green, Lift_edit_multiple_objects, Lift_edit_image
+from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green, Lift_edit_multiple_objects
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
-from src.helper_functions.wrap_env import make_multiprocess_env, make_env
+from src.helper_functions.wrap_env import make_multiprocess_env
 from src.helper_functions.camera_functions import adjust_width_of_image
-
-from src.helper_functions.customCombinedExtractor import LargeCombinedExtractor, CustomCombinedExtractor_object_obs
+from src.helper_functions.hyperparameters import linear_schedule_1,linear_schedule_2
+from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
 from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
 
@@ -50,10 +51,9 @@ if __name__ == '__main__':
     register_env(Lift_4_objects)
     register_env(Lift_edit_green)
     register_env(Lift_edit_multiple_objects)
-    register_env(Lift_edit_image)
 
-    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/ppo_baseline_100_close_img.yaml"
+    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    #yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -61,9 +61,9 @@ if __name__ == '__main__':
     with open(domain_yaml_file, 'r') as stream:
         domain_config = yaml.safe_load(stream)
 
-    #answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
-    #if answer != "y":
-    #    exit()
+    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
+    if answer != "y":
+         exit()
 
 
     # Environment specifications
@@ -72,6 +72,9 @@ if __name__ == '__main__':
         env_options["camera_widths"] = adjust_width_of_image(env_options["camera_heights"])
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
+    neg_rew = env_options['neg_rew']
+    use_rgbd = env_options['use_rgbd']
+    env_options.pop('use_rgbd')
 
     #normalize obs and rew
     normalize_obs = config['normalize_obs']
@@ -89,7 +92,7 @@ if __name__ == '__main__':
     obs_list = obs_config["observations"] 
     smaller_action_space = obs_config["smaller_action_space"]
     xyz_action_space = obs_config["xyz_action_space"]
-    use_rgbd = obs_config['rgbd']
+    close_img = obs_config['close_img']
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
@@ -97,18 +100,28 @@ if __name__ == '__main__':
     num_procs = sb_config["num_procs"]
     policy = sb_config['policy']
 
+
+    messages_to_wand_callback = config["wandb_callback"]
+    messages_to_eval_callback = config["eval_callback"]
+
     # Settings for stable-baselines policy
     policy_kwargs = config["sb_policy"]
     policy_type = policy_kwargs.pop("type")
 
-    #Eval callback
-    messages_to_eval_callback = config["eval_callback"]
+    #Implementing learning rate schedular if 
+    if config["learning_rate_schedular"] == 1:
+        policy_kwargs["learning_rate"] = linear_schedule_1(policy_kwargs["learning_rate"])
+    elif config["learning_rate_schedular"] == 2:
+        policy_kwargs["learning_rate"] = linear_schedule_2(policy_kwargs["learning_rate"])
     
+
+
+
     #Implementing custom feature extractor
     if policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'large':
         policy_kwargs["policy_kwargs"]["features_extractor_class"] = LargeCombinedExtractor
-    #elif policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'small':
-    #    policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
+    elif policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'small':
+        policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
     else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
 
     print(policy_kwargs["policy_kwargs"])
@@ -129,9 +142,18 @@ if __name__ == '__main__':
     training = config["training"]
     seed = config["seed"]
 
+    #Settings for wandb
+    wandb_settings = config["wandb"]
+    wandb_filename = config["wandb_filename"]
+
+    # RL pipeline
+    #Create ENV
     print("making")
     
-    env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
+    #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
+
+    env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew)
+    #env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
 
     import sys
     np.set_printoptions(threshold=sys.maxsize)
@@ -147,9 +169,10 @@ if __name__ == '__main__':
     #     print("robot joint position is", joint_pos)
     # # Setting up variables
     # joint_pos = obs['robot0_joint_pos']
-    image = obs['custom_image_rgbd']
-    frame_rgb = image[:,:,:3]
-    frame_d = image[:,:,3]
+    #image = obs['custom_image_rgbd']
+    image = obs['custom_image']
+    frame_rgb = image[:,:,:]
+    #frame_d = image[:,:,3]
     #np.save('robosuite_image.npy',image)
 
     #cropped_rgb = frame_rgb[:65,23:177,:]

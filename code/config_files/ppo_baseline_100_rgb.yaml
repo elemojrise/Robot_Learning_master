@@ -1,12 +1,12 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_100_rgb"
+wandb_filename: "ppo_baseline_100_rgb_2"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
   total_timesteps: 10.0e+6 
-  num_procs: 1
+  num_procs: 48
   policy: 'PPO'
 
 learning_rate_schedular: 1
