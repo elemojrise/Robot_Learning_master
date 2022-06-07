@@ -22,7 +22,7 @@ use_domain_rand: False
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
-  learning_rate: 0.00005 
+  learning_rate: 0.0001 
   n_steps: 3072
   batch_size: 512 
   n_epochs: 10 

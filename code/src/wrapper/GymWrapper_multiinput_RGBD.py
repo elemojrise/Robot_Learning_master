@@ -69,7 +69,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
             if "rgbd" in key:
                 low = 0
                 high = 255
-                dtype = np.uint16      ####Currently uint8
+                dtype = np.int16      ####Currently uint8
                 if self.close_img:
                     shape = (obs[self.env.camera_names[0]+"_image"][:65,23:177,:].shape)    
                 else:
@@ -137,8 +137,9 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 # rgb_img = np.squeeze(rgb_img, axis=2) 
                 # rgb_img = Image.fromarray(rgb_img)
                 # rgb_img.show()
-                depth_map = np.uint16(np.clip(real_depth_map*(65535/3), 0,65535))   #65535
 
+                depth_map = np.int16(np.clip(real_depth_map*(65535/6), 0, 32767))   #65535
+                
                 depth_array = depth_map
                 if self.close_img:
                     rgb_array = obs_dict[cam_name + "_image"][:65,23:177,:]  

@@ -204,13 +204,13 @@ if __name__ == '__main__':
     frame_rgb = image[:,:,:3]
     frame_d = image[:,:,3]
     noise_d = add_noise_func(frame_d)
-    frame_d = np.uint8(frame_d)
-    noise_d = np.uint8(noise_d)
     print(frame_d.shape)
     print(noise_d.shape)
 
     comp = frame_d - noise_d
     print(comp.shape)
+
+    print(frame_d)
 
     d_img = ndimage.rotate(comp, 180)
     d_img = Image.fromarray(d_img)
@@ -286,13 +286,13 @@ if __name__ == '__main__':
 
 
 
-
-#     import seaborn as sns
-#     import matplotlib.pyplot as plt
-#     fig, ax = plt.subplots(figsize=(20,5))  
-#     sns.heatmap(cropped_d, vmin = 88, vmax=110, annot=True, fmt='g')
-#     plt.show()
-#     plt.savefig('plot_d.png')
+    # cropped_d = ndimage.rotate(frame_d, 180)
+    # import seaborn as sns
+    # import matplotlib.pyplot as plt
+    # fig, ax = plt.subplots(figsize=(20,5))  
+    # sns.heatmap(cropped_d, annot=True, fmt='g')   # vmin, vmax
+    # plt.show()
+    # plt.savefig('plot_d.png')
 
 
 # Loop reseting env multiple times
