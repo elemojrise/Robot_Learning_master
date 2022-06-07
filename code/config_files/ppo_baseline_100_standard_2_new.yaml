@@ -1,7 +1,7 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_100_standard"
+wandb_filename: "ppo_baseline_100_standard_new"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
@@ -22,7 +22,7 @@ use_domain_rand: False
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
-  learning_rate: 0.0005 
+  learning_rate: 0.00005 
   n_steps: 1536
   batch_size: 512 
   n_epochs: 10 
@@ -104,8 +104,8 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 6144 
-  log_path: './logs_ppo_baseline_100_standard/' 
-  best_model_save_path: './logs_ppo_baseline_100_standard_2/'
+  log_path: './logs_ppo_baseline_100_standard_new/' 
+  best_model_save_path: './logs_ppo_baseline_100_standard_2_new/'
   deterministic: False
   render: False 
   verbose: 1 
