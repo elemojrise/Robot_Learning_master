@@ -27,7 +27,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         AssertionError: [Object observations must be enabled if no keys]
     """
 
-    def __init__(self, env, keys=None, smaller_action_space = False, xyz_action_space = False, close_img = False, neg_rew = False):
+    def __init__(self, env, keys=None, smaller_action_space = False, xyz_action_space = False, close_img = False, neg_rew = False, add_noise = False):
         # Run super method
         super().__init__(env=env)
         # Create name for gym
@@ -42,6 +42,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         self.xyz_action_space = xyz_action_space
         self.close_img = close_img
         self.neg_rew = neg_rew
+        self.add_noise = add_noise
         
 
         assert keys is not None, (
@@ -68,7 +69,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
             if "rgbd" in key:
                 low = 0
                 high = 255
-                dtype = np.uint8      ####Currently uint8
+                dtype = np.uint16      ####Currently uint8
                 if self.close_img:
                     shape = (obs[self.env.camera_names[0]+"_image"][:65,23:177,:].shape)    
                 else:
@@ -125,13 +126,18 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                     depth_array_normalized = obs_dict[cam_name +"_depth"][:65,23:177,:]         
                 else:
                     depth_array_normalized = obs_dict[cam_name +"_depth"]
-                depth_map = np.uint8(np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(255/3), 0,255))   ## maps from 0-3 to 0-255 and cuts all values over 255
+
+                real_depth_map = get_real_depth_map(self.sim, depth_array_normalized)
+                if self.add_noise:
+                    real_depth_map = add_noise_func(real_depth_map)
+
+                #depth_map = np.uint8(np.clip(real_depth_map*(255/3), 0,255))
                 # print(depth_map.shape)
                 # rgb_img = ndimage.rotate(depth_map, 180)
                 # rgb_img = np.squeeze(rgb_img, axis=2) 
                 # rgb_img = Image.fromarray(rgb_img)
                 # rgb_img.show()
-                # depth_map = np.clip(get_real_depth_map(self.sim, depth_array_normalized)*(65535/3), 0,65535).astype(np.uint16)   #65535
+                depth_map = np.uint16(np.clip(real_depth_map*(65535/3), 0,65535))   #65535
 
                 depth_array = depth_map
                 if self.close_img:
@@ -234,8 +240,23 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
         # Dummy args used to mimic Wrapper interface
         return self.env.reward()
 
-# def add_noice(input):
-#     noice = 
-#         output = input + noice     # stochastic noice Search for function online
+def add_precision_noice(input):
+    noice = np. random. normal(0, 0.000055, input.shape)
+    output = input + noice     # stochastic noice Search for function online
+    return output
 
-#     return
+def add_local_planarity_precision(input):
+    noice = np. random. normal(0, 0.000075, input.shape)
+    output = input + noice     # stochastic noice Search for function online
+    return output
+
+def add_global_planarity_precision(input):
+    noise = np. random. normal(0, 0.000160, 1)
+    output = input * noise     # stochastic noice Search for function online
+    return output
+
+def add_noise_func(input):
+    input = add_global_planarity_precision(input)
+    input = add_local_planarity_precision(input)
+    output = add_precision_noice(input)
+    return output

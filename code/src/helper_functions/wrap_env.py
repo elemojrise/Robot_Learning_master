@@ -17,13 +17,13 @@ from stable_baselines3.common.utils import set_random_seed
 
 
 
-def make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, neg_rew, num_procs):
+def make_multiprocess_env(add_noise, use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, neg_rew, num_procs):
 
-    multi_process_env = [make_env(use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]
+    multi_process_env = [make_env(add_noise, use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]
 
     return multi_process_env
 
-def make_env(use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, rank, seed=0, use_domain_rand=False, domain_rand_args=None):
+def make_env(add_noise, use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, rank, seed=0, use_domain_rand=False, domain_rand_args=None):
     """
     Utility function for multiprocessed env.
     :param env_id: (str) the environment ID
@@ -45,7 +45,7 @@ def make_env(use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smalle
 
         
         if use_rgbd:
-            env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew)
+            env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, add_noise)
         else:
             env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew)
         

@@ -27,7 +27,7 @@ from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green, Lift_ed
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
-from src.helper_functions.wrap_env import make_multiprocess_env
+from src.helper_functions.wrap_env import make_multiprocess_env, make_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 from src.helper_functions.hyperparameters import linear_schedule_1,linear_schedule_2
 from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
@@ -52,8 +52,8 @@ if __name__ == '__main__':
     register_env(Lift_edit_green)
     register_env(Lift_edit_multiple_objects)
 
-    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    #yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
+    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    yaml_file = "config_files/ppo_baseline_100_standard_domain_rand.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -93,6 +93,7 @@ if __name__ == '__main__':
     smaller_action_space = obs_config["smaller_action_space"]
     xyz_action_space = obs_config["xyz_action_space"]
     close_img = obs_config['close_img']
+    add_noise = obs_config['add_noise']
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
@@ -152,9 +153,13 @@ if __name__ == '__main__':
     
     #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
 
-    env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew)
-    #env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space)
-
+    #env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, use_rgbd, add_noise)
+    env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, add_noise)
+   # env = make_env(add_noise, use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, rank = 0, seed=0, use_domain_rand=False, domain_rand_args=None)
+    
+    
+    
+    
     import sys
     np.set_printoptions(threshold=sys.maxsize)
     from scipy import ndimage
@@ -170,9 +175,60 @@ if __name__ == '__main__':
     # # Setting up variables
     # joint_pos = obs['robot0_joint_pos']
     #image = obs['custom_image_rgbd']
-    image = obs['custom_image']
-    frame_rgb = image[:,:,:]
-    #frame_d = image[:,:,3]
+
+
+    def add_precision_noice(input):
+        noice = np. random. normal(0, 0.000055, input.shape)
+        output = input + noice     # stochastic noice Search for function online
+        return output
+
+    def add_local_planarity_precision(input):
+        noice = np. random. normal(0, 0.000075, input.shape)
+        output = input + noice     # stochastic noice Search for function online
+        return output
+
+    def add_global_planarity_precision(input):
+        noise = input * np. random. normal(0, 0.000160, 1)
+        output = input + noise     # stochastic noice Search for function online
+        return output
+
+    def add_noise_func(input):
+        input = add_global_planarity_precision(input)
+        input = add_local_planarity_precision(input)
+        output = add_precision_noice(input)
+        return output
+
+
+
+    image = obs['custom_image_rgbd']
+    frame_rgb = image[:,:,:3]
+    frame_d = image[:,:,3]
+    noise_d = add_noise_func(frame_d)
+    frame_d = np.uint8(frame_d)
+    noise_d = np.uint8(noise_d)
+    print(frame_d.shape)
+    print(noise_d.shape)
+
+    comp = frame_d - noise_d
+    print(comp.shape)
+
+    d_img = ndimage.rotate(comp, 180)
+    d_img = Image.fromarray(d_img)
+    d_img.save('comp.png') 
+   
+
+    d_img = ndimage.rotate(frame_d, 180)
+    d_img = Image.fromarray(d_img)
+    d_img.save('d.png')  
+
+
+    d_img = ndimage.rotate(noise_d, 180)
+    d_img = Image.fromarray(d_img)
+    d_img.save('noise.png') 
+
+    #comp = frame_d - noise_d
+    
+    
     #np.save('robosuite_image.npy',image)
 
     #cropped_rgb = frame_rgb[:65,23:177,:]
@@ -188,9 +244,13 @@ if __name__ == '__main__':
 
 #     #img.save('my.png')
 
-    rgb_img = ndimage.rotate(frame_rgb, 180)
-    rgb_img = Image.fromarray(rgb_img, 'RGB')
-    rgb_img.save('rgb.png')    
+    # d_img = ndimage.rotate(frame_d, 180)
+    # d_img = Image.fromarray(frame_d)
+    # d_img.save('d.png')   
+
+    # rgb_img = ndimage.rotate(frame_rgb, 180)
+    # rgb_img = Image.fromarray(rgb_img, 'RGB')
+    # rgb_img.save('rgb.png')    
     
 
 #     from stable_baselines3.common.env_checker import check_env
