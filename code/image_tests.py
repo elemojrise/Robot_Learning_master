@@ -1,4 +1,4 @@
-
+from robosuite.wrappers import DomainRandomizationWrapper
 
 from PIL import Image
 
@@ -53,17 +53,13 @@ if __name__ == '__main__':
     register_env(Lift_edit_multiple_objects)
 
     #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/ppo_baseline_100_standard_domain_rand.yaml"
+    yaml_file = "config_files/ppo_baseline_rgbd_domain.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
     domain_yaml_file = "config_files/domain_rand_args.yaml"
     with open(domain_yaml_file, 'r') as stream:
         domain_config = yaml.safe_load(stream)
-
-    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
-    if answer != "y":
-         exit()
 
 
     # Environment specifications
@@ -157,6 +153,10 @@ if __name__ == '__main__':
     env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, add_noise)
    # env = make_env(add_noise, use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, rank = 0, seed=0, use_domain_rand=False, domain_rand_args=None)
     
+    seed = np.random.randint(0,1000)
+    if use_domain_rand:
+        env = DomainRandomizationWrapper(env, seed= seed, **domain_rand_args)
+        
     
     
     
@@ -166,16 +166,12 @@ if __name__ == '__main__':
 
     obs = env.reset()
 
-    action = [0,0,0,0,0,0,0]
-    time = 0
+    action = [0,0,0,0,0]
+    time = 5
     # for i in range(time):
     #     obs,reward,done,info = env.step(action)
-    #     joint_pos = obs['robot0_joint_pos']
-    #     print("robot joint position is", joint_pos)
     # # Setting up variables
-    # joint_pos = obs['robot0_joint_pos']
-    #image = obs['custom_image_rgbd']
-
+    obs,reward,done,info = env.step(action)
 
     def add_precision_noice(input):
         noice = np. random. normal(0, 0.000055, input.shape)
@@ -203,28 +199,36 @@ if __name__ == '__main__':
     image = obs['custom_image_rgbd']
     frame_rgb = image[:,:,:3]
     frame_d = image[:,:,3]
-    noise_d = add_noise_func(frame_d)
-    print(frame_d.shape)
-    print(noise_d.shape)
 
-    comp = frame_d - noise_d
-    print(comp.shape)
-
-    print(frame_d)
-
-    d_img = ndimage.rotate(comp, 180)
-    d_img = Image.fromarray(d_img)
-    d_img.save('comp.png') 
-   
-
-    d_img = ndimage.rotate(frame_d, 180)
-    d_img = Image.fromarray(d_img)
-    d_img.save('d.png')  
+    obs = env.reset()
+    obs,reward,done,info = env.step(action)
+    image = obs['custom_image_rgbd']
+    frame_rgb = image[:,:,:3]
+    d_img = ndimage.rotate(frame_rgb, 180)
+    d_img = Image.fromarray(d_img,'RGB')
+    d_img.save('rgb.png')  
+    print(env.camera_modder.get_fovy('custom'))
 
 
-    d_img = ndimage.rotate(noise_d, 180)
-    d_img = Image.fromarray(d_img)
-    d_img.save('noise.png') 
+    obs = env.reset()
+    obs,reward,done,info = env.step(action)
+    image = obs['custom_image_rgbd']
+    frame_rgb = image[:,:,:3]
+    d_img = ndimage.rotate(frame_rgb, 180)
+    d_img = Image.fromarray(d_img,'RGB')
+    d_img.save('rgb2.png') 
+    print(env.camera_modder.get_fovy('custom'))
+
+    obs = env.reset()
+    obs,reward,done,info = env.step(action)
+    image = obs['custom_image_rgbd']
+    frame_rgb = image[:,:,:3]
+    d_img = ndimage.rotate(frame_rgb, 180)
+    d_img = Image.fromarray(d_img,'RGB')
+    d_img.save('rgb3.png') 
+    print(env.camera_modder.get_fovy('custom'))
+
+
 
     #comp = frame_d - noise_d
     
@@ -293,6 +297,7 @@ if __name__ == '__main__':
     # sns.heatmap(cropped_d, annot=True, fmt='g')   # vmin, vmax
     # plt.show()
     # plt.savefig('plot_d.png')
+    env.close()
 
 
 # Loop reseting env multiple times

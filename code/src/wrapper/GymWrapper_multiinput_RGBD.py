@@ -69,7 +69,7 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
             if "rgbd" in key:
                 low = 0
                 high = 255
-                dtype = np.int16      ####Currently uint8
+                dtype = np.uint8      ####Currently uint8   alt int16
                 if self.close_img:
                     shape = (obs[self.env.camera_names[0]+"_image"][:65,23:177,:].shape)    
                 else:
@@ -131,20 +131,22 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 if self.add_noise:
                     real_depth_map = add_noise_func(real_depth_map)
 
-                #depth_map = np.uint8(np.clip(real_depth_map*(255/3), 0,255))
+                depth_map = np.uint8(np.clip(real_depth_map*(255/3), 0,255))
                 # print(depth_map.shape)
                 # rgb_img = ndimage.rotate(depth_map, 180)
                 # rgb_img = np.squeeze(rgb_img, axis=2) 
                 # rgb_img = Image.fromarray(rgb_img)
                 # rgb_img.show()
 
-                depth_map = np.int16(np.clip(real_depth_map*(65535/6), 0, 32767))   #65535
+                #depth_map = np.int16(np.clip(real_depth_map*(65535/6), 0, 32767))   #65535
                 
                 depth_array = depth_map
                 if self.close_img:
                     rgb_array = obs_dict[cam_name + "_image"][:65,23:177,:]  
                 else:
-                    rgb_array = obs_dict[cam_name + "_image"] 
+                    rgb_array = obs_dict[cam_name + "_image"]
+                
+                
                 new_array = np.concatenate((rgb_array, depth_array), axis=-1)
 
                 ob_lst[key] = new_array
