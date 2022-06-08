@@ -17,7 +17,7 @@ normalize_obs: True
 normalize_rew: True
 norm_obs_keys: ['robot0_eef_pos', 'gripper_status']    #List of obs keys to normalize
 
-use_domain_rand: False
+use_domain_rand: True
 
 # Policy settings
 sb_policy:
