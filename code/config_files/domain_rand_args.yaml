@@ -42,7 +42,7 @@ domain_rand_args:
     
     # Body parameters
     body_names: ['table']           # all bodies randomized if null (None)
-    randomize_position: True
+    randomize_position: False
     randomize_quaternion: False
     randomize_inertia: False
     randomize_mass: False
