@@ -1,7 +1,7 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_rgbd_domain"
+wandb_filename: "ppo_baseline_rgbd_domain_tttest"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
@@ -44,6 +44,7 @@ sb_policy:
   policy_kwargs:
     features_extractor_class: 'small' 
     net_arch:
+
       - 260 
       - pi: 
         - 300

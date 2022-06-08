@@ -1,7 +1,7 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_rgb_domain"
+wandb_filename: "ppo_baseline_rgb_domain_tttttest"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
