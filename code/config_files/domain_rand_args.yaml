@@ -35,8 +35,8 @@ domain_rand_args:
     diffuse_perturbation_size: 0.3    #Light strength
   dynamics_randomization_args:  
     # Opt parameters
-    randomize_density: False
-    randomize_viscosity: False
+    randomize_density: True
+    randomize_viscosity: True
     density_perturbation_ratio: 0.05
     viscosity_perturbation_ratio: 0.1
     
@@ -54,8 +54,8 @@ domain_rand_args:
     # Geom parameters
     geom_names: null                  # all geoms randomized if null (None)
     randomize_friction: True
-    randomize_solref: False
-    randomize_solimp: False
+    randomize_solref: True
+    randomize_solimp: True
     friction_perturbation_ratio: 0.1
     solref_perturbation_ratio: 0.1
     solimp_perturbation_ratio: 0.1
