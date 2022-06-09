@@ -6,7 +6,7 @@ wandb_filename: "ppo_224_large"
 # Settings for stable-baselines RL algorithm
 sb_config:
   total_timesteps: 10.0e+6 
-  num_procs: 48
+  num_procs: 40
   policy: 'PPO'
 
 learning_rate_schedular: 1
