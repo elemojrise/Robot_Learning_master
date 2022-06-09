@@ -35,8 +35,8 @@ domain_rand_args:
     diffuse_perturbation_size: 0.3    #Light strength
   dynamics_randomization_args:  
     # Opt parameters
-    randomize_density: True
-    randomize_viscosity: True
+    randomize_density: False
+    randomize_viscosity: False
     density_perturbation_ratio: 0.05
     viscosity_perturbation_ratio: 0.1
     

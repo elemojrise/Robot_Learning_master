@@ -201,6 +201,12 @@ if __name__ == '__main__':
     num_procs = 1
     #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
 
+    if use_domain_rand:
+        turn_off = input("Do you want to turn off Domain Rand?   [y/n]")
+        if turn_off == "y":
+            use_domain_rand = False
+    
+    
     env = make_multiprocess_env(add_noise, use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, neg_rew, num_procs)
     env = SubprocVecEnv(env)
 
