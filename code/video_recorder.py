@@ -117,6 +117,8 @@ if __name__ == '__main__':
     env_options["custom_camera_trans_matrix"] = np.array(env_options["custom_camera_trans_matrix"])
     env_id = env_options.pop("env_id")
     neg_rew = env_options['neg_rew']
+    use_rgbd = env_options['use_rgbd']
+    env_options.pop('use_rgbd')
 
     #normalize obs and rew
     normalize_obs = config['normalize_obs']
@@ -134,8 +136,8 @@ if __name__ == '__main__':
     obs_list = obs_config["observations"] 
     smaller_action_space = obs_config["smaller_action_space"]
     xyz_action_space = obs_config["xyz_action_space"]
-    use_rgbd = obs_config['rgbd']
     close_img = obs_config['close_img']
+    add_noise = obs_config['add_noise']
 
     # Settings for stable-baselines RL algorithm
     sb_config = config["sb_config"]
@@ -176,8 +178,6 @@ if __name__ == '__main__':
     save_model_filename = file_handling["save_model_filename"]
     load_model_folder = file_handling["load_model_folder"]
     load_model_filename = file_handling["load_model_filename"]
-    best_model= config["eval_callback"]
-    best_model_save_path = best_model['best_model_save_path']
 
     # Join paths
     save_model_path = os.path.join(save_model_folder, save_model_filename)
