@@ -1,7 +1,7 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_rgbd_domain_teeest_3"
+wandb_filename: "ppo_224_large"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
@@ -44,7 +44,6 @@ sb_policy:
   policy_kwargs:wolfr
     features_extractor_class: 'large' 
     net_arch:
-
       - 512 
       - pi: 
         - 512
@@ -106,8 +105,8 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 6144 
-  log_path: './logs_ppo_baseline_rgbd_domain_test_3/' 
-  best_model_save_path: './logs_ppo_baseline_rgbd_domain_test_3'
+  log_path: './logs_ppo_224_large/' 
+  best_model_save_path: './logs_ppo_224_large'
   deterministic: False
   render: False 
   verbose: 1 
@@ -129,7 +128,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_baseline_rgbd_domain_test_3"
+  save_model_filename: "ppo_224_large"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: Null
