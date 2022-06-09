@@ -183,6 +183,10 @@ if __name__ == '__main__':
     save_model_path = os.path.join(save_model_folder, save_model_filename)
     save_vecnormalize_path = os.path.join(save_model_folder, 'vec_normalize_' + save_model_filename + '.pkl')
 
+    # Join paths
+    save_model_path = os.path.join(save_model_folder, save_model_filename)
+    save_vecnormalize_path = os.path.join(save_model_folder, 'vec_normalize_' + save_model_filename + '.pkl')
+
     # Settings for pipeline
     training = config["training"]
     seed = config["seed"]
@@ -197,9 +201,12 @@ if __name__ == '__main__':
     num_procs = 1
     #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
 
-    env = make_multiprocess_env(env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, neg_rew, num_procs)
+    env = make_multiprocess_env(add_noise, use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, neg_rew, num_procs)
     env = SubprocVecEnv(env)
 
+
+    best_model= config["eval_callback"]
+    best_model_save_path = best_model['best_model_save_path']
     load_model_path = os.path.join(best_model_save_path, 'best_model.zip')
     load_vecnormalize_path = os.path.join(best_model_save_path, 'vec_normalize_best_model.pkl')
 
