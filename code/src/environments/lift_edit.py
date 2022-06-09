@@ -278,7 +278,6 @@ class Lift_edit(SingleArmEnv):
             cube_pos = self.sim.data.body_xpos[self.cube_body_id]
             gripper_site_pos = self.sim.data.site_xpos[self.robots[0].eef_site_id]
             dist = np.linalg.norm(gripper_site_pos - cube_pos)
-            print(dist)
             reaching_reward = (1 - np.tanh(10.0 * dist))*0.5
             reward += reaching_reward
 
