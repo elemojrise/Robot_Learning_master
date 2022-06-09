@@ -1,7 +1,7 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_baseline_rgbd_domain"
+wandb_filename: "ppo_baseline_rgbd_domain_teeest"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
@@ -105,8 +105,8 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 6144 
-  log_path: './logs_ppo_baseline_rgbd_domain/' 
-  best_model_save_path: './logs_ppo_baseline_rgbd_domain'
+  log_path: './logs_ppo_baseline_rgbd_domain_test/' 
+  best_model_save_path: './logs_ppo_baseline_rgbd_domain_test'
   deterministic: False
   render: False 
   verbose: 1 
@@ -128,7 +128,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_baseline_rgbd_domain"
+  save_model_filename: "ppo_baseline_rgbd_domain_test"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: Null
