@@ -41,9 +41,10 @@ sb_policy:
   seed: null
   device: 'auto' 
   _init_setup_model: True
-  policy_kwargs:wolfr
+  policy_kwargs:
     features_extractor_class: 'large' 
     net_arch:
+
       - 512 
       - pi: 
         - 512
