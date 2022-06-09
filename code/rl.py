@@ -70,6 +70,7 @@ if __name__ == '__main__':
     domain_yaml_file = "config_files/" + env_options['domain_arg_yaml']
     with open(domain_yaml_file, 'r') as stream:
         domain_config = yaml.safe_load(stream)
+    env_options.pop('domain_arg_yaml')
 
     #normalize obs and rew
     normalize_obs = config['normalize_obs']
