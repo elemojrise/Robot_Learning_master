@@ -81,8 +81,6 @@ class LargeCNN(BaseFeaturesExtractor):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size = 3, stride = 2),
             nn.Flatten(),
-
-
         )
 
         # Compute shape by doing one forward pass
