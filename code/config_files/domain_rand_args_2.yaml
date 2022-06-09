@@ -3,12 +3,12 @@ domain_rand_args:
   randomize_color: True
   randomize_camera: True
   randomize_lighting: True
-  randomize_dynamics: True
+  randomize_dynamics: False
   color_randomization_args:
     geom_names:  null                 # all geoms are randomized if null (None)
-    randomize_local: False             # sample nearby colors
+    randomize_local: True             # sample nearby colors
     randomize_material: True          # randomize material reflectance / shininess / specular
-    local_rgb_interpolation: 0
+    local_rgb_interpolation: 0.5
     local_material_interpolation: 0.5
     texture_variations: ['rgb', 'checker', 'noise', 'gradient'] # all texture variation types
     randomize_skybox: True            # by default, randomize skybox too
@@ -53,9 +53,9 @@ domain_rand_args:
 
     # Geom parameters
     geom_names: null                  # all geoms randomized if null (None)
-    randomize_friction: False
-    randomize_solref: False
-    randomize_solimp: False
+    randomize_friction: True
+    randomize_solref: True
+    randomize_solimp: True
     friction_perturbation_ratio: 0.1
     solref_perturbation_ratio: 0.1
     solimp_perturbation_ratio: 0.1
