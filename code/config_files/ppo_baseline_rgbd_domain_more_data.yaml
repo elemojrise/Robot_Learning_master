@@ -129,7 +129,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_baseline_rgbd_domain_test_3"
+  save_model_filename: "exe"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: Null
