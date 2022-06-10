@@ -5,7 +5,7 @@ wandb_filename: "ppo_rgbd_domain_data"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 10.0e+6 
+  total_timesteps: 30.0e+6 
   num_procs: 48
   policy: 'PPO'
 
