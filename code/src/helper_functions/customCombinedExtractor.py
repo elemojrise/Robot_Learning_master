@@ -53,7 +53,7 @@ class CustomCombinedExtractor(BaseFeaturesExtractor):
                 to_extractor = to_extractor.unsqueeze(1)
             encoded_tensor_list.append(extractor(to_extractor))
         
-        """Trying to implement LSTM"""
+        """Trying to implement LSTM This is not used during training"""
         before_LSTM = th.cat(encoded_tensor_list, dim=1)
         before_LSTM = before_LSTM.unsqueeze(0)
         end_feature_extract, _ = self.rnn_stem(before_LSTM, None)
