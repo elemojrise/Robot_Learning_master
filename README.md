@@ -1,8 +1,12 @@
 # Robot_Learning_master
-Master repository for robot learning with Petter Rasmussen and Ole Jørgen Rise
+This repository is used in master thesis for Petter Rasmussen and Ole Jørgen Rise.
 
+The overarching goal of this framework is to make a robot manipulator able to automatically grasp objects with the use of vision-based deep reinforcement learning.
 
-## How to train on Idun
+## Installation
+The framework has been tested to run with Ubuntu20.04, python3.8. mujoco-py 2.1.2.14 robosuite 1.3.2 and stable_baselines3 1.5.0
+
+## Train on Idun
 
 ### Get custom made .sif file
 If you already have a custom made .sif file jump straight to
@@ -31,4 +35,6 @@ In the %files section remember to change to your local path to the file you want
 4) Run: pip install -r requirements.txt
 5) You are now able to train your robots with mujoco environment good luck
 
+## Train and run an RL agent
+It is made possible to train an RL agent to perform the robot grasp task with the identical robot at the MANULAB NTNU. The framework has been integrated with the PPO algorithm from Stable_Baselines3. Different controller and training setting can be specified in a .yaml file located '''config_files'''
 
