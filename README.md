@@ -36,5 +36,5 @@ In the %files section remember to change to your local path to the file you want
 5) You are now able to train your robots with mujoco environment good luck
 
 ## Train and run an RL agent
-It is made possible to train an RL agent to perform the robot grasp task with the identical robot at the MANULAB NTNU. The framework has been integrated with the PPO algorithm from Stable_Baselines3. Different controller and training setting can be specified in a .yaml file located '''config_files'''
+It is made possible to train an RL agent to perform the robot grasp task with the identical robot at the MANULAB NTNU. The framework has been integrated with the PPO algorithm from Stable_Baselines3. Different controller and training setting can be specified in a .yaml file located ''' config_files '''
 
