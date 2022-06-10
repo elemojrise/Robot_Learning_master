@@ -1,7 +1,7 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_224_large"
+wandb_filename: "ppo_224_large_new"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
@@ -106,8 +106,8 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 6144 
-  log_path: './logs_ppo_224_large/' 
-  best_model_save_path: './logs_ppo_224_large'
+  log_path: './logs_ppo_224_large_new/' 
+  best_model_save_path: './logs_ppo_224_large_new'
   deterministic: False
   render: False 
   verbose: 1 
