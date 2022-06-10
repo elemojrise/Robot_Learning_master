@@ -105,7 +105,7 @@ wandb_callback:
 eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
-  eval_freq: 6144 
+  eval_freq: 24576 
   log_path: './logs_ppo_baseline_rgbd_domain_test_3/' 
   best_model_save_path: './logs_ppo_baseline_rgbd_domain_test_3_2'
   deterministic: False
