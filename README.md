@@ -38,9 +38,9 @@ In the %files section remember to change to your local path to the file you want
 ## Train and run an RL agent
 It is made possible to train an RL agent to perform the robot grasp task with the identical robot at the MANULAB NTNU. The framework has been integrated with the PPO algorithm from Stable_Baselines3. Different controller and training setting can be specified in a **.yaml** file located **config_files**. 
 
-To train (or run) an agent run the following code:
+To train an agent run the following code:
 
 ```
 python3 rl_new.py
 ```
-
+wether to train a new agent or continue training an alerady existing model is specified in the **.yaml** file.
