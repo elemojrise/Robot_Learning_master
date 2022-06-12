@@ -152,7 +152,7 @@ class MediumCNN(BaseFeaturesExtractor):
         )
         n_input_channels = observation_space.shape[0]
         self.cnn = nn.Sequential(
-            nn.Conv2d(n_input_channels,32, kernel_size=7, stride=2, padding=3, bias= False),
+            nn.Conv2d(n_input_channels,32, kernel_size=7, stride=2, padding=3, bias = False),
             nn.BatchNorm2d(num_features=32),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size = 3, stride = 2),

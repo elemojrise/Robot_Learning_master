@@ -26,7 +26,7 @@ from src.helper_functions.register_new_models import register_gripper, register_
 from src.helper_functions.wrap_env import make_multiprocess_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 from src.helper_functions.hyperparameters import linear_schedule_1,linear_schedule_2
-from src.helper_functions.customCombinedExtractor import MediumCombinedExtractor, CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
+from src.helper_functions.customCombinedExtractor import MediumCombinedExtractor,CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
 from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
 if __name__ == '__main__':
@@ -216,7 +216,7 @@ if __name__ == '__main__':
     eval_callback = CustomEvalCallback(env, **messages_to_eval_callback)
     callback = CallbackList([wandb_callback, eval_callback])
     
-    env.rend
+
     model.lr_schedule = policy_kwargs["learning_rate"]
     
     model.learn(total_timesteps=training_timesteps, callback=callback, reset_num_timesteps=False)
