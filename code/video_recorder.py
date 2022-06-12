@@ -83,7 +83,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
 
 
 if __name__ == '__main__':
-        register_robot(IIWA_14_modified)
+    register_robot(IIWA_14_modified)
     register_robot(IIWA_14)
     register_robot(IIWA_14_modified_flange)
     register_gripper(Robotiq85Gripper_iiwa_14)
