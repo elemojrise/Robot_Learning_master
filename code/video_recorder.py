@@ -83,7 +83,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
 
 
 if __name__ == '__main__':
-    register_robot(IIWA_14_modified)
+        register_robot(IIWA_14_modified)
     register_robot(IIWA_14)
     register_robot(IIWA_14_modified_flange)
     register_gripper(Robotiq85Gripper_iiwa_14)
@@ -101,9 +101,8 @@ if __name__ == '__main__':
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
-    domain_yaml_file = "config_files/domain_rand_args.yaml"
-    with open(domain_yaml_file, 'r') as stream:
-        domain_config = yaml.safe_load(stream)
+
+
 
     answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
     if answer != "y":
@@ -119,6 +118,12 @@ if __name__ == '__main__':
     neg_rew = env_options['neg_rew']
     use_rgbd = env_options['use_rgbd']
     env_options.pop('use_rgbd')
+
+
+    domain_yaml_file = "config_files/" + env_options['domain_arg_yaml']
+    with open(domain_yaml_file, 'r') as stream:
+        domain_config = yaml.safe_load(stream)
+    env_options.pop('domain_arg_yaml')
 
     #normalize obs and rew
     normalize_obs = config['normalize_obs']

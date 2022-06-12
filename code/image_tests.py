@@ -52,8 +52,9 @@ if __name__ == '__main__':
     register_env(Lift_edit_green)
     register_env(Lift_edit_multiple_objects)
 
-    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/ppo_baseline_rgbd_domain.yaml"
+
+    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    #yaml_file = "config_files/ppo_baseline_rgbd_domain.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
@@ -148,9 +149,10 @@ if __name__ == '__main__':
     print("making")
     
     #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
-
+    # from robosuite.renderers import load_renderer_config
+    # ren_config = load_renderer_config("igibson")
     #env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, use_rgbd, add_noise)
-    env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, add_noise)
+    env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options, renderer_config=config), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, add_noise)
    # env = make_env(add_noise, use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, rank = 0, seed=0, use_domain_rand=False, domain_rand_args=None)
     
     seed = np.random.randint(0,1000)

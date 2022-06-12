@@ -214,7 +214,7 @@ if __name__ == '__main__':
     eval_callback = CustomEvalCallback(env, **messages_to_eval_callback)
     callback = CallbackList([wandb_callback, eval_callback])
     
-
+    env.rend
     model.lr_schedule = policy_kwargs["learning_rate"]
     
     model.learn(total_timesteps=training_timesteps, callback=callback, reset_num_timesteps=False)
