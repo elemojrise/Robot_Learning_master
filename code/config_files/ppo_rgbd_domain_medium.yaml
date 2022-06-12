@@ -23,8 +23,8 @@ use_domain_rand: True
 sb_policy:
   type: "MultiInputPolicy"
   learning_rate: 0.0001 
-  n_steps: 6144
-  batch_size: 1536
+  n_steps: 7372
+  batch_size: 1843
   n_epochs: 10 
   gamma: 0.99 
   gae_lambda: 0.95 
