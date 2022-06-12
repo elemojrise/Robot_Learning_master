@@ -26,7 +26,7 @@ from src.helper_functions.register_new_models import register_gripper, register_
 from src.helper_functions.wrap_env import make_multiprocess_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 from src.helper_functions.hyperparameters import linear_schedule_1,linear_schedule_2
-from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
+from src.helper_functions.customCombinedExtractor import MediumCombinedExtractor, CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
 from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
 if __name__ == '__main__':
@@ -119,6 +119,8 @@ if __name__ == '__main__':
         policy_kwargs["policy_kwargs"]["features_extractor_class"] = LargeCombinedExtractor
     elif policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'small':
         policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
+    elif policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'medium':
+        policy_kwargs["policy_kwargs"]["features_extractor_class"] = MediumCombinedExtractor
     else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
 
     print(policy_kwargs["policy_kwargs"])
