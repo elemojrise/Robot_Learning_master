@@ -97,7 +97,7 @@ class MediumCombinedExtractor(BaseFeaturesExtractor):
 
     def __init__(self, observation_space: gym.spaces.Dict, cnn_output_dim: int = 256):
         # TODO we do not know features-dim here before going over all the items, so put something there. This is dirty!
-        super(LargeCombinedExtractor, self).__init__(observation_space, features_dim=1)
+        super(MediumCombinedExtractor, self).__init__(observation_space, features_dim=1)
 
         extractors = {}
 
