@@ -139,7 +139,7 @@ class MediumCNN(BaseFeaturesExtractor):
     """
 
     def __init__(self, observation_space: gym.spaces.Box, features_dim: int = 256): #tror feature dim er det de refererer til som size
-        super(LargeCNN, self).__init__(observation_space, features_dim)
+        super(MediumCNN, self).__init__(observation_space, features_dim)
         # We assume CxHxW images (channels first)
         # Re-ordering will be done by pre-preprocessing or wrapper
         assert is_image_space(observation_space, check_channels=False), (
