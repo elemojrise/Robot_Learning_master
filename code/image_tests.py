@@ -29,8 +29,8 @@ from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
 from src.helper_functions.wrap_env import make_multiprocess_env, make_env
 from src.helper_functions.camera_functions import adjust_width_of_image
-from src.helper_functions.hyperparameters import linear_schedule_1,linear_schedule_2
-from src.helper_functions.customCombinedExtractor import CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
+from src.helper_functions.hyperparameters import linear_schedule_1,linear_schedule_2, linear_schedule_3
+from src.helper_functions.customCombinedExtractor import MediumCombinedExtractor ,CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
 from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
 
@@ -52,15 +52,17 @@ if __name__ == '__main__':
     register_env(Lift_edit_green)
     register_env(Lift_edit_multiple_objects)
 
-
     yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    #yaml_file = "config_files/ppo_baseline_rgbd_domain.yaml"
+    #yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
     
-    domain_yaml_file = "config_files/domain_rand_args.yaml"
-    with open(domain_yaml_file, 'r') as stream:
-        domain_config = yaml.safe_load(stream)
+
+
+
+    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
+    if answer != "y":
+         exit()
 
 
     # Environment specifications
@@ -72,6 +74,12 @@ if __name__ == '__main__':
     neg_rew = env_options['neg_rew']
     use_rgbd = env_options['use_rgbd']
     env_options.pop('use_rgbd')
+
+
+    domain_yaml_file = "config_files/" + env_options['domain_arg_yaml']
+    with open(domain_yaml_file, 'r') as stream:
+        domain_config = yaml.safe_load(stream)
+    env_options.pop('domain_arg_yaml')
 
     #normalize obs and rew
     normalize_obs = config['normalize_obs']
@@ -111,6 +119,8 @@ if __name__ == '__main__':
         policy_kwargs["learning_rate"] = linear_schedule_1(policy_kwargs["learning_rate"])
     elif config["learning_rate_schedular"] == 2:
         policy_kwargs["learning_rate"] = linear_schedule_2(policy_kwargs["learning_rate"])
+    elif config["learning_rate_schedular"] == 3:
+        policy_kwargs["learning_rate"] = linear_schedule_3(policy_kwargs["learning_rate"])
     
 
 
@@ -120,6 +130,8 @@ if __name__ == '__main__':
         policy_kwargs["policy_kwargs"]["features_extractor_class"] = LargeCombinedExtractor
     elif policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'small':
         policy_kwargs["policy_kwargs"]["features_extractor_class"] = CustomCombinedExtractor
+    elif policy_kwargs["policy_kwargs"]["features_extractor_class"] == 'medium':
+        policy_kwargs["policy_kwargs"]["features_extractor_class"] = MediumCombinedExtractor
     else: policy_kwargs["policy_kwargs"].pop("features_extractor_class")
 
     print(policy_kwargs["policy_kwargs"])

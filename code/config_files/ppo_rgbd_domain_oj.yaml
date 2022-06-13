@@ -5,8 +5,8 @@ wandb_filename: "ppo_rgbd_domain_oj"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 30.0e+6 
-  num_procs: 48
+  total_timesteps: 20.0e+6 
+  num_procs: 64
   policy: 'PPO'
 
 learning_rate_schedular: 1
@@ -23,8 +23,8 @@ use_domain_rand: True
 sb_policy:
   type: "MultiInputPolicy"
   learning_rate: 0.0001 
-  n_steps: 6144
-  batch_size: 1536
+  n_steps: 4608
+  batch_size: 2304
   n_epochs: 10 
   gamma: 0.99 
   gae_lambda: 0.95 
