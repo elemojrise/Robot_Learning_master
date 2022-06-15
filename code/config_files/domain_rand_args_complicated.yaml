@@ -1,0 +1,77 @@
+
+domain_rand_args:
+  randomize_color: True
+  randomize_camera: True
+  randomize_lighting: True
+  randomize_dynamics: True
+  color_randomization_args:
+    geom_names:  ['cube_g0','cube_g0_vis']                  # all geoms are randomized if null (None)
+    randomize_local: True             # sample nearby colors
+    randomize_material: True          # randomize material reflectance / shininess / specular
+    local_rgb_interpolation: 
+    local_material_interpolation: 0.5
+    texture_variations: ['rgb', 'checker', 'noise', 'gradient'] # all texture variation types
+    randomize_skybox: True            # by default, randomize skybox too
+  camera_randomization_args:
+    camera_names: null                # all cameras are randomized if null (None)
+    randomize_position: True
+    randomize_rotation: True
+    randomize_fovy: True
+    position_perturbation_size: 0.02
+    rotation_perturbation_size: 0.02
+    fovy_perturbation_size: 1.5
+  lighting_randomization_args:
+    light_names: null                 # all lights are randomized if null (None)
+    randomize_position: True
+    randomize_direction: True
+    randomize_specular: True
+    randomize_ambient: True
+    randomize_diffuse: True
+    randomize_active: True
+    position_perturbation_size: 0.4
+    direction_perturbation_size: 0.8
+    specular_perturbation_size: 0.4   #Degree of reflection
+    ambient_perturbation_size: 0.4    #Directional or ambient light
+    diffuse_perturbation_size: 0.4    #Light strength
+  dynamics_randomization_args:  
+    # Opt parameters
+    randomize_density: False
+    randomize_viscosity: False
+    density_perturbation_ratio: 0.05
+    viscosity_perturbation_ratio: 0.1
+    
+    # Body parameters
+    body_names: ['table']           # all bodies randomized if null (None)
+    randomize_position: True
+    randomize_quaternion: False
+    randomize_inertia: False
+    randomize_mass: False
+    position_perturbation_size: .0015
+    quaternion_perturbation_size: 0.003
+    inertia_perturbation_ratio: 0.002
+    mass_perturbation_ratio: 0.002
+
+    # Geom parameters
+    geom_names: null                  # all geoms randomized if null (None)
+    randomize_friction: True
+    randomize_solref: True
+    randomize_solimp: True
+    friction_perturbation_ratio: 0.1
+    solref_perturbation_ratio: 0.1
+    solimp_perturbation_ratio: 0.1
+
+    # Joint parameters
+    joint_names: null                 # all joints randomized if null (None)
+    randomize_stiffness: True
+    randomize_frictionloss: True
+    randomize_damping: True
+    randomize_armature: True
+    stiffness_perturbation_ratio: 0.1
+    frictionloss_perturbation_size: 0.05
+    damping_perturbation_size: 0.01
+    armature_perturbation_size: 0.01
+  randomize_on_reset: True
+  randomize_every_n_steps: 0         # Should be 0 when training. We do not wat to change the parameteres during an episode. Randomizes after the first step of an episode
+
+
+
