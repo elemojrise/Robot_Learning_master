@@ -6,7 +6,7 @@ domain_rand_args:
   randomize_dynamics: True
   color_randomization_args:
     geom_names:  ['cube_g0','cube_g0_vis']                  # all geoms are randomized if null (None)
-    randomize_local: True             # sample nearby colors
+    randomize_local: False             # sample nearby colors
     randomize_material: True          # randomize material reflectance / shininess / specular
     local_rgb_interpolation: 
     local_material_interpolation: 0.5
