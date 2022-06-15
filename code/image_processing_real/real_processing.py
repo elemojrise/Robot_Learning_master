@@ -33,7 +33,13 @@ if __name__ == '__main__':
 
     cut_d = cut_d(depth_image)
     print("image size", cut_d.shape)
-    Image.fromarray(cut_d).save("images/cut_d.png")
+
+    cut_d = change_size(cut_d, [100,100])
+
+    cut_d = imfill(cut_d)
+
+    
+    Image.fromarray(cut_d).save("images/cut_d_2.png")
 
     # Image.fromarray(depth_image).save("images/raw_d.png")
     # Image.fromarray(rgb_image).save("images/raw_rgb.png")

@@ -1,7 +1,3 @@
-from robosuite.wrappers import DomainRandomizationWrapper
-
-from PIL import Image
-
 from email import policy
 from locale import normalize
 from unicodedata import name
@@ -27,17 +23,12 @@ from src.environments import Lift_4_objects, Lift_edit, Lift_edit_green, Lift_ed
 from src.models.robots.manipulators.iiwa_14_robot import IIWA_14, IIWA_14_modified, IIWA_14_modified_flange
 from src.models.grippers.robotiq_85_iiwa_14_gripper import Robotiq85Gripper_iiwa_14, Robotiq85Gripper_iiwa_14_longer_finger
 from src.helper_functions.register_new_models import register_gripper, register_robot_class_mapping
-from src.helper_functions.wrap_env import make_multiprocess_env, make_env
+from src.helper_functions.wrap_env import make_multiprocess_env
 from src.helper_functions.camera_functions import adjust_width_of_image
 from src.helper_functions.hyperparameters import linear_schedule_1,linear_schedule_2, linear_schedule_3
-from src.helper_functions.customCombinedExtractor import MediumCombinedExtractor ,CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
+from src.helper_functions.customCombinedExtractor import MediumCombinedExtractor,CustomCombinedExtractor, LargeCombinedExtractor, CustomCombinedExtractor_object_obs
 from src.helper_functions.customCombinedSurreal import CustomCombinedSurreal
 
-
-
-#temp
-from src.wrapper.GymWrapper_multiinput_RGBD import GymWrapper_multiinput_RGBD
-from src.wrapper.GymWrapper_multiinput import GymWrapper_multiinput
 if __name__ == '__main__':
     register_robot(IIWA_14_modified)
     register_robot(IIWA_14)
@@ -52,17 +43,11 @@ if __name__ == '__main__':
     register_env(Lift_edit_green)
     register_env(Lift_edit_multiple_objects)
 
-    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    #yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
+    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    yaml_file = "config_files/ppo_rgbd_domain_4.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
-    
 
-
-
-    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
-    if answer != "y":
-         exit()
 
 
     # Environment specifications
@@ -159,160 +144,24 @@ if __name__ == '__main__':
     # RL pipeline
     #Create ENV
     print("making")
-    
+    num_procs = 1
     #env = VecTransposeImage(SubprocVecEnv([make_multiprocess_env(use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space,  i, seed, use_domain_rand=use_domain_rand, domain_rand_args=domain_rand_args) for i in range(num_procs)]))
-    # from robosuite.renderers import load_renderer_config
-    # ren_config = load_renderer_config("igibson")
-    #env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, use_rgbd, add_noise)
-    env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options, renderer_config=config), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, add_noise)
-   # env = make_env(add_noise, use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, rank = 0, seed=0, use_domain_rand=False, domain_rand_args=None)
-    
-    seed = np.random.randint(0,1000)
-    if use_domain_rand:
-        env = DomainRandomizationWrapper(env, seed= seed, **domain_rand_args)
-        
-    
-    
-    
-    import sys
-    np.set_printoptions(threshold=sys.maxsize)
+    env = make_multiprocess_env(add_noise, use_rgbd, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, seed, use_domain_rand, domain_rand_args, close_img, neg_rew, num_procs)
+    env = VecTransposeImage(SubprocVecEnv(env))
+
+
+    obs = env.reset()
+    from PIL import Image
     from scipy import ndimage
-
-    obs = env.reset()
-
-    action = [0,0,0,0,0]
-    time = 5
-    # for i in range(time):
-    #     obs,reward,done,info = env.step(action)
-    # # Setting up variables
-    obs,reward,done,info = env.step(action)
-
-    def add_precision_noice(input):
-        noice = np. random. normal(0, 0.000055, input.shape)
-        output = input + noice     # stochastic noice Search for function online
-        return output
-
-    def add_local_planarity_precision(input):
-        noice = np. random. normal(0, 0.000075, input.shape)
-        output = input + noice     # stochastic noice Search for function online
-        return output
-
-    def add_global_planarity_precision(input):
-        noise = input * np. random. normal(0, 0.000160, 1)
-        output = input + noise     # stochastic noice Search for function online
-        return output
-
-    def add_noise_func(input):
-        input = add_global_planarity_precision(input)
-        input = add_local_planarity_precision(input)
-        output = add_precision_noice(input)
-        return output
-
-
-
-    image = obs['custom_image_rgbd']
-    frame_rgb = image[:,:,:3]
-    frame_d = image[:,:,3]
-
-    obs = env.reset()
-    obs,reward,done,info = env.step(action)
-    image = obs['custom_image_rgbd']
-    frame_rgb = image[:,:,:3]
-    #d_img = ndimage.rotate(frame_rgb, 180)
-    d_img = frame_rgb
-    d_img = Image.fromarray(d_img,'RGB')
-    d_img.save('rgb.png')  
-    print(env.camera_modder.get_fovy('custom'))
-
-
-    obs = env.reset()
-    obs,reward,done,info = env.step(action)
-    image = obs['custom_image_rgbd']
-    frame_rgb = image[:,:,:3]
+    image = obs['custom_image_rgbd'][0]
+    print(image.shape)
+    frame_rgb = np.rollaxis(image,0,3)
+    frame_rgb = frame_rgb[:,:,:3]
     d_img = ndimage.rotate(frame_rgb, 180)
     d_img = Image.fromarray(d_img,'RGB')
-    d_img.save('rgb2.png') 
-    print(env.camera_modder.get_fovy('custom'))
+    d_img.save('rgb_test.png') 
 
-    obs = env.reset()
-    obs,reward,done,info = env.step(action)
-    image = obs['custom_image_rgbd']
-    frame_rgb = image[:,:,:3]
-    d_img = ndimage.rotate(frame_rgb, 180)
-    d_img = Image.fromarray(d_img,'RGB')
-    d_img.save('rgb3.png') 
-    print(env.camera_modder.get_fovy('custom'))
-
-
-
-    #comp = frame_d - noise_d
     
     
-    #np.save('robosuite_image.npy',image)
-
-    #cropped_rgb = frame_rgb[:65,23:177,:]
-
-    #print("robot joint position is", joint_pos)
-
-#     # crop image 
-#     # print nicely
-#     # see printing from machine learning
-#     #print(frame_rgb)
-
-#     #print(frame_d.shape)
-
-#     #img.save('my.png')
-
-    # d_img = ndimage.rotate(frame_d, 180)
-    # d_img = Image.fromarray(frame_d)
-    # d_img.save('d.png')   
-
-    # rgb_img = ndimage.rotate(frame_rgb, 180)
-    # rgb_img = Image.fromarray(rgb_img, 'RGB')
-    # rgb_img.save('rgb.png')    
     
-
-#     from stable_baselines3.common.env_checker import check_env
-#     from stable_baselines3.common.utils import obs_as_tensor
-#     #check_env(env)
-#     #obs_tens = obs_as_tensor(obs,model.device)
-#     #policy = model.policy
-#     #print(policy.extract_features(obs_tens))
-#     #print(model.policy)
-
-
-# # heat map plot
-    import sys
-    np.set_printoptions(threshold=sys.maxsize)
-    from scipy import ndimage
-
-#     cropped_d = frame_d[4:30,29:55]
-#     # #cropped_d = frame_d[4:14,45:55]
-#     cropped_d = ndimage.rotate(cropped_d, 180)
-
-#     # d_img = Image.fromarray(cropped_d)
-#     # d_img.save('d.png')
-#     # d_img.show()ndimage.rotate
-    
-
-#     frame_d = ndimage.rotate(frame_d, 180)
-#     frame_d = Image.fromarray(frame_d)
-#     frame_d.save('robosuite_d.png')
-
-#     frame_rgb = ndimage.rotate(frame_rgb, 180)
-#     frame_rgb = Image.fromarray(frame_rgb, 'RGB')
-#     frame_rgb.save('robosuite_rgb.png')
-
-
-
-    # cropped_d = ndimage.rotate(frame_d, 180)
-    # import seaborn as sns
-    # import matplotlib.pyplot as plt
-    # fig, ax = plt.subplots(figsize=(20,5))  
-    # sns.heatmap(cropped_d, annot=True, fmt='g')   # vmin, vmax
-    # plt.show()
-    # plt.savefig('plot_d.png')
     env.close()
-
-
-# Loop reseting env multiple times
