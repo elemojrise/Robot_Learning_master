@@ -62,10 +62,10 @@ domain_rand_args:
 
     # Joint parameters
     joint_names: null                 # all joints randomized if null (None)
-    randomize_stiffness: False
-    randomize_frictionloss: False
-    randomize_damping: False
-    randomize_armature: False
+    randomize_stiffness: True
+    randomize_frictionloss: True
+    randomize_damping: True
+    randomize_armature: True
     stiffness_perturbation_ratio: 0.1
     frictionloss_perturbation_size: 0.05
     damping_perturbation_size: 0.01
