@@ -52,7 +52,7 @@ domain_rand_args:
     mass_perturbation_ratio: 0.002
 
     # Geom parameters
-    geom_names: null                  # all geoms randomized if null (None)
+    geom_names: ['cube_g0']                  # all geoms randomized if null (None)
     randomize_friction: True
     randomize_solref: True
     randomize_solimp: True
