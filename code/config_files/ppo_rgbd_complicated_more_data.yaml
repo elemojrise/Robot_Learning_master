@@ -1,15 +1,15 @@
 seed: 3
 training: True   # Whether to train a model or not
 
-wandb_filename: "ppo_rgbd_complicated_medium"
+wandb_filename: "ppo_rgbd_complicated_more_data"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
   total_timesteps: 30.0e+6 
-  num_procs: 40
+  num_procs: 48
   policy: 'PPO'
 
-learning_rate_schedular: 3
+learning_rate_schedular: 1
 
 
 # Settings for normalization
@@ -23,8 +23,8 @@ use_domain_rand: True
 sb_policy:
   type: "MultiInputPolicy"
   learning_rate: 0.0001 
-  n_steps: 7372
-  batch_size: 1843
+  n_steps: 6144
+  batch_size: 3072
   n_epochs: 10 
   gamma: 0.99 
   gae_lambda: 0.95 
@@ -42,16 +42,15 @@ sb_policy:
   device: 'auto' 
   _init_setup_model: True
   policy_kwargs:
-    features_extractor_class: 'medium' 
+    features_extractor_class: 'small' 
     net_arch:
-
-      - 512 
+      - 260 
       - pi: 
-        - 512
-        - 256    # Custom actor network
+        - 300
+        - 200    # Custom actor network
         vf: 
-        - 512
-        - 256    # Value function network
+        - 300
+        - 200    # Value function network
   
 
 # Specify environment
@@ -106,8 +105,8 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 24576 
-  log_path: './logs_ppo_rgbd_complicated_medium/' 
-  best_model_save_path: './logs_ppo_rgbd_complicated_medium'
+  log_path: './logs_ppo_rgbd_complicated_more_data/' 
+  best_model_save_path: './logs_ppo_rgbd_complicated_more_data'
   deterministic: False
   render: False 
   verbose: 1 
@@ -129,7 +128,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_rgbd_complicated_medium"
+  save_model_filename: "ppo_rgbd_complicated_more_data"
   # Loading of trained models
   load_model_folder: "trained_models"
   load_model_filename: Null
