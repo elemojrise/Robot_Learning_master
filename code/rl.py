@@ -203,6 +203,10 @@ if __name__ == '__main__':
         # Load normalized env
         elif normalize_env == "load_file" and (normalize_obs or normalize_rew):
             env = VecNormalize.load(load_vecnormalize_path, env)
+        else:
+            "did not work"
+            stopp = str(input("Press ctrl c, and stop now"))
+            
 
         # Load model
         if policy == 'PPO':

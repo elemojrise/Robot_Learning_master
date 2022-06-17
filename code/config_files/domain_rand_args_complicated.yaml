@@ -53,9 +53,9 @@ domain_rand_args:
 
     # Geom parameters
     geom_names: null                  # all geoms randomized if null (None)
-    randomize_friction: False
-    randomize_solref: False
-    randomize_solimp: False
+    randomize_friction: True
+    randomize_solref: True
+    randomize_solimp: True
     friction_perturbation_ratio: 0.1
     solref_perturbation_ratio: 0.1
     solimp_perturbation_ratio: 0.1
