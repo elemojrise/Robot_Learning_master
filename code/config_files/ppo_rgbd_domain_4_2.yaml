@@ -106,7 +106,7 @@ eval_callback:
   callback_on_new_best: null
   n_eval_episodes: 100
   eval_freq: 24576 
-  log_path: './logs_ppo_rgbd_domain_4_2/' 
+  log_path: './logs_ppo_rgbd_domain_4/' 
   best_model_save_path: './logs_ppo_rgbd_domain_4_2'
   deterministic: False
   render: False 
@@ -131,5 +131,5 @@ file_handling:
   save_model_folder: "trained_models"
   save_model_filename: "ppo_rgbd_domain_4_2"
   # Loading of trained models
-  load_model_folder: "trained_models"
-  load_model_filename: "ppo_rgbd_domain_4"
+  load_model_folder: "logs_ppo_rgbd_domain_4"
+  load_model_filename: "best_model"
