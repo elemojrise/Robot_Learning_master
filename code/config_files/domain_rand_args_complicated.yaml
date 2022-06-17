@@ -3,7 +3,7 @@ domain_rand_args:
   randomize_color: True
   randomize_camera: True
   randomize_lighting: True
-  randomize_dynamics: False
+  randomize_dynamics: True
   color_randomization_args:
     geom_names:  ['cube_g0','cube_g0_vis']                  # all geoms are randomized if null (None)
     randomize_local: False             # sample nearby colors
@@ -53,9 +53,9 @@ domain_rand_args:
 
     # Geom parameters
     geom_names: null                  # all geoms randomized if null (None)
-    randomize_friction: True
-    randomize_solref: True
-    randomize_solimp: True
+    randomize_friction: False
+    randomize_solref: False
+    randomize_solimp: False
     friction_perturbation_ratio: 0.1
     solref_perturbation_ratio: 0.1
     solimp_perturbation_ratio: 0.1
