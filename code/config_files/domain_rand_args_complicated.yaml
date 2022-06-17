@@ -41,7 +41,7 @@ domain_rand_args:
     viscosity_perturbation_ratio: 0.1
     
     # Body parameters
-    body_names: null #['table']           # all bodies randomized if null (None)
+    body_names: ['table']           # all bodies randomized if null (None)
     randomize_position: False
     randomize_quaternion: False
     randomize_inertia: False
