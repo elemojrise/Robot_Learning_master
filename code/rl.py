@@ -227,7 +227,6 @@ if __name__ == '__main__':
     
     model.learn(total_timesteps=training_timesteps, callback=callback, reset_num_timesteps=False)
 
-    env._get_all_attributes()
     run.finish()
 
     # Save trained model

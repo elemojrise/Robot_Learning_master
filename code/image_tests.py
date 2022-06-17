@@ -56,13 +56,7 @@ if __name__ == '__main__':
     #yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
-    
 
-
-
-    answer = input("Have you dobbel checked if you are using the correct load and save files? \n  [y/n] ") 
-    if answer != "y":
-         exit()
 
 
     # Environment specifications
