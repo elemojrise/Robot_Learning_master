@@ -37,7 +37,7 @@ domain_rand_args:
     # Opt parameters
     randomize_density: False
     randomize_viscosity: False
-    density_perturbation_ratio: 0.05
+    density_perturbation_ratio: 0.06
     viscosity_perturbation_ratio: 0.1
     
     # Body parameters
