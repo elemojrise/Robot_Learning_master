@@ -3,7 +3,7 @@ domain_rand_args:
   randomize_color: True
   randomize_camera: True
   randomize_lighting: True
-  randomize_dynamics: True
+  randomize_dynamics: False
   color_randomization_args:
     geom_names:  ['cube_g0','cube_g0_vis']                  # all geoms are randomized if null (None)
     randomize_local: False             # sample nearby colors
