@@ -5,11 +5,11 @@ wandb_filename: "ppo_rgbd_complicated_larger_nett"
 
 # Settings for stable-baselines RL algorithm
 sb_config:
-  total_timesteps: 30.0e+6 
+  total_timesteps: 45.0e+6 
   num_procs: 40
   policy: 'PPO'
 
-learning_rate_schedular: 1
+learning_rate_schedular: 3
 
 
 # Settings for normalization
@@ -22,7 +22,7 @@ use_domain_rand: True
 # Policy settings
 sb_policy:
   type: "MultiInputPolicy"
-  learning_rate: 0.0001 
+  learning_rate: 0.0008 
   n_steps: 7372
   batch_size: 3686
   n_epochs: 10 
@@ -106,7 +106,7 @@ eval_callback:
   n_eval_episodes: 100
   eval_freq: 24576 
   log_path: './logs_ppo_rgbd_complicated_larger_nett/' 
-  best_model_save_path: './logs_ppo_rgbd_complicated_larger_nett'
+  best_model_save_path: './logs_ppo_rgbd_complicated_larger_nett_2'
   deterministic: False
   render: False 
   verbose: 1 
@@ -128,7 +128,7 @@ wandb:
 file_handling:
   # Logging with Tensorboard and saving trained models
   save_model_folder: "trained_models"
-  save_model_filename: "ppo_rgbd_complicated_larger_nett"
+  save_model_filename: "ppo_rgbd_complicated_larger_nett_2"
   # Loading of trained models
-  load_model_folder: "trained_models"
-  load_model_filename: Null
+  load_model_folder: "logs_ppo_rgbd_complicated_larger_nett"
+  load_model_filename: "best_model"
