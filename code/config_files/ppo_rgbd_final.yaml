@@ -115,7 +115,7 @@ eval_callback:
 gymwrapper:
   observations: ["custom_image_rgbd",'robot0_eef_pos', 'gripper_status']
   smaller_action_space: True
-  xyz_action_space: False
+  xyz_action_space: True
   close_img: False
   add_noise: False
 
