@@ -340,8 +340,8 @@ class Lift_edit_multiple_objects(SingleArmEnv):
             tex_attrib=tex_attrib,
             mat_attrib=mat_attrib,
         )
-        # self.objects.append( BoxObject(
-        #     name="cube",
+        # self.objects.append(BoxObject(
+        #     name="cube_ekstra",
         #     size_min= [0.019, 0.019, 0.019],  #[0.020] # [0.015, 0.015, 0.015],
         #     size_max=[0.021, 0.021, 0.021],  #[0.022] # [0.018, 0.018, 0.018])
         #     rgba=[1, 0, 0, 1],

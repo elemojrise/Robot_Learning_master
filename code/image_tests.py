@@ -52,8 +52,8 @@ if __name__ == '__main__':
     register_env(Lift_edit_green)
     register_env(Lift_edit_multiple_objects)
 
-    yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    #yaml_file = "config_files/sac_baseline_rgbd_uint8.yaml"
+    #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
+    yaml_file = "config_files/ppo_rgbd_final_multi.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
 
@@ -68,6 +68,7 @@ if __name__ == '__main__':
     neg_rew = env_options['neg_rew']
     use_rgbd = env_options['use_rgbd']
     env_options.pop('use_rgbd')
+    env_options.pop('neg_rew')
 
 
     domain_yaml_file = "config_files/" + env_options['domain_arg_yaml']
@@ -174,7 +175,7 @@ if __name__ == '__main__':
 
     obs = env.reset()
 
-    action = [0,0,0,0,0]
+    action = [0,0,0,0]
     time = 5
     # for i in range(time):
     #     obs,reward,done,info = env.step(action)
@@ -212,8 +213,7 @@ if __name__ == '__main__':
     obs,reward,done,info = env.step(action)
     image = obs['custom_image_rgbd']
     frame_rgb = image[:,:,:3]
-    #d_img = ndimage.rotate(frame_rgb, 180)
-    d_img = frame_rgb
+    d_img = ndimage.rotate(frame_rgb, 180)
     d_img = Image.fromarray(d_img,'RGB')
     d_img.save('rgb.png')  
     print(env.camera_modder.get_fovy('custom'))
@@ -306,7 +306,7 @@ if __name__ == '__main__':
     # sns.heatmap(cropped_d, annot=True, fmt='g')   # vmin, vmax
     # plt.show()
     # plt.savefig('plot_d.png')
-    env.close()
+    # env.close()
 
 
 # Loop reseting env multiple times

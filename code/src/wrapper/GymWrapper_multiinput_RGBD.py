@@ -130,7 +130,18 @@ class GymWrapper_multiinput_RGBD(Wrapper, Env):
                 real_depth_map = get_real_depth_map(self.sim, depth_array_normalized)
                 if self.add_noise:
                     real_depth_map = add_noise_func(real_depth_map)
+                
 
+                # cropped_d = np.clip(real_depth_map*(255/3), 0,255)
+                # cropped_d = ndimage.rotate(cropped_d[:,:,0], 180)
+                # import seaborn as sns
+                # import matplotlib.pyplot as plt
+                # fig, ax = plt.subplots(figsize=(20,5))  
+                # sns.heatmap(cropped_d, annot=True, fmt='g')   # vmin, vmax
+                # plt.show()
+                # plt.savefig('plot_real.png')
+
+                
                 depth_map = np.uint8(np.clip(real_depth_map*(255/3), 0,255))
                 # print(depth_map.shape)
                 # rgb_img = ndimage.rotate(depth_map, 180)

@@ -1,0 +1,89 @@
+
+domain_rand_args:
+  randomize_color: True
+  randomize_camera: True
+  randomize_lighting: True
+  randomize_dynamics: True
+  color_randomization_args:
+    geom_names:  ['floor', 'wall_front1', 'table_visual', 'table_leg1_visual', 'table_leg2_visual', 'table_leg3_visual', 
+    'table_leg4_visual', 'Bottle_g0', 'Bottle_g1', 'Bottle_g1_visual', 'Can_g0', 'Can_g0_visual', 'Lemon_g0', 'Lemon_g0_visual', 
+    'Milk_g0', 'Milk_g0_visual', 'Bread_g0', 'Bread_g0_visual', 'Cereal_g0', 'Cereal_g0_visual', 'SquareNut_g0', 'SquareNut_g1', 
+    'SquareNut_g2', 'SquareNut_g3', 'SquareNut_g4', 'SquareNut_g0_visual', 'SquareNut_g1_visual', 'SquareNut_g2_visual', 
+    'SquareNut_g3_visual', 'SquareNut_g4_visual', 'RoundNut_g0', 'RoundNut_g1', 'RoundNut_g2', 'RoundNut_g3', 'RoundNut_g4', 
+    'RoundNut_g5', 'RoundNut_g6', 'RoundNut_g7', 'RoundNut_g8', 'RoundNut_g0_visual', 'RoundNut_g1_visual', 'RoundNut_g2_visual', 
+    'RoundNut_g3_visual', 'RoundNut_g4_visual', 'RoundNut_g5_visual', 'RoundNut_g6_visual', 'RoundNut_g7_visual', 'RoundNut_g8_visual']                  # all geoms are randomized if null (None)
+    randomize_local: False             # sample nearby colors
+    randomize_material: True          # randomize material reflectance / shininess / specular
+    local_rgb_interpolation: 
+    local_material_interpolation: 0.5
+    texture_variations: ['rgb', 'checker', 'noise', 'gradient'] # all texture variation types
+    randomize_skybox: True            # by default, randomize skybox too
+  camera_randomization_args:
+    camera_names: null                # all cameras are randomized if null (None)
+    randomize_position: True
+    randomize_rotation: True
+    randomize_fovy: True
+    position_perturbation_size: 0.02
+    rotation_perturbation_size: 0.02
+    fovy_perturbation_size: 1.5
+  lighting_randomization_args:
+    light_names: null                 # all lights are randomized if null (None)
+    randomize_position: True
+    randomize_direction: True
+    randomize_specular: True
+    randomize_ambient: True
+    randomize_diffuse: True
+    randomize_active: True
+    position_perturbation_size: 0.4
+    direction_perturbation_size: 0.8
+    specular_perturbation_size: 0.4   #Degree of reflection
+    ambient_perturbation_size: 0.4    #Directional or ambient light
+    diffuse_perturbation_size: 0.4    #Light strength
+  dynamics_randomization_args:  
+    # Opt parameters
+    randomize_density: False
+    randomize_viscosity: False
+    density_perturbation_ratio: 0.06
+    viscosity_perturbation_ratio: 0.1
+    
+    # Body parameters
+    body_names: ['table']           # all bodies randomized if null (None)
+    randomize_position: False
+    randomize_quaternion: False
+    randomize_inertia: False
+    randomize_mass: False
+    position_perturbation_size: .0015
+    quaternion_perturbation_size: 0.003
+    inertia_perturbation_ratio: 0.002
+    mass_perturbation_ratio: 0.002
+
+    # Geom parameters
+    geom_names: ['floor', 'wall_front1', 'table_visual', 'table_leg1_visual', 'table_leg2_visual', 'table_leg3_visual', 
+    'table_leg4_visual', 'Bottle_g0', 'Bottle_g1', 'Bottle_g1_visual', 'Can_g0', 'Can_g0_visual', 'Lemon_g0', 'Lemon_g0_visual', 
+    'Milk_g0', 'Milk_g0_visual', 'Bread_g0', 'Bread_g0_visual', 'Cereal_g0', 'Cereal_g0_visual', 'SquareNut_g0', 'SquareNut_g1', 
+    'SquareNut_g2', 'SquareNut_g3', 'SquareNut_g4', 'SquareNut_g0_visual', 'SquareNut_g1_visual', 'SquareNut_g2_visual', 
+    'SquareNut_g3_visual', 'SquareNut_g4_visual', 'RoundNut_g0', 'RoundNut_g1', 'RoundNut_g2', 'RoundNut_g3', 'RoundNut_g4', 
+    'RoundNut_g5', 'RoundNut_g6', 'RoundNut_g7', 'RoundNut_g8', 'RoundNut_g0_visual', 'RoundNut_g1_visual', 'RoundNut_g2_visual', 
+    'RoundNut_g3_visual', 'RoundNut_g4_visual', 'RoundNut_g5_visual', 'RoundNut_g6_visual', 'RoundNut_g7_visual', 'RoundNut_g8_visual']               # all geoms randomized if null (None)
+    randomize_friction: True
+    randomize_solref: True
+    randomize_solimp: True
+    friction_perturbation_ratio: 0.1
+    solref_perturbation_ratio: 0.1
+    solimp_perturbation_ratio: 0.1
+
+    # Joint parameters
+    joint_names: null                 # all joints randomized if null (None)
+    randomize_stiffness: True
+    randomize_frictionloss: True
+    randomize_damping: True
+    randomize_armature: True
+    stiffness_perturbation_ratio: 0.1
+    frictionloss_perturbation_size: 0.05
+    damping_perturbation_size: 0.01
+    armature_perturbation_size: 0.01
+  randomize_on_reset: True
+  randomize_every_n_steps: 0         # Should be 0 when training. We do not wat to change the parameteres during an episode. Randomizes after the first step of an episode
+
+
+
