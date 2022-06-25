@@ -177,11 +177,11 @@ if __name__ == '__main__':
 
     obs = env.reset()
 
-    action = [0,0,0,0]
+    action = [0,0,1,0]
     time = 10
-    # for i in range(time):
-    #     obs,reward,done,info = env.step(action)
-    # # Setting up variables
+    for i in range(time):
+        obs,reward,done,info = env.step(action)
+    # Setting up variables
     obs,reward,done,info = env.step(action)
 
     def add_precision_noice(input):
