@@ -113,7 +113,7 @@ eval_callback:
   warn: True
 
 gymwrapper:
-  observations: ["custom_image_rgbd",'robot0_eef_pos', 'gripper_status']
+  observations: ["custom_image_rgbd",'robot0_eef_pos', 'gripper_status']  #,'robot0_joint_pos'
   smaller_action_space: True
   xyz_action_space: True
   close_img: False

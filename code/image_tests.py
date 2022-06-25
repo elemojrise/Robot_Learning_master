@@ -176,7 +176,7 @@ if __name__ == '__main__':
     obs = env.reset()
 
     action = [0,0,0,0]
-    time = 5
+    time = 10
     # for i in range(time):
     #     obs,reward,done,info = env.step(action)
     # # Setting up variables
@@ -209,8 +209,8 @@ if __name__ == '__main__':
     frame_rgb = image[:,:,:3]
     frame_d = image[:,:,3]
 
-    obs = env.reset()
-    obs,reward,done,info = env.step(action)
+    print(obs['robot0_joint_pos'])
+
     image = obs['custom_image_rgbd']
     frame_rgb = image[:,:,:3]
     d_img = ndimage.rotate(frame_rgb, 180)

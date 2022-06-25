@@ -137,7 +137,8 @@ if __name__ == "__main__":
     # Create environment
     env = suite.make(
         **config,
-        gripper_types="Robotiq85Gripper_iiwa_14",
+        gripper_types="Robotiq85Gripper_iiwa_14_longer_finger",
+        robots = "IIWA_14_modified_flange",
         has_renderer=True,
         has_offscreen_renderer=False,
         render_camera="frontview",
