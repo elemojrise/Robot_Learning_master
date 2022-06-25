@@ -38,6 +38,7 @@ if __name__ == '__main__':
     register_robot_class_mapping("IIWA_14")
     register_robot_class_mapping("IIWA_14_modified")
     register_robot_class_mapping("IIWA_14_modified_flange")
+    register_robot_class_mapping("IIWA_14_modified_flange_multi")
     register_env(Lift_edit)
     register_env(Lift_4_objects)
     register_env(Lift_edit_green)

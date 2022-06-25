@@ -56,7 +56,7 @@ sb_policy:
 # Specify environment
 robosuite:
   env_id: "Lift_edit_multiple_objects"
-  robots: "IIWA_14_modified_flange"
+  robots: "IIWA_14_modified_flange_multi"
   gripper_types: "Robotiq85Gripper_iiwa_14_longer_finger"      
   has_renderer: False                    
   has_offscreen_renderer: True           
@@ -113,7 +113,7 @@ eval_callback:
   warn: True
 
 gymwrapper:
-  observations: ["custom_image_rgbd",'robot0_eef_pos', 'gripper_status']  #,'robot0_joint_pos'
+  observations: ["custom_image_rgbd",'robot0_eef_pos', 'gripper_status','robot0_joint_pos']  #,'robot0_joint_pos'
   smaller_action_space: True
   xyz_action_space: True
   close_img: False
