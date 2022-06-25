@@ -184,6 +184,7 @@ class Lift_edit_multiple_objects(SingleArmEnv):
         custom_camera_trans_matrix = [],
         custom_camera_conversion = True,
         custom_camera_attrib = None,
+        neg_rew = False,
         objects = [BottleObject(name = "Bottle"),
                     CanObject(name = "Can"),
                     LemonObject(name = "Lemon"),
@@ -217,6 +218,7 @@ class Lift_edit_multiple_objects(SingleArmEnv):
         self.placement_initializer = placement_initializer
         self.objects = objects
 
+        self.neg_rew = neg_rew
 
         super().__init__(
             robots=robots,
@@ -271,7 +273,10 @@ class Lift_edit_multiple_objects(SingleArmEnv):
         Returns:
             float: reward value
         """
-        reward = 0.
+        if self.neg_rew:
+            reward = -1.
+        else:
+            reward = 0.
 
         # sparse completion reward
         if self._check_success():
