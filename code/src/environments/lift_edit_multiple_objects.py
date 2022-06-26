@@ -330,21 +330,21 @@ class Lift_edit_multiple_objects(SingleArmEnv):
             mujoco_arena.set_camera(self.custom_camera_name, custom_camera_pos, custom_camera_quat, self.custom_camera_attrib)
 
         # initialize objects of interest
-        tex_attrib = {
-            "type": "cube",
-        }
-        mat_attrib = {
-            "texrepeat": "1 1",
-            "specular": "0.4",
-            "shininess": "0.1",
-        }
-        redwood = CustomMaterial(
-            texture="WoodRed",
-            tex_name="redwood",
-            mat_name="redwood_mat",
-            tex_attrib=tex_attrib,
-            mat_attrib=mat_attrib,
-        )
+        # tex_attrib = {
+        #     "type": "cube",
+        # }
+        # mat_attrib = {
+        #     "texrepeat": "1 1",
+        #     "specular": "0.4",
+        #     "shininess": "0.1",
+        # }
+        # redwood = CustomMaterial(
+        #     texture="WoodRed",
+        #     tex_name="redwood",
+        #     mat_name="redwood_mat",
+        #     tex_attrib=tex_attrib,
+        #     mat_attrib=mat_attrib,
+        #)
         # self.objects.append(BoxObject(
         #     name="cube_ekstra",
         #     size_min= [0.019, 0.019, 0.019],  #[0.020] # [0.015, 0.015, 0.015],
@@ -355,8 +355,8 @@ class Lift_edit_multiple_objects(SingleArmEnv):
         #     #material=redwood,
         #     )
         # )
-
-        self.target = self.objects[0]
+        
+        self.target = random.choice(self.objects)
 
         # Create placement initializer
         if self.placement_initializer is not None:
@@ -379,8 +379,10 @@ class Lift_edit_multiple_objects(SingleArmEnv):
         self.model = ManipulationTask(
             mujoco_arena=mujoco_arena,
             mujoco_robots= [robot.robot_model for robot in self.robots], 
-            mujoco_objects= self.objects,
+            mujoco_objects= self.target,
         )
+
+
 
     def _setup_references(self):
         """
@@ -467,11 +469,9 @@ class Lift_edit_multiple_objects(SingleArmEnv):
         if not self.deterministic_reset:
 
             # Sample from the placement initializer for all objects
-            self.placement_initializer.reset()
+            # self.placement_initializer.reset()
+            # self.placement_initializer.add_objects(self.target)
 
-            self.target=random.choice(self.objects)
-            
-            self.placement_initializer.add_objects(self.target)
             object_placements = self.placement_initializer.sample()
 
             # Loop through all objects and reset their positions

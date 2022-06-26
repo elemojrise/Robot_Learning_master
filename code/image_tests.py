@@ -175,69 +175,28 @@ if __name__ == '__main__':
     np.set_printoptions(threshold=sys.maxsize)
     from scipy import ndimage
 
-    obs = env.reset()
+    #obs = env.reset()
 
-    action = [0,0,1,0]
-    time = 10
-    for i in range(time):
-        obs,reward,done,info = env.step(action)
+    action = [0.01,0,0,0]
+    # time = 10
+    # for i in range(time):
+    #     obs,reward,done,info = env.step(action)
     # Setting up variables
-    obs,reward,done,info = env.step(action)
+    # obs,reward,done,info = env.step(action)
 
-    def add_precision_noice(input):
-        noice = np. random. normal(0, 0.000055, input.shape)
-        output = input + noice     # stochastic noice Search for function online
-        return output
+    for i in range(15):
+        print(i)
+        obs = env.reset()
+        for j in range(15):
+            print(i,j)
+            obs,reward,done,info = env.step(action)
+            image = obs['custom_image_rgbd']
+            frame_rgb = image[:,:,:3]
+            d_img = ndimage.rotate(frame_rgb, 180)
+            d_img = Image.fromarray(d_img,'RGB')
+            d_img.save('rgb' + str(i) + '_' + str(j) + '.png') 
+            
 
-    def add_local_planarity_precision(input):
-        noice = np. random. normal(0, 0.000075, input.shape)
-        output = input + noice     # stochastic noice Search for function online
-        return output
-
-    def add_global_planarity_precision(input):
-        noise = input * np. random. normal(0, 0.000160, 1)
-        output = input + noise     # stochastic noice Search for function online
-        return output
-
-    def add_noise_func(input):
-        input = add_global_planarity_precision(input)
-        input = add_local_planarity_precision(input)
-        output = add_precision_noice(input)
-        return output
-
-
-
-    image = obs['custom_image_rgbd']
-    frame_rgb = image[:,:,:3]
-    frame_d = image[:,:,3]
-
-    print(obs['robot0_joint_pos'])
-
-    image = obs['custom_image_rgbd']
-    frame_rgb = image[:,:,:3]
-    d_img = ndimage.rotate(frame_rgb, 180)
-    d_img = Image.fromarray(d_img,'RGB')
-    d_img.save('rgb.png')  
-    print(env.camera_modder.get_fovy('custom'))
-
-
-    obs = env.reset()
-    obs,reward,done,info = env.step(action)
-    image = obs['custom_image_rgbd']
-    frame_rgb = image[:,:,:3]
-    d_img = ndimage.rotate(frame_rgb, 180)
-    d_img = Image.fromarray(d_img,'RGB')
-    d_img.save('rgb2.png') 
-    print(env.camera_modder.get_fovy('custom'))
-
-    obs = env.reset()
-    obs,reward,done,info = env.step(action)
-    image = obs['custom_image_rgbd']
-    frame_rgb = image[:,:,:3]
-    d_img = ndimage.rotate(frame_rgb, 180)
-    d_img = Image.fromarray(d_img,'RGB')
-    d_img.save('rgb3.png') 
-    print(env.camera_modder.get_fovy('custom'))
 
 
 
@@ -312,3 +271,24 @@ if __name__ == '__main__':
 
 
 # Loop reseting env multiple times
+
+    def add_precision_noice(input):
+        noice = np. random. normal(0, 0.000055, input.shape)
+        output = input + noice     # stochastic noice Search for function online
+        return output
+
+    def add_local_planarity_precision(input):
+        noice = np. random. normal(0, 0.000075, input.shape)
+        output = input + noice     # stochastic noice Search for function online
+        return output
+
+    def add_global_planarity_precision(input):
+        noise = input * np. random. normal(0, 0.000160, 1)
+        output = input + noise     # stochastic noice Search for function online
+        return output
+
+    def add_noise_func(input):
+        input = add_global_planarity_precision(input)
+        input = add_local_planarity_precision(input)
+        output = add_precision_noice(input)
+        return output

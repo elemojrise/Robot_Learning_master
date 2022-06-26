@@ -5,19 +5,13 @@ domain_rand_args:
   randomize_lighting: True
   randomize_dynamics: True
   color_randomization_args:
-    geom_names:  ['floor', 'wall_front1', 'table_visual', 'table_leg1_visual', 'table_leg2_visual', 'table_leg3_visual', 
-    'table_leg4_visual', 'Bottle_g0', 'Bottle_g1', 'Bottle_g1_visual', 'Can_g0', 'Can_g0_visual', 'Lemon_g0', 'Lemon_g0_visual', 
-    'Milk_g0', 'Milk_g0_visual', 'Bread_g0', 'Bread_g0_visual', 'Cereal_g0', 'Cereal_g0_visual', 'SquareNut_g0', 'SquareNut_g1', 
-    'SquareNut_g2', 'SquareNut_g3', 'SquareNut_g4', 'SquareNut_g0_visual', 'SquareNut_g1_visual', 'SquareNut_g2_visual', 
-    'SquareNut_g3_visual', 'SquareNut_g4_visual', 'RoundNut_g0', 'RoundNut_g1', 'RoundNut_g2', 'RoundNut_g3', 'RoundNut_g4', 
-    'RoundNut_g5', 'RoundNut_g6', 'RoundNut_g7', 'RoundNut_g8', 'RoundNut_g0_visual', 'RoundNut_g1_visual', 'RoundNut_g2_visual', 
-    'RoundNut_g3_visual', 'RoundNut_g4_visual', 'RoundNut_g5_visual', 'RoundNut_g6_visual', 'RoundNut_g7_visual', 'RoundNut_g8_visual']                  # all geoms are randomized if null (None)
+    geom_names:  ['floor', 'wall_front1', 'table_visual']                 # all geoms are randomized if null (None)
     randomize_local: False             # sample nearby colors
     randomize_material: True          # randomize material reflectance / shininess / specular
-    local_rgb_interpolation: 
+    local_rgb_interpolation: 0.5
     local_material_interpolation: 0.5
     texture_variations: ['rgb', 'checker', 'noise', 'gradient'] # all texture variation types
-    randomize_skybox: True            # by default, randomize skybox too
+    randomize_skybox: False            # by default, randomize skybox too
   camera_randomization_args:
     camera_names: null                # all cameras are randomized if null (None)
     randomize_position: True
@@ -58,13 +52,8 @@ domain_rand_args:
     mass_perturbation_ratio: 0.002
 
     # Geom parameters
-    geom_names: ['floor', 'wall_front1', 'table_visual', 'table_leg1_visual', 'table_leg2_visual', 'table_leg3_visual', 
-    'table_leg4_visual', 'Bottle_g0', 'Bottle_g1', 'Bottle_g1_visual', 'Can_g0', 'Can_g0_visual', 'Lemon_g0', 'Lemon_g0_visual', 
-    'Milk_g0', 'Milk_g0_visual', 'Bread_g0', 'Bread_g0_visual', 'Cereal_g0', 'Cereal_g0_visual', 'SquareNut_g0', 'SquareNut_g1', 
-    'SquareNut_g2', 'SquareNut_g3', 'SquareNut_g4', 'SquareNut_g0_visual', 'SquareNut_g1_visual', 'SquareNut_g2_visual', 
-    'SquareNut_g3_visual', 'SquareNut_g4_visual', 'RoundNut_g0', 'RoundNut_g1', 'RoundNut_g2', 'RoundNut_g3', 'RoundNut_g4', 
-    'RoundNut_g5', 'RoundNut_g6', 'RoundNut_g7', 'RoundNut_g8', 'RoundNut_g0_visual', 'RoundNut_g1_visual', 'RoundNut_g2_visual', 
-    'RoundNut_g3_visual', 'RoundNut_g4_visual', 'RoundNut_g5_visual', 'RoundNut_g6_visual', 'RoundNut_g7_visual', 'RoundNut_g8_visual']               # all geoms randomized if null (None)
+    # geom_names: Null
+    geom_names: ['table_collision', 'gripper0_left_fingerpad_collision', 'gripper0_right_fingerpad_collision']               # all geoms randomized if null (None)
     randomize_friction: True
     randomize_solref: True
     randomize_solimp: True
@@ -73,8 +62,9 @@ domain_rand_args:
     solimp_perturbation_ratio: 0.1
 
     # Joint parameters
-    joint_names: null                 # all joints randomized if null (None)
-    randomize_stiffness: True
+    joint_names: ['robot0_joint_1','robot0_joint_2', 'robot0_joint_3','robot0_joint_4', 'robot0_joint_5','robot0_joint_6', 'robot0_joint_7',
+     'gripper0_finger_joint', 'gripper0_left_inner_finger_joint', 'gripper0_left_inner_knuckle_joint', 'gripper0_right_outer_knuckle_joint',
+     'gripper0_right_inner_finger_joint','gripper0_right_inner_knuckle_joint'] # all joints randomized if null (None)
     randomize_frictionloss: True
     randomize_damping: True
     randomize_armature: True
