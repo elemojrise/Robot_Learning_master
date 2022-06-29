@@ -1,5 +1,5 @@
 from robosuite.wrappers import DomainRandomizationWrapper
-
+import cv2
 from PIL import Image
 
 from email import policy
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     register_env(Lift_edit_multiple_objects)
 
     #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/ppo_rgbd_final_multi.yaml"
+    yaml_file = "config_files/take_an_image.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
 
@@ -165,8 +165,8 @@ if __name__ == '__main__':
    # env = make_env(add_noise, use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, rank = 0, seed=0, use_domain_rand=False, domain_rand_args=None)
     
     seed = np.random.randint(0,1000)
-    if use_domain_rand:
-        env = DomainRandomizationWrapper(env, seed= seed, **domain_rand_args)
+    #if use_domain_rand:
+    #    env = DomainRandomizationWrapper(env, seed= seed, **domain_rand_args)
         
     
     
@@ -177,25 +177,41 @@ if __name__ == '__main__':
 
     #obs = env.reset()
 
-    action = [0.01,0,0,0]
+    action = [0,0,0,0]
     # time = 10
     # for i in range(time):
     #     obs,reward,done,info = env.step(action)
     # Setting up variables
     # obs,reward,done,info = env.step(action)
 
-    for i in range(15):
-        print(i)
+    # for i in range(15):
+    #     print(i)
+    #     obs = env.reset()
+    #     for j in range(15):
+    #         print(i,j)
+    #         obs,reward,done,info = env.step(action)
+    #         image = obs['custom_image_rgbd']
+    #         frame_rgb = image[:,:,:3]
+    #         d_img = ndimage.rotate(frame_rgb, 180)
+    #         d_img = Image.fromarray(d_img,'RGB')
+    #         d_img.save('rgb' + str(i) + '_' + str(j) + '.png') 
+    from robosuite.utils.camera_utils import CameraMover
+    # cam_move = CameraMover(env= env, camera = "custom")
+    # pos, quat = cam_move.get_camera_pose()
+    # print(pos,quat)
+    # cres, yas = cam_move.rotate_camera([1,1,1], [1,1,1], 40)
+    # print(cres,yas)
+    
+    for i in range (1):
         obs = env.reset()
-        for j in range(15):
-            print(i,j)
-            obs,reward,done,info = env.step(action)
-            image = obs['custom_image_rgbd']
-            frame_rgb = image[:,:,:3]
-            d_img = ndimage.rotate(frame_rgb, 180)
-            d_img = Image.fromarray(d_img,'RGB')
-            d_img.save('rgb' + str(i) + '_' + str(j) + '.png') 
-            
+        obs,reward,done,info = env.step(action)
+        
+        image = obs['frontview_image_rgbd']
+        d_img = image[:,:,:3]
+        #d_img = ndimage.rotate(frame_rgb, 180)
+        d_img = cv2.flip(d_img, flipCode=0)
+        d_img = Image.fromarray(d_img,'RGB')
+        d_img.save('rgb_f_' + str(i) +  '.png') 
 
 
 
