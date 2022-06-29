@@ -226,6 +226,5 @@ if __name__ == '__main__':
         model=model,
         video_length = horizon, 
         num_episodes= num_episodes, 
-        name_of_video_file=name_of_video_file,
-        fps = control_freq)
+        )
     env.close()
