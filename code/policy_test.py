@@ -224,7 +224,7 @@ if __name__ == '__main__':
     tester(
         env=env, 
         model=model,
-        video_length = horizon, 
+        horizon = horizon, 
         num_episodes= num_episodes, 
         )
     env.close()
