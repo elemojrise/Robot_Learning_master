@@ -221,7 +221,7 @@ if __name__ == '__main__':
     
 
 
-    record_video(
+    tester(
         env=env, 
         model=model,
         video_length = horizon, 
