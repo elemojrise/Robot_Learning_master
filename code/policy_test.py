@@ -55,6 +55,7 @@ def tester(env, model, horizon=200, num_episodes=100):
                 done = True
                 success_count += 1
                 total_time += i+1
+                break
             
     print("Sucsess rate", success_count/num_episodes)
     print("Average time", total_time/num_episodes)
