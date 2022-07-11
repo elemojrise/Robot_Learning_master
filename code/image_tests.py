@@ -55,7 +55,7 @@ if __name__ == '__main__':
     register_env(Lift_edit_multiple_objects)
 
     #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/take_an_image.yaml"
+    yaml_file = "config_files/ppo_rgbd_final.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
 
@@ -167,8 +167,16 @@ if __name__ == '__main__':
     seed = np.random.randint(0,1000)
     #if use_domain_rand:
     #    env = DomainRandomizationWrapper(env, seed= seed, **domain_rand_args)
-        
+    if policy == 'PPO':
+       model = PPO(policy_type, env= env, **policy_kwargs)
+       print("PPO")
+    elif policy == 'SAC':
+       model = SAC(policy_type, env = env, **policy_kwargs)
+       print("SAC")
+    else: 
+       ("-----------ERRROR no policy selected------------")
     
+    print(model.policy)
     
     
     import sys
@@ -205,7 +213,8 @@ if __name__ == '__main__':
     for i in range (1):
         obs = env.reset()
         obs,reward,done,info = env.step(action)
-        
+        print(obs['robot0_eef_pos'])
+        print(obs['gripper_status'])
         image = obs['frontview_image_rgbd']
         d_img = image[:,:,:3]
         #d_img = ndimage.rotate(frame_rgb, 180)
