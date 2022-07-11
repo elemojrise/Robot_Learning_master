@@ -196,10 +196,22 @@ if __name__ == '__main__':
     env = SubprocVecEnv(env)
 
 
+    model_type = input("Best_Model/Best_Succses_Rate/Normal")
+
     best_model= config["eval_callback"]
-    best_model_save_path = best_model['best_model_save_path']
-    load_model_path = os.path.join(best_model_save_path, 'best_model.zip')
-    load_vecnormalize_path = os.path.join(best_model_save_path, 'vec_normalize_best_model.pkl')
+    if model_type == "Best_Model":
+        best_model_save_path = best_model['best_model_save_path']
+        load_model_path = os.path.join(best_model_save_path, 'best_model.zip')
+        load_vecnormalize_path = os.path.join(best_model_save_path, 'vec_normalize_best_model.pkl')
+
+    if model_type == "Best_Succses_Rate":
+        best_model_save_path = best_model['best_model_save_path']
+        load_model_path = os.path.join(best_model_save_path, 'best_success_rate.zip')
+        load_vecnormalize_path = os.path.join(best_model_save_path, 'vec_normalize_best_success_rate.pkl')
+
+    if model_type == "Normal":
+        load_model_path = os.path.join(save_model_path + '.zip')
+        load_vecnormalize_path = os.path.join(save_vecnormalize_path)
 
 
     if (normalize_obs or normalize_rew):
