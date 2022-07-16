@@ -57,9 +57,12 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
             
             if real_reward == 1:
                 highest_reward = 1
+                print("counted")
+                success_count += 1
+                break
             
-            reward_plot.append(env.get_original_reward())
-            step_plot.append(i)
+            # reward_plot.append(env.get_original_reward())
+            # step_plot.append(i)
             frame = obs["custom_image_rgbd"][0,:,:,:3]
             img = Image.fromarray(frame, 'RGB')
             img = img.rotate(180)
@@ -69,19 +72,13 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
             video_file.append(frame)
             # writer.append_data(frame)
 
-            # if done:
-            #     plt.plot(step_plot,reward_plot)
-            #     plt.ylabel('Reward')
-            #     plt.xlabel('Timestep')
-            #     plt.title(str(j) + "epsiode")
-            #     plt.savefig(name_of_video_file + "/plot_" + str(j+1))
-            #     plt.clf()
-            #     break
         if highest_reward == 1:
             print("counted")
             success_count += 1
         else:
-            writer.append_data(video_file)
+            for k in range (i):
+                writer.append_data(video_file[k])
+            print("failed_episode")
             
     print("Sucsess rate", success_count/num_episodes)
 
