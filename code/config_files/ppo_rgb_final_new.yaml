@@ -69,7 +69,7 @@ robosuite:
   reward_shaping: True
   camera_depths: True
   camera_names: "custom"
-  custom_camera_name: "custom" 
+  custom_camera_name: "custom"
   custom_camera_trans_matrix: [ [ 0.007445,  0.588405, -0.808532,  1422.578369], 
                                 [ 0.999970, -0.002809,  0.007163, -19.350439], 
                                 [ 0.001943, -0.808561, -0.588409,  849.809448], 

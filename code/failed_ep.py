@@ -61,7 +61,7 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
             
             # reward_plot.append(env.get_original_reward())
             # step_plot.append(i)
-            frame = obs["custom_image_rgbd"][0,:,:,:3]
+            frame = obs["custom_image"][0,:,:,:3]
             img = Image.fromarray(frame, 'RGB')
             img = img.rotate(180)
 

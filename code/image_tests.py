@@ -55,7 +55,7 @@ if __name__ == '__main__':
     register_env(Lift_edit_multiple_objects)
 
     #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/image_tests.yaml"
+    yaml_file = "config_files/ppo_rgb_final_new.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
 
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     # from robosuite.renderers import load_renderer_config
     # ren_config = load_renderer_config("igibson")
     #env = GymWrapper_multiinput(suite.make(env_id, **env_options), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, use_rgbd, add_noise)
-    env = GymWrapper_multiinput_RGBD(suite.make(env_id, **env_options, renderer_config=config), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew, add_noise)
+    env = GymWrapper_multiinput(suite.make(env_id, **env_options, renderer_config=config), obs_list, smaller_action_space, xyz_action_space, close_img, neg_rew)
    # env = make_env(add_noise, use_rgbd, neg_rew, close_img, env_id, env_options, obs_list, smaller_action_space, xyz_action_space, rank = 0, seed=0, use_domain_rand=False, domain_rand_args=None)
     
     seed = np.random.randint(0,1000)
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     else: 
        ("-----------ERRROR no policy selected------------")
     
-    print(model.policy)
+ 
     
     
     import sys
@@ -209,6 +209,9 @@ if __name__ == '__main__':
     # print(pos,quat)
     # cres, yas = cam_move.rotate_camera([1,1,1], [1,1,1], 40)
     # print(cres,yas)
+    obs = env.reset()
+    obs,reward,done,info = env.step(action)
+    print(obs.keys())
     
     for i in range (1):
         obs = env.reset()
