@@ -57,8 +57,6 @@ def record_video(env, model, video_length,num_episodes, fps, name_of_video_file)
             
             if real_reward == 1:
                 highest_reward = 1
-                print("counted")
-                success_count += 1
                 break
             
             # reward_plot.append(env.get_original_reward())

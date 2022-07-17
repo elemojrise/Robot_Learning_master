@@ -55,7 +55,7 @@ if __name__ == '__main__':
     register_env(Lift_edit_multiple_objects)
 
     #yaml_file = "config_files/" + input("Which yaml file to load config from: ")
-    yaml_file = "config_files/ppo_rgbd_final.yaml"
+    yaml_file = "config_files/image_tests.yaml"
     with open(yaml_file, 'r') as stream:
         config = yaml.safe_load(stream)
 
@@ -215,7 +215,7 @@ if __name__ == '__main__':
         obs,reward,done,info = env.step(action)
         print(obs['robot0_eef_pos'])
         print(obs['gripper_status'])
-        image = obs['frontview_image_rgbd']
+        image = obs['custom_image_rgbd']
         d_img = image[:,:,:3]
         #d_img = ndimage.rotate(frame_rgb, 180)
         d_img = cv2.flip(d_img, flipCode=0)
